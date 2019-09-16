@@ -17,6 +17,7 @@
 package com.xiyuan.util.json;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,7 @@ public class TokenList
         if (capacity < 10)
             capacity = 10;
         list = new Token[capacity];
+//        map = new HashMap<Integer, List<Integer>>();
     }
 
     public void addToken(Token token, boolean filterComma, boolean hasList)
@@ -53,23 +55,31 @@ public class TokenList
             this.list = datas;
         }
 
-        if (parent >= 0)// 父节点添加当前
+        if (parent >= 0 && map != null)// 父节点添加当前
+        {
             map.get(parent).add(size);
+        }
 
         if (token.type() == JsonUtil.T_BRACE_L || token.type() == JsonUtil.T_BRACKET_L)
         {
-            if (map.isEmpty())
-                this.root = token;
-            
-            List<Integer> ls = map.get(size);
-            if (ls == null)
-            {
-                ls = new ArrayList<Integer>(0);
-                map.put(size, ls);
-            }
             // 当前节点为父节点
             if (hasList)
                 this.parent = token.begin();
+            
+//            if ( map != null && map.isEmpty())
+//                this.root = token;
+            if ( size == 0)
+                this.root = token;
+            
+            if (map != null)
+            {
+                List<Integer> ls = map.get(token.begin());
+                if (ls == null)
+                {
+                    ls = new ArrayList<Integer>(0);
+                    map.put(token.begin(), ls);
+                }
+            }
         }
 
         this.list[size++] = token;
@@ -90,6 +100,11 @@ public class TokenList
     
     public void finish()
     {
+        
+        if (map == null)
+            return;
+        
+        
         for (int i = 0; i < size; i++)
         {
             Token token = list[i];

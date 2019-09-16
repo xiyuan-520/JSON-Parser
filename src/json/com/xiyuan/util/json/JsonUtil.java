@@ -527,7 +527,7 @@ public final class JsonUtil implements Serializable
         Token root = null, current = null, prevToken = null, parent = null, keyScope = null;// , keyToken = null; keyToken 不需要了因为 既然ke所在的keyScope与范围都找到了跟定keyToken 也找到了
         if (field != null && json.indexOf(field) == -1)
             return null;
-
+        TokenList tokenList = new TokenList(json.length()/100);
         List<Token> starts = new ArrayList<Token>();
         for (int pos = 0; pos < maxLenth; pos++)
         {
@@ -544,7 +544,7 @@ public final class JsonUtil implements Serializable
             {
                 case BRACE_L:
                 {
-                    current = Token.newToken(JsonUtil.T_BRACE_L, pos);
+                    current = Token.newToken(JsonUtil.T_BRACE_L, pos, tokenList);
                     objNum++;
 
                     starts.add(current);
@@ -572,7 +572,7 @@ public final class JsonUtil implements Serializable
                 {
                     if (objNum > 0)
                     {
-                        current = Token.newToken(T_BRACE_R, pos);
+                        current = Token.newToken(T_BRACE_R, pos, tokenList);
                         objNum--;
                         int ind = starts.size() - 1;
                         if (!starts.isEmpty() && starts.get(ind).type() == T_BRACE_L)
@@ -592,7 +592,7 @@ public final class JsonUtil implements Serializable
                 }
                 case BRACKET_L:
                 {
-                    current = Token.newToken(T_BRACKET_L, pos);
+                    current = Token.newToken(T_BRACKET_L, pos, tokenList);
                     arrNum++;
                     starts.add(current);
                     if (root == null)
@@ -619,7 +619,7 @@ public final class JsonUtil implements Serializable
                 {
                     if (arrNum > 0)
                     {
-                        current = Token.newToken(T_BRACKET_R, pos);
+                        current = Token.newToken(T_BRACKET_R, pos, tokenList);
                         arrNum--;
                         int ind = starts.size() - 1;
                         if (!starts.isEmpty() && starts.get(ind).type() == T_BRACKET_L)
@@ -642,7 +642,7 @@ public final class JsonUtil implements Serializable
                     if (prevToken != null && prevToken.type() == T_COMMA)
                         continue;
 
-                    current = Token.newToken(T_COMMA, pos);
+                    current = Token.newToken(T_COMMA, pos, tokenList);
                     current.end(pos);
 //                    parent.end(pos);// 设置结束位置
                     break;
@@ -653,14 +653,14 @@ public final class JsonUtil implements Serializable
                     {// 如果上一个token为 逗号，则当前 冒号为键的开始部分 列{a::ss:sdcsdcs} 其中 :ss:sdcsdcs 为值
 
                         int length = getStringTokenLength(json, pos, parent.type(), prevToken);
-                        current = length == 0 ? null : Token.newToken(T_VALUE, pos);// getStringToken(json, pos, scope, prevToken);
+                        current = length == 0 ? null : Token.newToken(T_VALUE, pos, tokenList);// getStringToken(json, pos, scope, prevToken);
                         pos += (length - 1);
                         if (current != null)
                             current.end(pos);// 设置结束位置
                     }
                     else if (prevToken != null && prevToken.type() != T_COLON && prevToken.type() != T_BRACE_L && prevToken.type() != T_BRACKET_L)
                     {
-                        current = Token.newToken(T_COLON, pos);
+                        current = Token.newToken(T_COLON, pos, tokenList);
                         current.end(pos);// 设置结束位置
                     }
 
@@ -672,7 +672,7 @@ public final class JsonUtil implements Serializable
                         continue;
 
                     int length = getStringTokenLength(json, pos, parent.type(), prevToken);
-                    current = length == 0 ? null : Token.newToken(T_VALUE, pos);// getStringToken(json, pos, scope, prevToken);
+                    current = length == 0 ? null : Token.newToken(T_VALUE, pos, tokenList);// getStringToken(json, pos, scope, prevToken);
                     pos += length - 1;
                     current.end(pos);// 设置结束位置
                 }
@@ -687,7 +687,7 @@ public final class JsonUtil implements Serializable
 
                 if (parent != null && field == null)
                 {// 非指定字段查询放入父级token列表节省资源开销
-                    current = Token.newToken(T_VALUE, pos);// 上一个是 冒号 当前是逗号 则当前是空值
+                    current = Token.newToken(T_VALUE, pos, tokenList);// 上一个是 冒号 当前是逗号 则当前是空值
                     parent.addToken(current, true);
                     parent.addToken(prevToken, true);
                     current.end(-1);// 小于0 表示该值为 null
@@ -761,6 +761,9 @@ public final class JsonUtil implements Serializable
 
         if (root != null)
             root.end(json.length() - 1);
+        
+        tokenList.finish();
+        System.out.println(tokenList.getRoot().size());
         return field == null ? root : keyScope;
     }
 

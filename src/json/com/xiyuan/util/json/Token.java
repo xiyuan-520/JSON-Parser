@@ -33,16 +33,20 @@ public final class Token implements Serializable
      * @param begin token开始索引
      * @return
      */
-    public static Token newToken(byte type, int begin)
+    public static Token newToken(byte type, int begin, TokenList list)
     {
-
+        boolean hasList = false;
         Token token = new Token();
         token.type = type;
         token.begin = begin < 0 ? 0 : begin;
         token.end = token.begin;// 默认是当前索引
         if (type == JsonUtil.T_BRACE_L || type == JsonUtil.T_BRACKET_L)
+        {
             token.list = new Token[10];
-
+            hasList = true;
+        }
+        if (list != null)
+            list.addToken(token, true, hasList);
         return token;
     }
 
