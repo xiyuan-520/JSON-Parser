@@ -11,6 +11,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.xiyuan.util.json.JsonUtil;
+import com.xiyuan.util.json.Token;
 
 import frame.model.OrdOrder;
 
@@ -19,15 +20,17 @@ public class JsonMain implements TypeConstants, CodeConstants
     
     public static void main(String[] args) throws Exception
     {
+        String jsonPath = "./json/10000.json";
         long l1 = System.currentTimeMillis();
         long l2 = System.currentTimeMillis();
+        @SuppressWarnings("unused")
         String jsonString = "{\"oid\":1802241101547130,\"tids\":\"119037997603325752\",\"status\":\"7\",\"shopNick\":\"th办公旗舰店\",\"buyerNick\":\"梦醒天神人\",\"prdTypeId\":1,\"productId\":1159,\"productText\":\"名片 | 铜版纸覆膜 | 90x54mm | 双面 | 2百张 | 1款1模\",\"policyIds\":\"\",\"amount\":1400,\"draftType\":0,\"invoiceType\":0,\"invoiceNotes\":\"\",\"invoiceItin\":\"\",\"industryId\":0,\"isOnlyDesign\":false,\"isUrgent\":false,\"printWidth\":0,\"printHeight\":0,\"printKs\":1,\"printMs\":1,\"printSpecial\":\"\",\"creater\":\"蛋蛋\",\"createTime\":\"2018-02-24 11:01:54\",\"modifyTime\":\"2018-02-24 14:07:50\",\"userText\":\"\",\"userMobile\":\"\",\"userQq\":\"\",\"receiverName\":\"黄浩\",\"receiverMobile\":\"13157172203\",\"receiverState\":\"浙江省\",\"receiverCity\":\"杭州市\",\"receiverDistrict\":\"滨江区\",\"receiverAddress\":\"长河街道春晓路529号 江南星座1栋一单元502\",\"supplierId\":6805,\"supplierOid\":\"10476998\",\"supplierOidStatus\":\"b\",\"supplierTime\":\"2018-02-24 14:04:03\",\"isSendSelfAddr\":false,\"csCount\":0,\"orderSrc\":0,\"orderSrcOid\":0,\"expressCode\":\"ZTO\",\"isSelfPickup\":false,\"isSfTopay\":false,\"unpackingNum\":0,\"productCostPriceJson\":\"{\\\"costPriceDate\\\":\\\"2018-02-01\\\",\\\"productId\\\":1159,\\\"prdPrice\\\":1400,\\\"prdCostPrice\\\":600,\\\"costPriceStatus\\\":0,\\\"costPriceModifyTime\\\":\\\"2018-02-01 14:14:36\\\"}\",\"ordShipHours\":24,\"ordShipTime\":\"2018-02-25 11:01:54\"}";
         l1 = System.currentTimeMillis();
-        String json = new String(Files.read(new File("./json/100000.txt"), 500 * MiB));
+        String json = new String(Files.read(new File(jsonPath), 1800 * MiB));
         l2 = System.currentTimeMillis();
         System.out.println("文件加载完成，共耗时：" + (l2 - l1));
         
-        // testFastJson(json);
+//         testFastJson(json);
         testMy(json, jsonString);
     }
     
@@ -38,18 +41,18 @@ public class JsonMain implements TypeConstants, CodeConstants
         System.out.println("===========================================================================");
         long a = 0;
         l1 = System.currentTimeMillis();
-        orders = JsonUtil.toList(json, OrdOrder.class);
-        // Token token = MyJsons.getTokens(json);
+//        orders = JsonUtil.toList(json, OrdOrder.class);
+        Token token = JsonUtil.getTokens(json);
         l2 = System.currentTimeMillis();
         System.out.println("自己代码 共生成 " + (orders != null ? orders.size() : a) + "条数据，共耗时：" + (l2 - l1) + " 毫秒");
         // System.out.println(orders.get(0));
         // System.out.println(JsonUtil.getString(jsonString, "productCostPriceJson"));
-        jsonString = "{\"oid\":1802241101547130,\"tids\":\"119037997603325752\",\"status\":\"7\",\"shopNick\":\"th办公旗舰店\",\"buyerNick\":\"梦醒天神人\",\"prdTypeId\":1,\"productId\":1159,\"productText\":\"名片 | 铜版纸覆膜 | 90x54mm | 双面 | 2百张 | 1款1模\",\"policyIds\":\"\",\"amount\":1400,\"draftType\":0,\"invoiceType\":0,\"invoiceNotes\":\"\",\"invoiceItin\":\"\",\"industryId\":0,\"isOnlyDesign\":false,\"isUrgent\":false,\"printWidth\":0,\"printHeight\":0,\"printKs\":1,\"printMs\":1,\"printSpecial\":\"\",\"creater\":\"蛋蛋\",\"createTime\":\"2018-02-24 11:01:54\",\"modifyTime\":\"2018-02-24 14:07:50\",\"userText\":\"\",\"userMobile\":\"\",\"userQq\":\"\",\"receiverName\":\"黄浩\",\"receiverMobile\":\"13157172203\",\"receiverState\":\"浙江省\",\"receiverCity\":\"杭州市\",\"receiverDistrict\":\"滨江区\",\"receiverAddress\":\"长河街道春晓路529号 江南星座1栋一单元502\",\"supplierId\":6805,\"supplierOid\":\"10476998\",\"supplierOidStatus\":\"b\",\"supplierTime\":\"2018-02-24 14:04:03\",\"isSendSelfAddr\":false,\"csCount\":0,\"orderSrc\":0,\"orderSrcOid\":0,\"expressCode\":\"ZTO\",\"isSelfPickup\":false,\"isSfTopay\":false,\"unpackingNum\":0,\"productCostPriceJson\":\"{\\\"costPriceDate\\\":\\\"2018-02-01\\\",\\\"productId\\\":1159,\\\"prdPrice\\\":1400,\\\"prdCostPrice\\\":600,\\\"costPriceStatus\\\":0,\\\"costPriceModifyTime\\\":\\\"2018-02-01 14:14:36\\\"}\",\"ordShipHours\":24,\"ordShipTime\":\"2018-02-25 11:01:54\"}";
         // jsonString = "{ssss:tids::,}";
         // System.out.println(jsonString);
         // System.out.println(JsonUtil.getString(jsonString, "tids"));
-        System.out.println(JsonUtil.toStringAddOrUpdate(jsonString, "tids", 3454849));
-        System.out.println(JsonUtil.remove(jsonString, "tids"));
+        // System.out.println(JsonUtil.toStringAddOrUpdate(jsonString, "tids",
+        // 3454849));
+        // System.out.println(JsonUtil.remove(jsonString, "tids"));
         // System.out.println(JsonUtil.remove(jsonString, "22"));
         // jsonString = "{\"oid1\":{vvv:[1]}, ss:, dd:[]}";
         // System.out.println(JsonUtil.insertOrUpdate(jsonString, "fffdddd", new Date()));
