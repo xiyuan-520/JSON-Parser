@@ -56,6 +56,10 @@ public final class JsonUtil implements Serializable
     public final static char QUOTE = '\'';
     /** 双引号 " */
     public final static char DB_QUOTE = '"';
+    /** 单引号 ' */
+    public final static String QUOTE_S = String.valueOf(QUOTE);
+    /** 双引号 " */
+    public final static String DB_QUOTE_S = String.valueOf(DB_QUOTE);
 
     /** null " */
     public final static String NULL = "null";
@@ -951,15 +955,15 @@ public final class JsonUtil implements Serializable
     {
         if (str == null)
             return null;
-
-        if (str.length() >= 2 && str.startsWith("\"") && str.endsWith("\""))
+        
+        if (str.length() >= 2 && str.startsWith(DB_QUOTE_S) && str.endsWith(DB_QUOTE_S))
         {// 有双引号删除退出
             str = str.substring(1, str.length() - 1);
             return str;
         }
 
         // 没有双引号则判断单引号
-        if (str.length() >= 2 && str.startsWith("\'") && str.endsWith("\'"))
+        if (str.length() >= 2 && str.startsWith(QUOTE_S) && str.endsWith(QUOTE_S))
             str = str.substring(1, str.length() - 1);
 
         return str;
@@ -1067,7 +1071,7 @@ public final class JsonUtil implements Serializable
     public static boolean getBoolean(String json, String field)
     {
         String value = getString(json, field);
-        return "true".equalsIgnoreCase(value) ? true : "1".equals(value);
+        return TRUE.equalsIgnoreCase(value) ? true : "1".equals(value);
     }
 
     /**

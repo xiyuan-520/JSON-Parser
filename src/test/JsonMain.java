@@ -20,7 +20,7 @@ public class JsonMain implements TypeConstants, CodeConstants
     
     public static void main(String[] args) throws Exception
     {
-        String jsonPath = "./json/100000.json";
+        String jsonPath = "./json/10000.json";
         long l1 = System.currentTimeMillis();
         long l2 = System.currentTimeMillis();
         @SuppressWarnings("unused")
