@@ -20,7 +20,7 @@ public class JsonMain implements TypeConstants, CodeConstants
     
     public static void main(String[] args) throws Exception
     {
-        String jsonPath = "./json/10000.json";
+        String jsonPath = "./json/100000.json";
         long l1 = System.currentTimeMillis();
         long l2 = System.currentTimeMillis();
         @SuppressWarnings("unused")
@@ -41,8 +41,8 @@ public class JsonMain implements TypeConstants, CodeConstants
         System.out.println("===========================================================================");
         long a = 0;
         l1 = System.currentTimeMillis();
-//        orders = JsonUtil.toList(json, OrdOrder.class);
-        Token token = JsonUtil.getTokens(json);
+        orders = JsonUtil.toList(json, OrdOrder.class);
+//        Token token = JsonUtil.getTokens(json);
         l2 = System.currentTimeMillis();
         System.out.println("自己代码 共生成 " + (orders != null ? orders.size() : a) + "条数据，共耗时：" + (l2 - l1) + " 毫秒");
         // System.out.println(orders.get(0));
