@@ -863,7 +863,6 @@ public final class JsonUtil implements Serializable
                 {
                     current = Token.newToken(JsonUtil.T_BRACE_L, pos, 0);
                     objNum++;
-                    
                     starts.add(current);
                     if (root == null)
                     {
@@ -898,7 +897,7 @@ public final class JsonUtil implements Serializable
                         if (!starts.isEmpty() && starts.get(ind).type() == T_BRACE_L)
                             starts.remove(ind);
                         
-                        parent.end(pos);// 设置结束位置
+                        // parent.end(pos);// 设置结束位置
                         if (starts.isEmpty())
                         {
                             parent = root;
@@ -1026,7 +1025,7 @@ public final class JsonUtil implements Serializable
                     // parent.addToken(prevToken, true);
                     // current.end(-1);// 小于0 表示该值为 null
                     
-                    size.begin(parent.begin(), json);
+                    // size.begin(parent.begin(), json);
                     size.addIncrement();
                     size.addIncrement();
                 }
@@ -1034,7 +1033,7 @@ public final class JsonUtil implements Serializable
                 if (field != null && keyScope != null)
                 {// 找到字段
                  // keyScope.addToken(current, false);
-                    size.begin(keyScope.begin(), json);
+                 // size.begin(keyScope.begin(), json);
                     size.addIncrement();
                     return size;
                 }
@@ -1077,11 +1076,11 @@ public final class JsonUtil implements Serializable
                 if (keyScope == null && prevToken.type() != T_COLON && field.equals(removeStartEndQuotation(current.toString(json))))
                 {// 找到字段，但是上一个token 不是冒号
                     keyScope = parent;
-                    // keyScope.addToken(prevToken, false);
+                    // keyScope.addToken(prevToken, false, json);
+                    prevToken = current;
+                    
                     size.begin(keyScope.begin(), json);
                     size.addIncrement();
-                    
-                    prevToken = current;
                     
                     continue;
                 }
@@ -1093,7 +1092,7 @@ public final class JsonUtil implements Serializable
                     if (valueType == T_BRACE_L || valueType == T_BRACKET_L)
                     {// 值类型是对象或者数组
                      // parent.addToken(current, true);
-                        size.begin(parent.begin(), json);
+                     // size.begin(parent.begin(), json);
                         size.addIncrement();
                         continue;
                     }
@@ -1102,7 +1101,7 @@ public final class JsonUtil implements Serializable
                     // continue;//{arr:{dddd:ccc}} 字段 = arr 当前 = ：
                     
                     // parent.addToken(current, true);
-                    size.begin(parent.begin(), json);
+//                    size.begin(parent.begin(), json);
                     size.addIncrement();
                     return size;
                 }
