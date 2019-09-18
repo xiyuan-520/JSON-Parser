@@ -16,8 +16,20 @@ public final class Token implements Serializable
     public static String json = null;
     private static final long serialVersionUID = 1L;
     
-    private Token()
+    public Token(byte type, int begin, int length)
     {
+        this.type = type;
+        this.begin = begin < 0 ? 0 : begin;
+        this.end = this.begin;// 默认是当前索引
+        if (length <= 0)
+            return;
+//        long l1 = System.currentTimeMillis();
+        if ((type == JsonUtil.T_BRACE_L || type == JsonUtil.T_BRACKET_L))
+            this.list = new Token[length];
+//        long l2 = System.currentTimeMillis();
+//        long diff = (l2-l1);
+//        if (diff > 0)
+//            System.out.println(begin+"new Token["+length+"]="+diff);
     }
     
     /**
@@ -27,18 +39,31 @@ public final class Token implements Serializable
      * @param begin     token开始索引
      * @return
      */
-    public static Token newToken(byte type, int begin)
+    public static Token newToken(byte type, int begin, int length)
     {
-        
-        Token token = new Token();
-        token.type = type;
-        token.begin = begin < 0 ? 0 : begin;
-        token.end = token.begin;// 默认是当前索引
-        if (type == JsonUtil.T_BRACE_L || type == JsonUtil.T_BRACKET_L)
-            token.list = new Token[10];
-        
-        return token;
+        return new Token(type, begin, length);
     }
+    
+    // /**
+    // * 提供静态构造
+    // *
+    // * @param type token类型
+    // * @param begin token开始索引
+    // * @return
+    // */
+    // public static Token newToken(byte type, int begin)
+    // {
+    //
+    // Token token = new Token();
+    // token.type = type;
+    // token.begin = begin < 0 ? 0 : begin;
+    // token.end = token.begin;// 默认是当前索引
+    //
+    // if ((type == JsonUtil.T_BRACE_L || type == JsonUtil.T_BRACKET_L))
+    // token.list = new Token[10];
+    //
+    // return token;
+    // }
     
     private int size = 0;
     private byte type = 0;
@@ -77,7 +102,7 @@ public final class Token implements Serializable
      * @param token
      * @param filterComma       是否过滤逗号
      */
-    public void addToken(Token token, boolean filterComma)
+    public void addToken(Token token, boolean filterComma, String json)
     {
         if (token == null || list == null)
             return;
@@ -88,14 +113,15 @@ public final class Token implements Serializable
         if (size == Integer.MAX_VALUE)
             return;// 达到最大指
             
-        if ((size + 1) > this.list.length)
+        if (size > this.list.length)
         {
-            Token[] datas = new Token[size + 520];
-            System.arraycopy(list, 0, datas, 0, size);
-            this.list = datas;
+            if (json != null)
+                System.out.println(token.begin() + "==" + json.substring(token.begin(), token.end() + 1));
+            return;
         }
         
         this.list[size++] = token;
+        
     }
     
     /**
