@@ -1,6 +1,7 @@
 package com.xiyuan.util.json;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,7 +21,7 @@ public final class TokenSize implements Serializable
         map.put(begin, size);
     }
     
-    private Map<Integer, AtomicInteger> map = new LinkedHashMap<Integer, AtomicInteger>();
+    private Map<Integer, AtomicInteger> map = new HashMap<Integer, AtomicInteger>();
     private int begin = 0;
     private AtomicInteger size = new AtomicInteger(1);
     
