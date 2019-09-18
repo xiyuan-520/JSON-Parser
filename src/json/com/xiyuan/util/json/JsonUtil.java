@@ -869,16 +869,14 @@ public final class JsonUtil implements Serializable
                     {
                         root = current;
                         parent = root;
-                        size.begin(parent.begin(), json);
+                        size.begin(pos, json);
                     }
                     else
                     {
                         // parent.addToken(current, true);
-                        size.begin(parent.begin(), json);
-                        size.addIncrement(current.type(), true);
-                        
+                        size.addIncrement();
+                        size.begin(pos, json);
                         parent = current;
-                        size.begin(parent.begin(), json);
                     }
                     
                     // if (field != null && keyToken != null && valueType == -1)
@@ -927,14 +925,15 @@ public final class JsonUtil implements Serializable
                     {// 第一个 token
                         root = current;
                         parent = root;
-                        size.begin(parent.begin(), json);
+                        size.begin(pos, json);
                     }
                     else
                     {// 添加子元素
                      // parent.addToken(current, true);
-                        size.addIncrement(current.type(), true);
+                        size.addIncrement();
+                        size.begin(pos, json);
+                        
                         parent = current;
-                        size.begin(parent.begin(), json);
                     }
                     
                     // if (field != null && keyToken != null && valueType == -1)
@@ -1028,15 +1027,15 @@ public final class JsonUtil implements Serializable
                     // current.end(-1);// 小于0 表示该值为 null
                     
                     size.begin(parent.begin(), json);
-                    size.addIncrement(current.type(), true);
-                    size.addIncrement(prevToken.type(), true);
+                    size.addIncrement();
+                    size.addIncrement();
                 }
                 
                 if (field != null && keyScope != null)
                 {// 找到字段
                  // keyScope.addToken(current, false);
                     size.begin(keyScope.begin(), json);
-                    size.addIncrement(current.type(), false);
+                    size.addIncrement();
                     return size;
                 }
             }
@@ -1060,7 +1059,7 @@ public final class JsonUtil implements Serializable
                  // prevToken = current;
                  // parent.addToken(current, true);
                     size.begin(parent.begin(), json);
-                    size.addIncrement(current.type(), true);
+                    size.addIncrement();
                     continue;
                 }
                 
@@ -1080,7 +1079,7 @@ public final class JsonUtil implements Serializable
                     keyScope = parent;
                     // keyScope.addToken(prevToken, false);
                     size.begin(keyScope.begin(), json);
-                    size.addIncrement(current.type(), false);
+                    size.addIncrement();
                     
                     prevToken = current;
                     
@@ -1095,7 +1094,7 @@ public final class JsonUtil implements Serializable
                     {// 值类型是对象或者数组
                      // parent.addToken(current, true);
                         size.begin(parent.begin(), json);
-                        size.addIncrement(current.type(), true);
+                        size.addIncrement();
                         continue;
                     }
                     
@@ -1104,7 +1103,7 @@ public final class JsonUtil implements Serializable
                     
                     // parent.addToken(current, true);
                     size.begin(parent.begin(), json);
-                    size.addIncrement(current.type(), true);
+                    size.addIncrement();
                     return size;
                 }
             }

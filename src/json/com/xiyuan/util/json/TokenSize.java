@@ -76,14 +76,8 @@ public final class TokenSize implements Serializable
      * @param token
      * @param filterComma       是否过滤逗号
      */
-    public void addIncrement(byte type, boolean filterComma)
+    public void addIncrement()
     {
-        if (type < JsonUtil.T_BRACE_L || type > JsonUtil.T_VALUE)
-            return;
-        
-//        if (filterComma && type == JsonUtil.T_COMMA)
-//            return;
-        
         size.getAndIncrement();
     }
 }
