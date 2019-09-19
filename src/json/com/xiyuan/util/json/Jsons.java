@@ -24,20 +24,6 @@ public final class Jsons implements Serializable
     
     private static final long serialVersionUID = 1L;
     public final static byte ZERO = 0;
-    /** 左大括号 0 = { */
-    public final static byte T_BRACE_L = 0;// "{"
-    /** 右大中括号 1 = } */
-    public final static byte T_BRACE_R = 1;// "}"
-    /** 左中括号 2 = [ */
-    public final static byte T_BRACKET_L = 2;// "["
-    /** 右中括号 3 = ] */
-    public final static byte T_BRACKET_R = 3;// "]"
-    /** 冒号 4 = : */
-    public final static byte T_COLON = 4;// ":"
-    /** 逗号 5 = , */
-    public final static byte T_COMMA = 5;// ","
-    /** 字符串键 6 */
-    public final static byte T_VALUE = 6;// String值
     
     /** 左大括号 { */
     public final static char BRACE_L = '{';
@@ -547,7 +533,7 @@ public final class Jsons implements Serializable
             {
                 case BRACE_L:
                 {
-                    current = Token.newToken(Jsons.T_BRACE_L, pos);
+                    current = Token.newToken(Token.BRACE_L, pos);
                     objNum++;
 
                     starts.add(current);
@@ -564,9 +550,9 @@ public final class Jsons implements Serializable
 
                     // if (field != null && keyToken != null && valueType == -1)
                     if (field != null && keyScope != null && valueType == -1)
-                        valueType = T_BRACE_L; // 指定字段值为对象是且当前为结束对象
+                        valueType = Token.BRACE_L; // 指定字段值为对象是且当前为结束对象
 
-                    if (root.type() == T_BRACE_L && end_char != BRACE_R)
+                    if (root.type() == Token.BRACE_L && end_char != BRACE_R)
                         return root;
 
                     break;
@@ -575,10 +561,10 @@ public final class Jsons implements Serializable
                 {
                     if (objNum > 0)
                     {
-                        current = Token.newToken(T_BRACE_R, pos);
+                        current = Token.newToken(Token.BRACE_R, pos);
                         objNum--;
                         int ind = starts.size() - 1;
-                        if (!starts.isEmpty() && starts.get(ind).type() == T_BRACE_L)
+                        if (!starts.isEmpty() && starts.get(ind).type() == Token.BRACE_L)
                             starts.remove(ind);
 
                         parent.end(pos);// 设置结束位置
@@ -595,7 +581,7 @@ public final class Jsons implements Serializable
                 }
                 case BRACKET_L:
                 {
-                    current = Token.newToken(T_BRACKET_L, pos);
+                    current = Token.newToken(Token.BRACKET_L, pos);
                     arrNum++;
                     starts.add(current);
                     if (root == null)
@@ -611,9 +597,9 @@ public final class Jsons implements Serializable
 
                     // if (field != null && keyToken != null && valueType == -1)
                     if (field != null && keyScope != null && valueType == -1)
-                        valueType = T_BRACKET_L; // 指定字段值类型数组
+                        valueType = Token.BRACKET_L; // 指定字段值类型数组
 
-                    if (root.type() == T_BRACKET_L && end_char != BRACKET_R)
+                    if (root.type() == Token.BRACKET_L && end_char != BRACKET_R)
                         return root;
 
                     break;
@@ -622,10 +608,10 @@ public final class Jsons implements Serializable
                 {
                     if (arrNum > 0)
                     {
-                        current = Token.newToken(T_BRACKET_R, pos);
+                        current = Token.newToken(Token.BRACKET_R, pos);
                         arrNum--;
                         int ind = starts.size() - 1;
-                        if (!starts.isEmpty() && starts.get(ind).type() == T_BRACKET_L)
+                        if (!starts.isEmpty() && starts.get(ind).type() == Token.BRACKET_L)
                             starts.remove(ind);
 
                         parent.end(pos);// 设置结束位置
@@ -642,28 +628,28 @@ public final class Jsons implements Serializable
                 }
                 case COMMA:// 上一个token 不能为,
                 {// 前面token 必须是 对象结束 或者 数组结束 或者字符串
-                    if (prevToken != null && prevToken.type() == T_COMMA)
+                    if (prevToken != null && prevToken.type() == Token.COMMA)
                         continue;
 
-                    current = Token.newToken(T_COMMA, pos);
+                    current = Token.newToken(Token.COMMA, pos);
                     current.end(pos);
 //                    parent.end(pos);// 设置结束位置
                     break;
                 }
                 case COLON:
                 {
-                    if (prevToken != null && (prevToken.type() == T_COMMA || prevToken.type() == T_COLON))
+                    if (prevToken != null && (prevToken.type() == Token.COMMA || prevToken.type() == Token.COLON))
                     {// 如果上一个token为 逗号，则当前 冒号为键的开始部分 列{a::ss:sdcsdcs} 其中 :ss:sdcsdcs 为值
 
                         int length = getStringTokenLength(json, pos, parent.type(), prevToken);
-                        current = length == 0 ? null : Token.newToken(T_VALUE, pos);// getStringToken(json, pos, scope, prevToken);
+                        current = length == 0 ? null : Token.newToken(Token.STRING, pos);// getStringToken(json, pos, scope, prevToken);
                         pos += (length - 1);
                         if (current != null)
                             current.end(pos);// 设置结束位置
                     }
-                    else if (prevToken != null && prevToken.type() != T_COLON && prevToken.type() != T_BRACE_L && prevToken.type() != T_BRACKET_L)
+                    else if (prevToken != null && prevToken.type() != Token.COLON && prevToken.type() != Token.BRACE_L && prevToken.type() != Token.BRACKET_L)
                     {
-                        current = Token.newToken(T_COLON, pos);
+                        current = Token.newToken(Token.COLON, pos);
                         current.end(pos);// 设置结束位置
                     }
 
@@ -675,22 +661,22 @@ public final class Jsons implements Serializable
                         continue;
 
                     int length = getStringTokenLength(json, pos, parent.type(), prevToken);
-                    current = length == 0 ? null : Token.newToken(T_VALUE, pos);// getStringToken(json, pos, scope, prevToken);
+                    current = length == 0 ? null : Token.newToken(Token.STRING, pos);// getStringToken(json, pos, scope, prevToken);
                     pos += length - 1;
                     current.end(pos);// 设置结束位置
                 }
             }
 
-            if (prevToken != null && current != null && prevToken.type() == current.type() && prevToken.type() == T_COMMA)
+            if (prevToken != null && current != null && prevToken.type() == current.type() && prevToken.type() == Token.COMMA)
                 continue;// 上一个是是逗号 当前也是逗号
 
-            if (prevToken != null && current != null && prevToken.type() == T_COLON && current.type() == T_COMMA)
+            if (prevToken != null && current != null && prevToken.type() == Token.COLON && current.type() == Token.COMMA)
             {// 处理上一个是 冒号 当前为逗号，则当前值为null 列：{dd:,} 被整理 后为 {dd:null,}
                 prevToken = current;
 
                 if (parent != null && field == null)
                 {// 非指定字段查询放入父级token列表节省资源开销
-                    current = Token.newToken(T_VALUE, pos);// 上一个是 冒号 当前是逗号 则当前是空值
+                    current = Token.newToken(Token.STRING, pos);// 上一个是 冒号 当前是逗号 则当前是空值
                     parent.addToken(current, true);
                     parent.addToken(prevToken, true);
                     current.end(-1);// 小于0 表示该值为 null
@@ -711,7 +697,7 @@ public final class Jsons implements Serializable
                     continue;
                 }
 
-                if (!(current.type() == T_COLON || current.type() == T_COMMA || current.type() == T_VALUE))
+                if (!(current.type() == Token.COLON || current.type() == Token.COMMA || current.type() == Token.STRING))
                 {
                     prevToken = current;
                     continue;
@@ -729,13 +715,13 @@ public final class Jsons implements Serializable
                 /********************************/
 
                 // 一下是指定字段相关操作
-                if (keyScope == null && current.type() != T_VALUE)
+                if (keyScope == null && current.type() != Token.STRING)
                 {
                     prevToken = current;
                     continue;// 没找到字段 并且当前不是字符串
                 }
 
-                if (keyScope == null && prevToken.type() != T_COLON && field.equals(removeStartEndQuotation(current.toString(json))))
+                if (keyScope == null && prevToken.type() != Token.COLON && field.equals(removeStartEndQuotation(current.toString(json))))
                 {// 找到字段，但是上一个token 不是冒号
                     keyScope = parent;
                     keyScope.addToken(prevToken, false);
@@ -744,16 +730,16 @@ public final class Jsons implements Serializable
                 }
 
                 prevToken = current;
-                if (keyScope != null && current.type() == T_VALUE)
+                if (keyScope != null && current.type() == Token.STRING)
                 {// 已经找到字段
 
-                    if (valueType == T_BRACE_L || valueType == T_BRACKET_L)
+                    if (valueType == Token.BRACE_L || valueType == Token.BRACKET_L)
                     {// 值类型是对象或者数组
                         parent.addToken(current, true);
                         continue;
                     }
 
-                    // if (valueType == -1 && current.type() == T_COLON)
+                    // if (valueType == -1 && current.type() == Token.COLON)
                     // continue;//{arr:{dddd:ccc}} 字段 = arr 当前 = ：
 
                     parent.addToken(current, true);
@@ -796,7 +782,7 @@ public final class Jsons implements Serializable
                 if (scope == 2 && ch == COLON)// 如果是数组当前是冒号&所属范围是数组，则当前冒号为值
                     continue;
                 
-                if (ch == COLON && prevToken != null && prevToken.type() == T_COLON)// 当前为冒号 上一个token的类型为冒号，则档前为值
+                if (ch == COLON && prevToken != null && prevToken.type() == Token.COLON)// 当前为冒号 上一个token的类型为冒号，则档前为值
                     continue;// {a::sss:sdcsdcs, b:wwww} 其中 sss:sdcsdcs 为值
                 else
                     return length;// 非引号开始 并且有结束负号
@@ -1015,10 +1001,10 @@ public final class Jsons implements Serializable
     {
         
         Token token = getTokens(json);
-        if (token == null || token.type() != T_BRACKET_L)
+        if (token == null || token.type() != Token.BRACKET_L)
             return new ArrayList<T>(0);
         
-        List<Token> elems = token.getElements(T_COMMA);
+        List<Token> elems = token.getElements(Token.COMMA);
         List<T> list = new ArrayList<T>(elems.size());
         for (Token t : elems)
             list.add((T) getParser(resultClass).toObject(json, t, resultClass));
@@ -1224,7 +1210,7 @@ public final class Jsons implements Serializable
         // token.getElements()[0] = field的上一个token，token.getElements()[1] = field 的value
         Token[] tokens = token.getElements();
         StringBuilder sb = new StringBuilder(json.length());
-        sb.append(json.substring(0, (tokens[0] != null && tokens[0].type() == T_COMMA) ? tokens[0].begin() : tokens[1].begin()));
+        sb.append(json.substring(0, (tokens[0] != null && tokens[0].type() == Token.COMMA) ? tokens[0].begin() : tokens[1].begin()));
         sb.append(json.substring(tokens[1].end() + 1));
         return sb.toString();
     }

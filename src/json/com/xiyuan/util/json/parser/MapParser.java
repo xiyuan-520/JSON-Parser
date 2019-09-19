@@ -53,7 +53,7 @@ public final class MapParser extends JsonParser implements Serializable
             map = new LinkedHashMap<String, String>();
         else if (cls == TreeMap.class)
             map = new TreeMap<String, String>();
-        else if (map == null || token.type() != Jsons.T_BRACE_L)
+        else if (map == null || token.type() != Token.BRACE_L)
             return map;// 不支持的类型或者不是 对象
             
         Token[] ls = token.getElements();
@@ -61,10 +61,10 @@ public final class MapParser extends JsonParser implements Serializable
         Token key = null;
         for (Token t : ls)
         {
-            if (t.type() == Jsons.T_COMMA)
+            if (t.type() == Token.COMMA)
                 continue;
             
-            if (t.type() == Jsons.T_COLON && key != null)
+            if (t.type() == Token.COLON && key != null)
             {
                 isValue = true;
                 continue;

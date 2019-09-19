@@ -188,7 +188,7 @@ public final class ArrayParser extends JsonParser implements Serializable
     {
         if (isPrimitiveArray(cls) || isPrimitiveObjArray(cls))
         {// 基础类型 和 String型
-            List<Token> values = (token == null || token.type() != Jsons.T_BRACKET_L) ? new ArrayList<Token>() : token.getStringElements();
+            List<Token> values = (token == null || token.type() != Token.BRACKET_L) ? new ArrayList<Token>() : token.getStringElements();
             
             if (cls == boolean[].class || cls == Boolean[].class)
                 return fromJsonBooleanObj(values, json);
@@ -211,16 +211,16 @@ public final class ArrayParser extends JsonParser implements Serializable
         }
         else if (cls == String[].class)
         {
-            List<Token> values = (token == null || token.type() != Jsons.T_BRACKET_L) ? new ArrayList<Token>() : token.getElements(Jsons.T_COMMA);
+            List<Token> values = (token == null || token.type() != Token.BRACKET_L) ? new ArrayList<Token>() : token.getElements(Token.COMMA);
             return fromJsonString(values, json);
         }
         else
         {
             Class<?> type = cls.getComponentType();
-            if (token == null || token.type() != Jsons.T_BRACKET_L)
+            if (token == null || token.type() != Token.BRACKET_L)
                 return (Object[]) Array.newInstance(type, 0);// 不是 数组类型
                 
-            List<Token> values = token.getElements(Jsons.T_COMMA);// 过滤逗号token
+            List<Token> values = token.getElements(Token.COMMA);// 过滤逗号token
             Object[] objs = (Object[]) Array.newInstance(type, values.size());
             for (int i = 0; i < objs.length; i++)
                 objs[i] = Jsons.getParser(type).toObject(json, values.get(i), type);

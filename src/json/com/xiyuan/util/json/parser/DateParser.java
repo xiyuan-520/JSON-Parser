@@ -58,7 +58,7 @@ public final class DateParser extends JsonParser implements Serializable
     @Override
     public Object toObject(String json, Token token, Class<?> cls)
     {
-        if (token == null || token.type() != Jsons.T_VALUE)
+        if (token == null || token.type() != Token.STRING)
             return null;
         
         String value = Jsons.removeStartEndQuotation(token.toString(json));

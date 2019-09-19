@@ -72,15 +72,15 @@ public final class ObjectParser extends JsonParser implements Serializable
         }
         
         
-        Token[] ls = (token == null || token.type() != Jsons.T_BRACE_L) ? new Token[0] : token.getElements();
+        Token[] ls = (token == null || token.type() != Token.BRACE_L) ? new Token[0] : token.getElements();
         boolean isValue = false;
         Field field = null;
         for (Token vt : ls)
         {
-            if (vt.type() == Jsons.T_COMMA)
+            if (vt.type() == Token.COMMA)
                 continue;
 
-            if (vt.type() == Jsons.T_COLON && field != null)
+            if (vt.type() == Token.COLON && field != null)
             {
                 isValue = true;
                 continue;

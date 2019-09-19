@@ -19,9 +19,23 @@ import java.util.Map;
  */
 public final class Token implements Serializable
 {
-    public static String json = null;
     private static final long serialVersionUID = 1L;
-
+    /** 未知类型 0 token  */
+    public final static byte ZERO = 0;
+    /** 左大括号类型 1 = { */
+    public final static byte BRACE_L = 1;// "{"
+    /** 右大括号类型 2 = } */
+    public final static byte BRACE_R = 2;// "}"
+    /** 左中括号类型 3 = [ */
+    public final static byte BRACKET_L = 3;// "["
+    /** 右中括号类型 4 = ] */
+    public final static byte BRACKET_R = 4;// "]"
+    /** 冒号类型 5 = : */
+    public final static byte COLON = 5;// ":"
+    /** 逗号类型 6 = , */
+    public final static byte COMMA = 6;// ","
+    /** 字符类型 7 */
+    public final static byte STRING = 7;// String值
     private Token()
     {
     }
@@ -39,7 +53,7 @@ public final class Token implements Serializable
         token.type = type;
         token.begin = begin < 0 ? 0 : begin;
         token.end = token.begin;// 默认是当前索引
-        if (type == Jsons.T_BRACE_L || type == Jsons.T_BRACKET_L)
+        if (type == BRACE_L || type == BRACKET_L)
             token.list = new Token[10];
         return token;
     }
@@ -85,7 +99,7 @@ public final class Token implements Serializable
         if (token == null || list == null)
             return;
 
-        if (filterComma && token.type == Jsons.T_COMMA)
+        if (filterComma && token.type == COMMA)
             return;
 
         if (size == Integer.MAX_VALUE)
@@ -167,9 +181,9 @@ public final class Token implements Serializable
     public List<Token> getStringElements()
     {
 
-        List<Token> ls = new ArrayList<Token>(getElementSize(Jsons.T_VALUE));
+        List<Token> ls = new ArrayList<Token>(getElementSize(STRING));
         for (Token elem : getElements())
-            if (elem.type() == Jsons.T_VALUE)
+            if (elem.type() == STRING)
                 ls.add(elem);
 
         return ls;
@@ -182,10 +196,10 @@ public final class Token implements Serializable
      */
     public List<Token> getObjectElements()
     {
-        List<Token> ls = new ArrayList<Token>(getElementSize(Jsons.T_BRACE_L));
+        List<Token> ls = new ArrayList<Token>(getElementSize(BRACE_L));
         for (Token elem : getElements())
         {
-            if (elem.type() == Jsons.T_BRACE_L)
+            if (elem.type() == BRACE_L)
                 ls.add(elem);
         }
         return ls;
@@ -201,7 +215,7 @@ public final class Token implements Serializable
         int lenth = 0;
         for (Token elem : getElements())
         {
-            if (elem.type() == Jsons.T_BRACKET_L)
+            if (elem.type() == BRACKET_L)
                 lenth++;// 先进行length计算是为了初始化list的长度
                         // 避免list.add方法调用System.arrayCopy 从而降低时间损耗
         }
@@ -209,7 +223,7 @@ public final class Token implements Serializable
         List<Token> ls = new ArrayList<Token>(lenth);
         for (Token elem : getElements())
         {
-            if (elem.type() == Jsons.T_BRACKET_L)
+            if (elem.type() == BRACKET_L)
                 ls.add(elem);
         }
         return ls;

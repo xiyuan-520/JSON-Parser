@@ -45,9 +45,9 @@ public final class ListParser extends JsonParser
         if (list == null)// 其他不支持，直接返回null;
             return list;
         
-        if (token == null || token.type() != Jsons.T_BRACKET_L)
+        if (token == null || token.type() != Token.BRACKET_L)
             return list;
-        for (Token t : token.getElements(Jsons.T_COMMA))
+        for (Token t : token.getElements(Token.COMMA))
             list.add(t.toString(json));// TODO 以后 获取list 具体类型构造对象，目前只放入 String
         
         return list;
