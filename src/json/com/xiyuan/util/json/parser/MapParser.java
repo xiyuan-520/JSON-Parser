@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.xiyuan.util.json.JsonParser;
-import com.xiyuan.util.json.JsonUtil;
+import com.xiyuan.util.json.Jsons;
 import com.xiyuan.util.json.Token;
 
 public final class MapParser extends JsonParser implements Serializable
@@ -21,20 +21,20 @@ public final class MapParser extends JsonParser implements Serializable
     public String toString(Object obj)
     {
         if (obj == null || !(obj instanceof Map) || ((Map<?, ?>) obj).isEmpty())
-            return JsonUtil.EMPTY_OBJ;
+            return Jsons.EMPTY_OBJ;
         Map<?, ?> map = (Map<?, ?>) obj;
         
-        StringBuilder strb = new StringBuilder().append(JsonUtil.BRACE_L);
+        StringBuilder strb = new StringBuilder().append(Jsons.BRACE_L);
         for (Entry<?, ?> entry : map.entrySet())
         {
             Object o = entry.getKey();
-            String key = o == null ? JsonUtil.NULL : JsonUtil.getParser(o.getClass()).toString(o);
+            String key = o == null ? Jsons.NULL : Jsons.getParser(o.getClass()).toString(o);
             Object value = entry.getValue();
-            strb.append(JsonUtil.DB_QUOTE).append(JsonUtil.removeStartEndQuotation(key)).append(JsonUtil.DB_QUOTE).append(JsonUtil.COLON).append(value == null ? JsonUtil.NULL : JsonUtil.getParser(o.getClass()).toString(value)).append(JsonUtil.COMMA);
+            strb.append(Jsons.DB_QUOTE).append(Jsons.removeStartEndQuotation(key)).append(Jsons.DB_QUOTE).append(Jsons.COLON).append(value == null ? Jsons.NULL : Jsons.getParser(o.getClass()).toString(value)).append(Jsons.COMMA);
         }
         
         strb.setLength(strb.length() - 1);
-        strb.append(JsonUtil.BRACE_R);
+        strb.append(Jsons.BRACE_R);
         return strb.toString();
     }
     
@@ -53,7 +53,7 @@ public final class MapParser extends JsonParser implements Serializable
             map = new LinkedHashMap<String, String>();
         else if (cls == TreeMap.class)
             map = new TreeMap<String, String>();
-        else if (map == null || token.type() != JsonUtil.T_BRACE_L)
+        else if (map == null || token.type() != Jsons.T_BRACE_L)
             return map;// 不支持的类型或者不是 对象
             
         Token[] ls = token.getElements();
@@ -61,10 +61,10 @@ public final class MapParser extends JsonParser implements Serializable
         Token key = null;
         for (Token t : ls)
         {
-            if (t.type() == JsonUtil.T_COMMA)
+            if (t.type() == Jsons.T_COMMA)
                 continue;
             
-            if (t.type() == JsonUtil.T_COLON && key != null)
+            if (t.type() == Jsons.T_COLON && key != null)
             {
                 isValue = true;
                 continue;
@@ -72,8 +72,8 @@ public final class MapParser extends JsonParser implements Serializable
             
             if (isValue && key != null)
             {
-                String v = JsonUtil.removeStartEndQuotation(t.toString(json));
-                map.put(JsonUtil.removeStartEndQuotation(key.toString(json)), JsonUtil.NULL.equals(v) ? null : v);
+                String v = Jsons.removeStartEndQuotation(t.toString(json));
+                map.put(Jsons.removeStartEndQuotation(key.toString(json)), Jsons.NULL.equals(v) ? null : v);
                 isValue = false;
                 key = null;
             }

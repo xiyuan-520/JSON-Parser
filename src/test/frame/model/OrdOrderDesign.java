@@ -9,7 +9,7 @@ package frame.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-import com.xiyuan.util.json.JsonUtil;
+import com.xiyuan.util.json.Jsons;
 
 /**
  * 订单设计表 对应表《ORD_ORDER_DESIGN》
@@ -59,7 +59,7 @@ public class OrdOrderDesign implements Serializable
 
     public String toString()
     {
-        return JsonUtil.toString(this);
+        return Jsons.toString(this);
     }
 
     public long getOid()

@@ -12,11 +12,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @version v1.0.0 @author lgz 2019-9-6 新建与整理
  */
-public final class TokenSize implements Serializable
+public final class TokenContext implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
-    public TokenSize()
+    public TokenContext()
     {
         map.put(begin, size);
     }

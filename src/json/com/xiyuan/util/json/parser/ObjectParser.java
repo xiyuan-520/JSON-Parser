@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.xiyuan.util.json.JsonParser;
-import com.xiyuan.util.json.JsonUtil;
+import com.xiyuan.util.json.Jsons;
 import com.xiyuan.util.json.Token;
 
 /**
@@ -26,7 +26,7 @@ public final class ObjectParser extends JsonParser implements Serializable
         if (obj == null)
             return null;
         
-        StringBuilder sb = new StringBuilder().append(JsonUtil.BRACE_L);
+        StringBuilder sb = new StringBuilder().append(Jsons.BRACE_L);
         Class<?> cls = obj.getClass();
         List<Field> fieldList = new ArrayList<Field>();
         getFieldListDeep(cls, fieldList);
@@ -44,13 +44,13 @@ public final class ObjectParser extends JsonParser implements Serializable
             catch (Exception e)
             {}
             
-            sb.append(JsonUtil.DB_QUOTE).append(name).append(JsonUtil.DB_QUOTE).append(JsonUtil.COLON).append(value == null ? JsonUtil.NULL : JsonUtil.getParser(value.getClass()).toString(value)).append(JsonUtil.COMMA);
+            sb.append(Jsons.DB_QUOTE).append(name).append(Jsons.DB_QUOTE).append(Jsons.COLON).append(value == null ? Jsons.NULL : Jsons.getParser(value.getClass()).toString(value)).append(Jsons.COMMA);
         }
 
         if (sb.length() > 1)
             sb.setLength(sb.length() - 1);
 
-        sb.append(JsonUtil.BRACE_R);
+        sb.append(Jsons.BRACE_R);
         return sb.toString();
     }
 
@@ -72,15 +72,15 @@ public final class ObjectParser extends JsonParser implements Serializable
         }
         
         
-        Token[] ls = (token == null || token.type() != JsonUtil.T_BRACE_L) ? new Token[0] : token.getElements();
+        Token[] ls = (token == null || token.type() != Jsons.T_BRACE_L) ? new Token[0] : token.getElements();
         boolean isValue = false;
         Field field = null;
         for (Token vt : ls)
         {
-            if (vt.type() == JsonUtil.T_COMMA)
+            if (vt.type() == Jsons.T_COMMA)
                 continue;
 
-            if (vt.type() == JsonUtil.T_COLON && field != null)
+            if (vt.type() == Jsons.T_COLON && field != null)
             {
                 isValue = true;
                 continue;
@@ -91,7 +91,7 @@ public final class ObjectParser extends JsonParser implements Serializable
                
                 // JSON转化为对象
                 Class<?> type = field.getType();
-                Object vo = JsonUtil.getParser(type).toObject(json, vt, type);// jsonMain.toObject(value, type, false);
+                Object vo = Jsons.getParser(type).toObject(json, vt, type);// jsonMain.toObject(value, type, false);
                
                 if (!field.isAccessible())
                     field.setAccessible(true);
@@ -109,7 +109,7 @@ public final class ObjectParser extends JsonParser implements Serializable
             }
             else
             {//尝试获取字段
-                String name = JsonUtil.removeStartEndQuotation(vt.toString(json));// 去除引号
+                String name = Jsons.removeStartEndQuotation(vt.toString(json));// 去除引号
                 if (filedMap.containsKey(name))
                     field = filedMap.get(name);
             }

@@ -1,29 +1,24 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.zhiqim.kernel.constants.CodeConstants;
 import org.zhiqim.kernel.constants.TypeConstants;
-import org.zhiqim.kernel.json.Jsons;
 import org.zhiqim.kernel.util.Files;
 
 import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.xiyuan.util.json.JsonUtil;
-import com.xiyuan.util.json.Token;
-import com.xiyuan.util.json.TokenSize;
+import com.xiyuan.util.json.Jsons;
 
 import frame.model.OrdOrder;
-import frame.model.Person;
 
 public class JsonMain implements TypeConstants, CodeConstants
 {
     
     public static void main(String[] args) throws Exception
     {
-        String jsonPath = "./json/100000.json";
+        String jsonPath = "./json/10000.json";
         long l1 = System.currentTimeMillis();
         long l2 = l1;
         @SuppressWarnings("unused")
@@ -33,7 +28,7 @@ public class JsonMain implements TypeConstants, CodeConstants
         l2 = System.currentTimeMillis();
         System.out.println("文件加载完成，共耗时：" + (l2 - l1));
         
-        // testFastJson(json);
+//         testFastJson(json);
         testMy(json, jsonString);
         
         // Token[] ss = new Token[100000];
@@ -97,7 +92,7 @@ public class JsonMain implements TypeConstants, CodeConstants
         System.out.println("===========================================================================");
         long a = 0;
         l1 = System.currentTimeMillis();
-         orders = JsonUtil.toList(json, OrdOrder.class);
+         orders = Jsons.toList(json, OrdOrder.class);
 //         Token token = JsonUtil.getTokens(json);
         l2 = System.currentTimeMillis();
         System.out.println("自己代码 共生成 " + (orders != null ? orders.size() : a) + "条数据，共耗时：" + (l2 - l1) + " 毫秒");
@@ -157,7 +152,7 @@ public class JsonMain implements TypeConstants, CodeConstants
         List<OrdOrder> orders = new ArrayList<OrdOrder>();
         System.out.println("===========================================================================");
         l1 = System.currentTimeMillis();
-        orders = Jsons.toList(json, OrdOrder.class);
+        orders = org.zhiqim.kernel.json.Jsons.toList(json, OrdOrder.class);
         l2 = System.currentTimeMillis();
         System.out.println("公司代码 共生成 " + (orders.size()) + "条数据，共耗时：" + (l2 - l1) + " 毫秒");
     }

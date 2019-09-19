@@ -4,7 +4,7 @@ package com.xiyuan.util.json.parser;
 import java.io.Serializable;
 
 import com.xiyuan.util.json.JsonParser;
-import com.xiyuan.util.json.JsonUtil;
+import com.xiyuan.util.json.Jsons;
 import com.xiyuan.util.json.Token;
 
 /***
@@ -25,12 +25,12 @@ public final class BaseParser extends JsonParser implements Serializable
         {// 对long型进行判断，超过JS支持的最大值时行字符串处理，防止JS数值不准
             long l = (Long) obj;
             if (l > JS_MAX_LONG_VALUE)
-                return new StringBuilder().append(JsonUtil.DB_QUOTE).append(l).append(JsonUtil.DB_QUOTE).toString();
+                return new StringBuilder().append(Jsons.DB_QUOTE).append(l).append(Jsons.DB_QUOTE).toString();
         }
         else if (obj instanceof String)
         {// 要对引号进行增加转义
-            String str = JsonUtil.addEscapeChar((String) obj, JsonUtil.DB_QUOTE);
-            return new StringBuilder().append(JsonUtil.DB_QUOTE).append(str).append(JsonUtil.DB_QUOTE).toString();
+            String str = Jsons.addEscapeChar((String) obj, Jsons.DB_QUOTE);
+            return new StringBuilder().append(Jsons.DB_QUOTE).append(str).append(Jsons.DB_QUOTE).toString();
         }
 
         return String.valueOf(obj);
@@ -38,57 +38,57 @@ public final class BaseParser extends JsonParser implements Serializable
 
     public static boolean booleanValue(Token token, String json)
     {
-        String value = JsonUtil.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
+        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
         return Boolean.parseBoolean(json) || "1".equals(value) ? true : false;
     }
 
     public static byte byteValue(Token token, String json)
     {
-        String value = JsonUtil.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
+        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
         return Byte.parseByte(value);
     }
 
     public static char charValue(Token token, String json)
     {
-        String value = JsonUtil.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
+        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
         return value == null ? (char)0 : value.charAt(0);
     }
     
     public static short shortValue(Token token, String json)
     {
-        String value = JsonUtil.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
+        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
         return Short.parseShort(value);
     }
     
     public static int intValue(Token token, String json)
     {
-        String value = JsonUtil.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
+        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
         return Integer.parseInt(value);
     }
     
     public static long longValue(Token token, String json)
     {
-        String value = JsonUtil.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
+        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
         return Long.parseLong(value);
     }
     
     public static float floatValue(Token token, String json)
     {
-        String value = JsonUtil.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
+        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
         return Float.parseFloat(value);
     }
     
     public static double doubleValue(Token token, String json)
     {
-        String value = JsonUtil.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
+        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
         return Double.parseDouble(value);
     }
     
     public static String stringValue(Token token, String json)
     {
         // 去掉前后可能的引号
-        String value = JsonUtil.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
-        return JsonUtil.removeEscapeChar(value);// 字符串要求删除转义
+        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
+        return Jsons.removeEscapeChar(value);// 字符串要求删除转义
     }
 
     @Override

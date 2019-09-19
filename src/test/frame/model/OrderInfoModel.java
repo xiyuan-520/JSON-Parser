@@ -13,7 +13,7 @@ package frame.model;
 
 import java.util.List;
 
-import com.xiyuan.util.json.JsonUtil;
+import com.xiyuan.util.json.Jsons;
 
 /**
  * 订单信息model类
@@ -81,6 +81,6 @@ public class OrderInfoModel
     @Override
     public String toString()
     {
-        return JsonUtil.toString(this);
+        return Jsons.toString(this);
     }
 }

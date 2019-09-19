@@ -9,7 +9,7 @@ package frame.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-import com.xiyuan.util.json.JsonUtil;
+import com.xiyuan.util.json.Jsons;
 
 /**
  * 订单表 对应表《ORD_ORDER》
@@ -96,7 +96,7 @@ public class OrdOrder implements Serializable
     @Override
     public String toString()
     {
-        return JsonUtil.toString(this);
+        return Jsons.toString(this);
     }
 
     public long getOid()

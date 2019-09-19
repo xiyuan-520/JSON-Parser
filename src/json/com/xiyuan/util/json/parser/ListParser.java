@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.xiyuan.util.json.JsonParser;
-import com.xiyuan.util.json.JsonUtil;
+import com.xiyuan.util.json.Jsons;
 import com.xiyuan.util.json.Token;
 
 public final class ListParser extends JsonParser
@@ -21,13 +21,13 @@ public final class ListParser extends JsonParser
     {
         Collection<?> list = null;
         if (obj == null || !(obj instanceof Collection) || (list = (Collection<?>) obj).isEmpty())
-            return JsonUtil.EMPTY_ARR;
+            return Jsons.EMPTY_ARR;
 
-        StringBuilder strb = new StringBuilder().append(JsonUtil.BRACKET_L);
+        StringBuilder strb = new StringBuilder().append(Jsons.BRACKET_L);
         for (Object o : list)
-            strb.append(o == null ? JsonUtil.NULL : JsonUtil.getParser(o.getClass()).toString(o)).append(JsonUtil.COMMA);
+            strb.append(o == null ? Jsons.NULL : Jsons.getParser(o.getClass()).toString(o)).append(Jsons.COMMA);
         strb.setLength(strb.length()-1);
-        strb.append(JsonUtil.BRACKET_R);
+        strb.append(Jsons.BRACKET_R);
         return strb.toString();
     }
 
@@ -45,9 +45,9 @@ public final class ListParser extends JsonParser
         if (list == null)// 其他不支持，直接返回null;
             return list;
         
-        if (token == null || token.type() != JsonUtil.T_BRACKET_L)
+        if (token == null || token.type() != Jsons.T_BRACKET_L)
             return list;
-        for (Token t : token.getElements(JsonUtil.T_COMMA))
+        for (Token t : token.getElements(Jsons.T_COMMA))
             list.add(t.toString(json));// TODO 以后 获取list 具体类型构造对象，目前只放入 String
         
         return list;

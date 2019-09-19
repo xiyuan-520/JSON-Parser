@@ -5,7 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import com.xiyuan.util.json.JsonParser;
-import com.xiyuan.util.json.JsonUtil;
+import com.xiyuan.util.json.Jsons;
 import com.xiyuan.util.json.Token;
 
 /**
@@ -29,27 +29,27 @@ public final class DateParser extends JsonParser implements Serializable
         if (obj instanceof java.sql.Date)
         {
             java.sql.Date date = (java.sql.Date) obj;
-            return JsonUtil.DB_QUOTE + toDateString(date) + JsonUtil.DB_QUOTE;
+            return Jsons.DB_QUOTE + toDateString(date) + Jsons.DB_QUOTE;
         }
         else if (obj instanceof java.sql.Time)
         {
             java.sql.Time time = (java.sql.Time) obj;
-            return JsonUtil.DB_QUOTE + toTimeString(time) + JsonUtil.DB_QUOTE;
+            return Jsons.DB_QUOTE + toTimeString(time) + Jsons.DB_QUOTE;
         }
         else if (obj instanceof java.sql.Timestamp)
         {
             java.sql.Timestamp time = (java.sql.Timestamp) obj;
-            return JsonUtil.DB_QUOTE + toDateTimeString(time) + JsonUtil.DB_QUOTE;
+            return Jsons.DB_QUOTE + toDateTimeString(time) + Jsons.DB_QUOTE;
         }
         else if (obj instanceof Date)
         {
             Date date = (Date) obj;
-            return JsonUtil.DB_QUOTE + toDateTimeString(date) + JsonUtil.DB_QUOTE;
+            return Jsons.DB_QUOTE + toDateTimeString(date) + Jsons.DB_QUOTE;
         }
         else if (obj instanceof Calendar)
         {
             Calendar calendar = (Calendar) obj;
-            return JsonUtil.DB_QUOTE + toDateTimeString(calendar) + JsonUtil.DB_QUOTE;
+            return Jsons.DB_QUOTE + toDateTimeString(calendar) + Jsons.DB_QUOTE;
         }
         
         return null;
@@ -58,10 +58,10 @@ public final class DateParser extends JsonParser implements Serializable
     @Override
     public Object toObject(String json, Token token, Class<?> cls)
     {
-        if (token == null || token.type() != JsonUtil.T_VALUE)
+        if (token == null || token.type() != Jsons.T_VALUE)
             return null;
         
-        String value = JsonUtil.removeStartEndQuotation(token.toString(json));
+        String value = Jsons.removeStartEndQuotation(token.toString(json));
         if (cls == java.sql.Date.class)
             return toDate(value);
         else if (cls == java.sql.Time.class)
