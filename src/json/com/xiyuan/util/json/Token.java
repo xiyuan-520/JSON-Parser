@@ -8,6 +8,7 @@ package com.xiyuan.util.json;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,8 +95,6 @@ public final class Token implements Serializable
      */
     public void addToken(Token token, boolean filterComma)
     {
-        if (token == null)
-            return;
         
         if (list == null && (type == BRACE_L || type == BRACKET_L))
             this.list = new Token[10];
@@ -173,22 +172,7 @@ public final class Token implements Serializable
 
         return count;
     }
-    
-    /**
-     * 初始化子元素
-     * 
-     * @param token
-     * @param filterComma 是否过滤逗号
-     */
-    protected void initList(Token[] list)
-    {
-        if (list == null)
-            return;
-        
-        this.list = list;
-        this.size = list.length;
-    }
-    
+
     /**
      * 获取键或者值的子元素列表
      * 
@@ -245,6 +229,12 @@ public final class Token implements Serializable
         return ls;
     }
 
+    public int initList(Token[] list)
+    {
+        this.list = list;
+        return (this.size = list == null ? 0 : list.length);
+    }
+    
     /**
      * 获取元素列表大小
      * 
@@ -269,4 +259,11 @@ public final class Token implements Serializable
             return (json.substring(this.begin, this.end + 1));
     }
 
+    @Override
+    public String toString()
+    {
+        return "{\"size\":" + size + ", \"type\":" + type + ", \"begin\":" + begin + ", \"end\":" + end + "}";
+    }
+    
+    
 }
