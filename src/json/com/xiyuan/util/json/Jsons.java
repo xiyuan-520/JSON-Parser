@@ -505,7 +505,8 @@ public final class Jsons implements Serializable
         }
         if (maxLenth <= 0)
             return null;
-
+        
+        TokenContext context = new TokenContext();
         // 1.arrNum 数组数量，
         // 2.objNum 对象数量，
         // 3.scope当前token所属范围，-1=初始时，0=在对象{}里，2 =在数组[]里;
@@ -544,10 +545,12 @@ public final class Jsons implements Serializable
                     }
                     else
                     {
-                        parent.addToken(current, true);
+//                        parent.addToken(current, true);
                         parent = current;
+                        context.addIncrement(current, false);
                     }
-
+                    
+                    context.context(parent, json);//设置context
                     // if (field != null && keyToken != null && valueType == -1)
                     if (field != null && keyScope != null && valueType == -1)
                         valueType = Token.BRACE_L; // 指定字段值为对象是且当前为结束对象
@@ -572,10 +575,11 @@ public final class Jsons implements Serializable
                             parent = root;
                         else
                             parent = starts.get(starts.size() - 1);
-
+                        
+                        context.context(parent, json);//设置context
                         // if (field != null && keyScope != null && keyToken != null && parent.equals(keyScope))
                         if (field != null && keyScope != null && keyScope != null && parent.equals(keyScope))
-                            return parent; // 指定字段值为对象是且当前为结束对象
+                            return context.complated(parent.begin(), json); // 指定字段值为对象是且当前为结束对象
                     }
                     break;
                 }
@@ -591,10 +595,12 @@ public final class Jsons implements Serializable
                     }
                     else
                     {// 添加子元素
-                        parent.addToken(current, true);
+//                        parent.addToken(current, true);
+                        context.addIncrement(current, false);
                         parent = current;
                     }
-
+                    
+                    context.context(parent, json);//设置context
                     // if (field != null && keyToken != null && valueType == -1)
                     if (field != null && keyScope != null && valueType == -1)
                         valueType = Token.BRACKET_L; // 指定字段值类型数组
@@ -619,10 +625,11 @@ public final class Jsons implements Serializable
                             parent = root;
                         else
                             parent = starts.get(starts.size() - 1);
-
+                        
+                        context.context(parent, json);//设置context
                         // if (field != null && keyScope != null && keyToken != null && parent.equals(keyScope))
                         if (field != null && keyScope != null && parent.equals(keyScope))
-                            return parent; // 指定字段值为数组是且当前为结束数组
+                            return context.complated(parent.begin(), json); // 指定字段值为数组是且当前为结束数组
                     }
                     break;
                 }
@@ -677,15 +684,20 @@ public final class Jsons implements Serializable
                 if (parent != null && field == null)
                 {// 非指定字段查询放入父级token列表节省资源开销
                     current = Token.newToken(Token.STRING, pos);// 上一个是 冒号 当前是逗号 则当前是空值
-                    parent.addToken(current, true);
-                    parent.addToken(prevToken, true);
+//                    parent.addToken(current, true);
+//                    parent.addToken(prevToken, true);
                     current.end(-1);// 小于0 表示该值为 null
+                    
+                    context.addIncrement(current, false);
+                    context.addIncrement(prevToken, true);
+                    
                 }
                 
                 if (field != null && keyScope != null)
                 {//找到字段
-                    keyScope.addToken(current, false);
-                    return keyScope;
+//                    keyScope.addToken(current, false);
+                    context.addIncrement(current, false);
+                    return context.complated(keyScope.begin(), json);
                 }
             }
             else
@@ -706,7 +718,8 @@ public final class Jsons implements Serializable
                 if (field == null)
                 {// 非指定字段查找{
                     prevToken = current;
-                    parent.addToken(current, true);
+//                    parent.addToken(current, true);
+                    context.addIncrement(current, true);
                     continue;
                 }
 
@@ -724,7 +737,8 @@ public final class Jsons implements Serializable
                 if (keyScope == null && prevToken.type() != Token.COLON && field.equals(removeStartEndQuotation(current.toString(json))))
                 {// 找到字段，但是上一个token 不是冒号
                     keyScope = parent;
-                    keyScope.addToken(prevToken, false);
+//                    keyScope.addToken(prevToken, false);
+                    context.addIncrement(prevToken, false);
                     prevToken = current;
                     continue;
                 }
@@ -735,14 +749,16 @@ public final class Jsons implements Serializable
 
                     if (valueType == Token.BRACE_L || valueType == Token.BRACKET_L)
                     {// 值类型是对象或者数组
-                        parent.addToken(current, true);
+//                        parent.addToken(current, true);
+                        context.addIncrement(current, false);
                         continue;
                     }
 
                     // if (valueType == -1 && current.type() == Token.COLON)
                     // continue;//{arr:{dddd:ccc}} 字段 = arr 当前 = ：
 
-                    parent.addToken(current, true);
+//                    parent.addToken(current, true);
+                    context.addIncrement(current, false);
                     return parent;
                 }
             }
@@ -750,7 +766,8 @@ public final class Jsons implements Serializable
 
         if (root != null)
             root.end(json.length() - 1);
-        return field == null ? root : keyScope;
+        
+        return context.complated(field == null ? root.begin() : keyScope.begin(), json);
     }
     
     /**
@@ -1362,4 +1379,281 @@ public final class Jsons implements Serializable
         }
         return sb.toString();
     }
+
+    /**
+         * 解析字符串并生成token并json字符串的首个token<br>
+         * 举例：字符串{"a":"a1", "b":[1,2,3]} 则返回 { 对应的token<br>
+         * 备注：其中每个token可能有多个子token<br>
+         * token { 的子token 有 "a"， :， "a1"， , ，"b" : , [<br>
+         * 其中 1，,，2，3为 token 的子token<br>
+         * ] 为当前作用范围 [ 的结束token<br>
+         * } 为当前作用范围 { 的结束token<br>
+         * 
+         * @param json  json字符串
+         * @param field 指定字段
+         * @return 返回json字符串的首个token 值,如果是指定字段 token.getElements()[0] = root,token.getElements()[1] = field的上一个token，token.getElements()[2] = field 的value <br>
+         *         举例：json = {a:{s:b}, cc:ss} <br>
+         *         1. field = a时 token.getElements()[0] = '{' token.getElements()[1] = {s:b} <br>
+         *         1. field = cc:ss时 token.getElements()[0] = ',' token.getElements()[1] = ss
+         */
+        public static Token getTokens2(String json, String field)
+        {
+            int maxLenth = json == null ? 0 : json.length();
+            for (; maxLenth > 0;)
+            {// 剔除右边空白
+                char ch = json.charAt(maxLenth - 1);
+                if (!isWhitespace(ch))
+                    break;
+    
+                maxLenth--;
+            }
+            if (maxLenth <= 0)
+                return null;
+    
+            // 1.arrNum 数组数量，
+            // 2.objNum 对象数量，
+            // 3.scope当前token所属范围，-1=初始时，0=在对象{}里，2 =在数组[]里;
+            // 4.valueType当前token所属范围，-1=初始时，参见 tokenType，
+            // 5.root 跟节点，prevToken 上一个token, parent 所在范围的token,keyScope=字段所在token域
+            int arrNum = 0, objNum = 0, valueType = -1;
+            char end_char = json.charAt(maxLenth - 1);
+            Token root = null, current = null, prevToken = null, parent = null, keyScope = null;// , keyToken = null; keyToken 不需要了因为 既然ke所在的keyScope与范围都找到了跟定keyToken 也找到了
+            if (field != null && json.indexOf(field) == -1)
+                return null;
+            
+            List<Token> starts = new ArrayList<Token>();
+            for (int pos = 0; pos < maxLenth; pos++)
+            {
+                char ch = json.charAt(pos);
+                if (root == null && isWhitespace(ch))
+                    continue;// 空白字符开头
+                if (root == null && BRACE_L != ch && ch != BRACKET_L)
+                    continue;// json 数据格式只有两种，1.对象使用{} 括起，2.数组[] 括起。所以非 {或者[开头的数据
+    
+                if (current != null)
+                    current = null;
+    
+                switch (ch)
+                {
+                    case BRACE_L:
+                    {
+                        current = Token.newToken(Token.BRACE_L, pos);
+                        objNum++;
+    
+                        starts.add(current);
+                        if (root == null)
+                        {
+                            root = current;
+                            parent = root;
+                        }
+                        else
+                        {
+                            parent.addToken(current, true);
+                            parent = current;
+                        }
+    
+                        // if (field != null && keyToken != null && valueType == -1)
+                        if (field != null && keyScope != null && valueType == -1)
+                            valueType = Token.BRACE_L; // 指定字段值为对象是且当前为结束对象
+    
+                        if (root.type() == Token.BRACE_L && end_char != BRACE_R)
+                            return root;
+    
+                        break;
+                    }
+                    case BRACE_R:
+                    {
+                        if (objNum > 0)
+                        {
+                            current = Token.newToken(Token.BRACE_R, pos);
+                            objNum--;
+                            int ind = starts.size() - 1;
+                            if (!starts.isEmpty() && starts.get(ind).type() == Token.BRACE_L)
+                                starts.remove(ind);
+    
+                            parent.end(pos);// 设置结束位置
+                            if (starts.isEmpty())
+                                parent = root;
+                            else
+                                parent = starts.get(starts.size() - 1);
+    
+                            // if (field != null && keyScope != null && keyToken != null && parent.equals(keyScope))
+                            if (field != null && keyScope != null && keyScope != null && parent.equals(keyScope))
+                                return parent; // 指定字段值为对象是且当前为结束对象
+                        }
+                        break;
+                    }
+                    case BRACKET_L:
+                    {
+                        current = Token.newToken(Token.BRACKET_L, pos);
+                        arrNum++;
+                        starts.add(current);
+                        if (root == null)
+                        {// 第一个 token
+                            root = current;
+                            parent = root;
+                        }
+                        else
+                        {// 添加子元素
+                            parent.addToken(current, true);
+                            parent = current;
+                        }
+    
+                        // if (field != null && keyToken != null && valueType == -1)
+                        if (field != null && keyScope != null && valueType == -1)
+                            valueType = Token.BRACKET_L; // 指定字段值类型数组
+    
+                        if (root.type() == Token.BRACKET_L && end_char != BRACKET_R)
+                            return root;
+    
+                        break;
+                    }
+                    case BRACKET_R:
+                    {
+                        if (arrNum > 0)
+                        {
+                            current = Token.newToken(Token.BRACKET_R, pos);
+                            arrNum--;
+                            int ind = starts.size() - 1;
+                            if (!starts.isEmpty() && starts.get(ind).type() == Token.BRACKET_L)
+                                starts.remove(ind);
+    
+                            parent.end(pos);// 设置结束位置
+                            if (starts.isEmpty())
+                                parent = root;
+                            else
+                                parent = starts.get(starts.size() - 1);
+    
+                            // if (field != null && keyScope != null && keyToken != null && parent.equals(keyScope))
+                            if (field != null && keyScope != null && parent.equals(keyScope))
+                                return parent; // 指定字段值为数组是且当前为结束数组
+                        }
+                        break;
+                    }
+                    case COMMA:// 上一个token 不能为,
+                    {// 前面token 必须是 对象结束 或者 数组结束 或者字符串
+                        if (prevToken != null && prevToken.type() == Token.COMMA)
+                            continue;
+    
+                        current = Token.newToken(Token.COMMA, pos);
+                        current.end(pos);
+    //                    parent.end(pos);// 设置结束位置
+                        break;
+                    }
+                    case COLON:
+                    {
+                        if (prevToken != null && (prevToken.type() == Token.COMMA || prevToken.type() == Token.COLON))
+                        {// 如果上一个token为 逗号，则当前 冒号为键的开始部分 列{a::ss:sdcsdcs} 其中 :ss:sdcsdcs 为值
+    
+                            int length = getStringTokenLength(json, pos, parent.type(), prevToken);
+                            current = length == 0 ? null : Token.newToken(Token.STRING, pos);// getStringToken(json, pos, scope, prevToken);
+                            pos += (length - 1);
+                            if (current != null)
+                                current.end(pos);// 设置结束位置
+                        }
+                        else if (prevToken != null && prevToken.type() != Token.COLON && prevToken.type() != Token.BRACE_L && prevToken.type() != Token.BRACKET_L)
+                        {
+                            current = Token.newToken(Token.COLON, pos);
+                            current.end(pos);// 设置结束位置
+                        }
+    
+                        break;
+                    }
+                    default:
+                    {
+                        if (isWhitespace(ch))
+                            continue;
+    
+                        int length = getStringTokenLength(json, pos, parent.type(), prevToken);
+                        current = length == 0 ? null : Token.newToken(Token.STRING, pos);// getStringToken(json, pos, scope, prevToken);
+                        pos += length - 1;
+                        current.end(pos);// 设置结束位置
+                    }
+                }
+    
+                if (prevToken != null && current != null && prevToken.type() == current.type() && prevToken.type() == Token.COMMA)
+                    continue;// 上一个是是逗号 当前也是逗号
+    
+                if (prevToken != null && current != null && prevToken.type() == Token.COLON && current.type() == Token.COMMA)
+                {// 处理上一个是 冒号 当前为逗号，则当前值为null 列：{dd:,} 被整理 后为 {dd:null,}
+                    prevToken = current;
+    
+                    if (parent != null && field == null)
+                    {// 非指定字段查询放入父级token列表节省资源开销
+                        current = Token.newToken(Token.STRING, pos);// 上一个是 冒号 当前是逗号 则当前是空值
+                        parent.addToken(current, true);
+                        parent.addToken(prevToken, true);
+                        current.end(-1);// 小于0 表示该值为 null
+                    }
+                    
+                    if (field != null && keyScope != null)
+                    {//找到字段
+                        keyScope.addToken(current, false);
+                        return keyScope;
+                    }
+                }
+                else
+                {
+                    // prevToken = current;//自地方注释因为指定字段是要保存字段的前一个token所以放到每个括号赋值
+                    if (parent == null || current == null)
+                    {
+                        prevToken = current;
+                        continue;
+                    }
+    
+                    if (!(current.type() == Token.COLON || current.type() == Token.COMMA || current.type() == Token.STRING))
+                    {
+                        prevToken = current;
+                        continue;
+                    }
+    
+                    if (field == null)
+                    {// 非指定字段查找{
+                        prevToken = current;
+                        parent.addToken(current, true);
+                        continue;
+                    }
+    
+                    /********************************/
+                    // 以下是查找字段&字段值
+                    /********************************/
+    
+                    // 一下是指定字段相关操作
+                    if (keyScope == null && current.type() != Token.STRING)
+                    {
+                        prevToken = current;
+                        continue;// 没找到字段 并且当前不是字符串
+                    }
+    
+                    if (keyScope == null && prevToken.type() != Token.COLON && field.equals(removeStartEndQuotation(current.toString(json))))
+                    {// 找到字段，但是上一个token 不是冒号
+                        keyScope = parent;
+                        keyScope.addToken(prevToken, false);
+                        prevToken = current;
+                        continue;
+                    }
+    
+                    prevToken = current;
+                    if (keyScope != null && current.type() == Token.STRING)
+                    {// 已经找到字段
+    
+                        if (valueType == Token.BRACE_L || valueType == Token.BRACKET_L)
+                        {// 值类型是对象或者数组
+                            parent.addToken(current, true);
+                            continue;
+                        }
+    
+                        // if (valueType == -1 && current.type() == Token.COLON)
+                        // continue;//{arr:{dddd:ccc}} 字段 = arr 当前 = ：
+    
+                        parent.addToken(current, true);
+                        return parent;
+                    }
+                }
+            }
+    
+            if (root != null)
+                root.end(json.length() - 1);
+            return field == null ? root : keyScope;
+        }
 }

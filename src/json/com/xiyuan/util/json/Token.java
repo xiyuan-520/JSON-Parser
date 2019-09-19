@@ -229,6 +229,12 @@ public final class Token implements Serializable
         return ls;
     }
 
+    
+    public void initList(Token[] list)
+    {
+        this.list = list;
+        this.size = list == null ? 0 : list.length;
+    }
     /**
      * 获取元素列表大小
      * 
