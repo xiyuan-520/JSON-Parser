@@ -53,8 +53,6 @@ public final class Token implements Serializable
         token.type = type;
         token.begin = begin < 0 ? 0 : begin;
         token.end = token.begin;// 默认是当前索引
-        if (type == BRACE_L || type == BRACKET_L)
-            token.list = new Token[10];
         return token;
     }
     private int size = 0;
@@ -96,8 +94,11 @@ public final class Token implements Serializable
      */
     public void addToken(Token token, boolean filterComma)
     {
-        if (token == null || list == null)
+        if (token == null)
             return;
+        
+        if (list == null && (type == BRACE_L || type == BRACKET_L))
+            this.list = new Token[10];
 
         if (filterComma && token.type == COMMA)
             return;
@@ -172,7 +173,22 @@ public final class Token implements Serializable
 
         return count;
     }
-
+    
+    /**
+     * 初始化子元素
+     * 
+     * @param token
+     * @param filterComma 是否过滤逗号
+     */
+    protected void initList(Token[] list)
+    {
+        if (list == null)
+            return;
+        
+        this.list = list;
+        this.size = list.length;
+    }
+    
     /**
      * 获取键或者值的子元素列表
      * 
