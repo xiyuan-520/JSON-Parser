@@ -492,7 +492,7 @@ public final class Jsons implements Serializable
      *         1. field = a时 token.getElements()[0] = '{' token.getElements()[1] = {s:b} <br>
      *         1. field = cc:ss时 token.getElements()[0] = ',' token.getElements()[1] = ss
      */
-    private static Token getTokens(String json, String field)
+    public static Token getTokens(String json, String field)
     {
         int maxLenth = json == null ? 0 : json.length();
         for (; maxLenth > 0;)
@@ -759,7 +759,7 @@ public final class Jsons implements Serializable
 
 //                    parent.addToken(current, true);
                     context.addIncrement(current, false);
-                    return parent;
+                    return context.complated(parent.begin(), json);
                 }
             }
         }
@@ -1018,6 +1018,22 @@ public final class Jsons implements Serializable
     {
         
         Token token = getTokens(json);
+        if (token == null || token.type() != Token.BRACKET_L)
+            return new ArrayList<T>(0);
+        
+        List<Token> elems = token.getElements(Token.COMMA);
+        List<T> list = new ArrayList<T>(elems.size());
+        for (Token t : elems)
+            list.add((T) getParser(resultClass).toObject(json, t, resultClass));
+        
+        return list;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <T> List<T> toList2(String json, Class<T> resultClass)
+    {
+        
+        Token token = getTokens2(json, null);
         if (token == null || token.type() != Token.BRACKET_L)
             return new ArrayList<T>(0);
         

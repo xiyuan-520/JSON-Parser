@@ -19,7 +19,8 @@ public class JsonMain implements TypeConstants, CodeConstants
     
     public static void main(String[] args) throws Exception
     {
-        String jsonPath = "./json/10000.json";
+        int listSize = 10000;
+        String jsonPath = "./json/" + listSize + ".json";
         long l1 = System.currentTimeMillis();
         long l2 = l1;
         @SuppressWarnings("unused")
@@ -33,78 +34,28 @@ public class JsonMain implements TypeConstants, CodeConstants
         testMy(json, jsonString);
         // testZhiqim(json);
         // testGson(json);
-        // Token[] ss = new Token[100000];
-        // Token[] s2 = new Token[10];
-        // for (int i = 0; i < ss.length; i++)
-        // {
-        // Token token = Token.newToken((byte) 0, i);
-        // if (i<s2.length)
-        // s2[i] = token;
-        // ss[i] = token;
-        // }
-        //
-        // l1 = System.nanoTime();
-        // Token[] ss1 = new Token[ss.length+520];
-        // System.arraycopy(ss, 0, ss1, 0, ss.length);
-        // System.out.println(ss1.length+"\tss1:"+(System.nanoTime() - l1));
-        //
-        // int length = s2.length;
-        // int dif = 520;
-        // l1 = System.nanoTime();
-        //
-        // while (length < 100520)
-        // {
-        // Token[] s21 = new Token[s2.length+dif];
-        // System.arraycopy(s2, 0, s21, 0, s2.length);
-        // length += dif;
-        // }
-        //
-        // System.out.println(length + "\ts21:"+(System.nanoTime() - l1));
-        //
-        // long s1 = System.currentTimeMillis();
-        // for (int i = 0; i < json.length(); i++)
-        // {
-        // Person person = new Person();
-        // person.setId(1001);
-        // person.setName("kevin");
-        // person.setAge(29);
-        // person.setSex("男");
-        // }
-        // System.out.println("  set      方式：" + (System.currentTimeMillis() - s1) + " ms");
-        // long s2 = System.currentTimeMillis();
-        // for (int i = 0; i < json.length(); i++)
-        // {
-        // Person person = new Person();
-        // person.init(1001, "kevin", 29, "男");
-        // }
-        // System.out.println("  init     方式：" + (System.currentTimeMillis() - s2) + " ms");
-        // long s3 = System.currentTimeMillis();
-        // for (int i = 0; i < json.length(); i++)
-        // {
-        // Person person = new Person(1001, "kevin", 29, "男");
-        // }
-        // System.out.println("constrution方式：" + (System.currentTimeMillis() - s3) + " ms");
-        // System.out.println("===============================结束");
     }
     
     public static void testMy(String json, String jsonString)
     {
-        Token token = null;
+        Token token = Token.newToken((byte) 0, 0);
         long l1 = 0, l2 = 0;
         List<OrdOrder> orders = new ArrayList<OrdOrder>();
         System.out.println("===========================================================================");
         long a = 0;
         l1 = System.currentTimeMillis();
-         orders = Jsons.toList(json, OrdOrder.class);
-//        token = Jsons.getTokens(json);
-//        token = Jsons.getTokens2(json, null);
-        // for (int i = 0; i < json.length(); i++)
-        // {
-        //
-        // }
+//        json = "[{\"oid\":1970649346523,\"tids\":\"625421090979097318\",\"status\":\"2\"},{\"oid\":1970649256481,\"tids\":\"625345184971437955\",\"status\":\"2\",\"shopNick\":\"th办公旗舰店\"},{\"oid\":1970649176433,\"tids\":\"625470499260064842\",\"status\":\"1\",\"shopNick\":\"yawiiwen\",\"buyerNick\":\"许诺612\"},{\"oid\":1970649086392,\"tids\":\"625340544680873331\",\"status\":\"2\",\"servicesMessage\":\"\",\"isOldUser\":0},{\"oid\":1970649026370,\"tids\":\"555698372277719588\",\"status\":\"1\",\"shopNick\":\"th办公旗舰店\"\"isOldUser\":0}]";
+        orders = Jsons.toList(json, OrdOrder.class);
+//        orders = Jsons.toList2(json, OrdOrder.class);
+//         token = Jsons.getTokens(json);
+        // token = Jsons.getTokens(json, "oid");
+         token = Jsons.getTokens2(json, null);
         l2 = System.currentTimeMillis();
         System.out.println("自己代码 共生成 " + (orders != null ? orders.size() : a) + "条数据，共耗时：" + (l2 - l1) + " 毫秒");
-        System.out.println(orders.get(0));
+        if (orders.size() > 0)
+            System.out.println(orders.get(0));
+//        System.out.println(token.toString(json));
+        // System.out.println(Token.count);
         // TokenSize size = JsonUtil.calculateSubTokenSize(json, null);
         // System.out.println(size.size(1153));
         // System.out.println(size.beginCount());

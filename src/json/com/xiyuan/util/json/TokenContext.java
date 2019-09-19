@@ -13,6 +13,9 @@ import java.util.Map;
  */
 public final class TokenContext implements Serializable
 {
+    private static int a = 0;
+    private static int b = 0;
+    private static String json = null;
     private static final long serialVersionUID = 1L;
     private static final int capacity = 500;
     
@@ -40,11 +43,17 @@ public final class TokenContext implements Serializable
             if (this.begin == token.begin() || (token.type() != Token.BRACE_L && token.type() != Token.BRACKET_L))
                 return token;
             
-            this.begin = token.begin();
-            if (!map.containsKey(begin))
-                push(token);
+            if (!map.containsKey(token.begin()))
+            {
+                this.cur = new ArrayList<Integer>();
+                map.put(token.begin(), this.cur);
+                if (index==-1)//初始值
+                    push(token);
+            }
             else
-                cur = map.get(begin);
+                cur = map.get(token.begin());
+            
+            this.begin = token.begin();
             return token;
         }
         
@@ -55,12 +64,20 @@ public final class TokenContext implements Serializable
     {
         if ((tokens.length - 1) == index)
         {
+            long l1 = System.currentTimeMillis();
             Token[] arr = new Token[tokens.length + capacity];
             System.arraycopy(tokens, 0, arr, 0, tokens.length);
             this.tokens = null;
             this.tokens = arr;
+            long l2 = System.currentTimeMillis();
+            long diff = l2-l1;
+            if (diff > 1)
+               a += diff;
         }
         
+        if (this.index >= token.begin())
+            return -1;// 已经添加过了
+            
         this.tokens[++index] = token;
         return index;
     }
@@ -76,16 +93,21 @@ public final class TokenContext implements Serializable
      */
     public Token addIncrement(Token token, boolean filter)
     {
-        if (token == null || filter)
+        if (token == null || (filter && token.type() == Token.COMMA))
             return token;
         
-        if (cur == null)
-        {
-            this.cur = new ArrayList<Integer>();
-            map.put(this.begin, this.cur);
-        }
-        this.cur.add(push(token));//
+        int ind = push(token);
         
+        long l1 = System.currentTimeMillis();
+       
+      
+        if (ind >= 0)
+            this.cur.add(ind);//
+        
+        long l2 = System.currentTimeMillis();
+        long diff = l2-l1;
+        if (diff > 1)
+           b += diff;
         return token;
     }
     
@@ -94,12 +116,14 @@ public final class TokenContext implements Serializable
      * @param begin
      * @return
      */
-    public Token complated(int begin,String json)
+    public Token complated(int begin, String json)
     {
+        long l1 = System.currentTimeMillis();
         Token root = null;
         for (int i = 0; i <= index; i++)
         {
             Token token = tokens[i];
+            // System.out.println(i + "--" + token.begin() + "=" + (token.type() == Token.STRING ? token.toString(json) : token.toString(json).charAt(0)));
             if (root == null && token.begin() == begin)
                 root = token;
             
@@ -112,21 +136,19 @@ public final class TokenContext implements Serializable
                 arr[j] = tokens[ls.get(j)];
             
             token.initList(arr);
-            @SuppressWarnings("unused")
-            int ss = 22;
+//            if (token != root)
+//                System.out.println(i + "" + token.toString(json));
         }
-        
+        long l2 = System.currentTimeMillis();
+        System.out.println("complated"+(l2-l1));
         map.clear();
         cur = null;
         this.begin = index = -1;
         tokens = null;
         
-//        for (Token item : root.getElements())
-//        {
-//            this.begin++;
-//            if ((this.begin) < 5)
-//                System.out.println(item.toString(json));
-//        }
+//        System.out.println(root.toString(json));
+        System.out.println("数组组拷贝耗时"+a);
+        System.out.println("list.add耗时"+b);
         return root;
     }
 }
