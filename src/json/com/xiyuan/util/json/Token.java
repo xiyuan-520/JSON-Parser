@@ -86,8 +86,35 @@ public final class Token implements Serializable
         this.next = next;
         next.context = this.type==BRACE_L || this.type == BRACKET_L ? this : this.context;
         next.prev = this;
-        
         return this.next;
+    }
+    
+    /**获取子token的数量
+     * 注意：是实时遍历，有损性能
+     * 
+     * @param filters   过滤类型
+     * */
+    public int size(byte... filters)
+    {
+        int size = 0;
+        Token next = this.next;
+        Token context = next == null  ? null : next.context;
+        while (next != null)
+        {
+            if (next.context != context)
+            {//子集子集里面跳过
+                next = next.next;
+                continue;
+            }
+            
+            if (next.context == this.context)
+                break;//和当前对象平级作用域，说明已经退出
+            
+            next = next.next;
+            size++;
+        }
+        
+        return size;
     }
     
     /**

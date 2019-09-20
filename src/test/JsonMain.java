@@ -19,7 +19,7 @@ public class JsonMain implements TypeConstants, CodeConstants
     
     public static void main(String[] args) throws Exception
     {
-        int listSize = 10000;
+        int listSize = 100000;
         String jsonPath = "./json/" + listSize + ".json";
         long l1 = System.currentTimeMillis();
         long l2 = l1;
@@ -31,9 +31,17 @@ public class JsonMain implements TypeConstants, CodeConstants
         System.out.println("文件加载完成，共耗时：" + (l2 - l1));
         
         // testFastJson(json);
-        testMy(json, jsonString);
+//        testMy(json, jsonString);
         // testZhiqim(json);
         // testGson(json);
+        Token root = Token.root(Token.BRACE_L, 0);
+        Token next = root.next(Token.STRING, 1);
+        for (int i = 2; i <= 200; i++)
+        {
+            next = next.next(Token.STRING, 0);
+        }
+        
+        System.out.println(root.size(null));
     }
     
     public static void testMy(String json, String jsonString)
