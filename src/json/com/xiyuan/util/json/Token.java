@@ -13,14 +13,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * token标记符
- * 
- * @version v1.0.0 @author lgz 2019-9-6 新建与整理
+ * 1.Token类提供root() 方法，用于创建token的跟
+ * 2.创建跟token后 有token.next(byte type, int begin) 派生子token
+ * @version v1.0.0 @author lgz 2019-9-20 新建与整理
  */
 public final class Token implements Serializable
 {
     private static final long serialVersionUID = 1L;
-    public static int count = 0;
     /** 未知类型 0 token  */
     public final static byte ZERO = 0;
     /** 左大括号类型 1 = { */
@@ -37,236 +36,97 @@ public final class Token implements Serializable
     public final static byte COMMA = 6;// ","
     /** 字符类型 7 */
     public final static byte STRING = 7;// String值
+    /**提供床架根token方法*/
+    public static Token root(byte type, int begin)
+    {
+        return new Token(type, begin);
+    }
     
-    private Token()
-    {count++;
+    private byte type;
+    private int begin;
+    private int end;
+    
+    private Token context;//当前token所在作用域
+    private Token prev;
+    private Token next;
+    
+    private Token(byte type, int begin)
+    {
+        this.type = type;
+        this.begin = begin;
+        this.end = this.begin;
     }
     
     /**
-     * 提供静态构造
-     * 
-     * @param type token类型
-     * @param begin token开始索引
+     * 生成下一个 返回 下一个token
+     * 注：当下一个token类型为逗号时，不自动设置为当前的下一个token，需要手动社会
+     * @param type          下一个token的类型
+     * @param begin         下一个token的字符索引
      * @return
      */
-    public static Token newToken(byte type, int begin)
+    public Token next(byte type, int begin)
     {
-        Token token = new Token();
-        token.type = type;
-        token.begin = begin < 0 ? 0 : begin;
-        token.end = token.begin;// 默认是当前索引
-        // if (type == BRACE_L || type == BRACKET_L)
-        // token.list = new Token[10];
-        return token;
+        Token next = new Token(type,begin);
+        if (type == COMMA)
+            return next;
+        
+        return next(next);
     }
     
-    private int size = 0;
-    private byte type = 0;
-    private int begin = 0;// 字符串值 的开始索引
-    private int end = 0;
-    private Token[] list;
-    
-    public byte type()
+    /**获取下一个token*/
+    public Token next()
     {
-        return type;
+        return this.next;
+    }
+    /**设置下一个token
+     * 注：这里不是插入，可能会丢失数据，举例：token序列 =[1,2,3,4,5,6,7] this = 1, 目标next=5,然后 1.next(5) 之后，2，3，4将会丢失，而设置后的token序列=[1,5,6,7]
+     * */
+    public Token next(Token next)
+    {
+        this.next = next;
+        next.context = this.type==BRACE_L || this.type == BRACKET_L ? this : this.context;
+        next.prev = this;
+        
+        return this.next;
     }
     
     /**
-     * 获取token开始字字符索引
-     * */
-    public int begin()
+     * 获取上一个token
+     */
+    public Token prev()
     {
-        return begin;
+        return this.prev;
     }
     
-    /** 获取token结束字字符索引 */
-    public int end()
-    {
-        return end;
-    }
-    
-    /** 设置结束索引 */
+    /**设置token结束索引*/
     public void end(int end)
     {
         this.end = end;
     }
-    
-    /**
-     * 添加子元素
-     * 
-     * @param token
-     * @param filterComma 是否过滤逗号
-     */
-    public void addToken(Token token, boolean filterComma)
+    /**获取token开始索引*/
+    public int begin()
     {
-        
-        if (token == null)
-            return;
-        if (list == null && (type == BRACE_L || type == BRACKET_L))
-            this.list = new Token[10];
-        if (filterComma && token.type == COMMA)
-            return;
-        if (size == Integer.MAX_VALUE)
-            return;// 达到最大指
-            
-        if ((size + 1) > this.list.length)
-        {
-            Token[] datas = new Token[size + 520];
-            System.arraycopy(list, 0, datas, 0, size);
-            this.list = datas;
-        }
-        
-        this.list[size++] = token;
+        return this.begin;
     }
-    
-    /**
-     * 获取子节点列表
-     * 
-     * @return 返回子元素列表
-     */
-    public Token[] getElements()
+    /**获取token类型*/
+    public byte type()
     {
-        if (this.list == null)
-            return new Token[0];
-        
-        if (size != list.length)
-        {
-            Token[] datas = new Token[size];
-            System.arraycopy(list, 0, datas, 0, size);
-            this.list = datas;
-        }
-        return this.list;
+        return this.type;
     }
-    
-    /**
-     * 获取子节点列表
-     * 
-     * @param 过滤指定token类型
-     * @return 返回子元素列表
-     */
-    
-    public List<Token> getElements(byte filterType)
+    /**获取token结束索引*/
+    public int end()
     {
-        List<Token> ls = new ArrayList<Token>(this.list.length - getElementSize(filterType));
-        for (Token elem : getElements())
-        {
-            if (elem.type() == filterType)
-                continue;
-            ls.add(elem);
-        }
-        return ls;
-    }
-    
-    /** 获取指定元素类型的数量 **/
-    public int getElementSize(byte...types)
-    {
-        if (types == null)
-            return 0;
-        
-        Map<Byte, Byte> map = new HashMap<Byte, Byte>();
-        for (byte type : types)
-            map.put(type, Jsons.ZERO);
-        
-        int count = 0;
-        for (Token elem : getElements())
-        {
-            if (map.containsKey(elem.type()))
-                count++;
-        }
-        
-        return count;
-    }
-    
-    /**
-     * 获取键或者值的子元素列表
-     * 
-     * @return 返回子元素列表
-     */
-    public List<Token> getStringElements()
-    {
-        
-        List<Token> ls = new ArrayList<Token>(getElementSize(STRING));
-        for (Token elem : getElements())
-            if (elem.type() == STRING)
-                ls.add(elem);
-        
-        return ls;
-    }
-    
-    /***
-     * 获取对象类型的元素列表
-     * 
-     * @return
-     */
-    public List<Token> getObjectElements()
-    {
-        List<Token> ls = new ArrayList<Token>(getElementSize(BRACE_L));
-        for (Token elem : getElements())
-        {
-            if (elem.type() == BRACE_L)
-                ls.add(elem);
-        }
-        return ls;
-    }
-    
-    /***
-     * 获取数组类型的元素列表
-     * 
-     * @return
-     */
-    public List<Token> getArrayElements()
-    {
-        int lenth = 0;
-        for (Token elem : getElements())
-        {
-            if (elem.type() == BRACKET_L)
-                lenth++;// 先进行length计算是为了初始化list的长度
-                        // 避免list.add方法调用System.arrayCopy 从而降低时间损耗
-        }
-        
-        List<Token> ls = new ArrayList<Token>(lenth);
-        for (Token elem : getElements())
-        {
-            if (elem.type() == BRACKET_L)
-                ls.add(elem);
-        }
-        return ls;
-    }
-    
-    public void initList(Token[] list)
-    {
-        this.list = list;
-        this.size = list == null ? 0 : list.length;
-    }
-    
-    /**
-     * 获取元素列表大小
-     * 
-     * @return
-     */
-    public int size()
-    {
-        return size;
-    }
-    
-    public String toString(String json)
-    {
-        if (this.end < 0)
-            return null;
-        
-        if (json == null || json.length() == 0 || this.end > json.length())
-            return null;
-        
-        if (json.length() <= this.end)
-            return (json.substring(this.begin));
-        else
-            return (json.substring(this.begin, this.end + 1));
+        return this.end;
     }
     
     @Override
     public String toString()
     {
-        return "Token [size=" + size + ", type=" + type + ", begin=" + begin + ", end=" + end + "]";
+        return "Token [type=" + type + ", begin=" + begin + ", end=" + end + "]";
     }
     
+    public String toString(String json)
+    {
+        return  toString();
+    }
 }
