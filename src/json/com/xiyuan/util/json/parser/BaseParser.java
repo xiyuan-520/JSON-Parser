@@ -3,9 +3,9 @@ package com.xiyuan.util.json.parser;
 
 import java.io.Serializable;
 
+import com.xiyuan.util.json.JsonLexer;
 import com.xiyuan.util.json.JsonParser;
 import com.xiyuan.util.json.Jsons;
-import com.xiyuan.util.json.Token;
 
 /***
  * 基本类型适配器，8种基本类型&字符串
@@ -15,7 +15,7 @@ import com.xiyuan.util.json.Token;
 public final class BaseParser extends JsonParser implements Serializable
 {
     private static final long serialVersionUID = 1L;
-
+    
     public String toString(Object obj)
     {
         if (obj == null)
@@ -29,89 +29,89 @@ public final class BaseParser extends JsonParser implements Serializable
         }
         else if (obj instanceof String)
         {// 要对引号进行增加转义
-            String str = Jsons.addEscapeChar((String) obj, Jsons.DB_QUOTE);
+            String str = Jsons.addEscapeChar((String)obj, JsonLexer.DB_QUOTE);
             return new StringBuilder().append(Jsons.DB_QUOTE).append(str).append(Jsons.DB_QUOTE).toString();
         }
 
         return String.valueOf(obj);
     }
 
-    public static boolean booleanValue(Token token, String json)
+    public static boolean booleanValue(JsonLexer lexer)
     {
-        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
-        return Boolean.parseBoolean(json) || "1".equals(value) ? true : false;
+        String value = Jsons.removeStartEndQuotation(lexer.value());
+        return Boolean.parseBoolean(value) || "1".equals(value) ? true : false;
     }
 
-    public static byte byteValue(Token token, String json)
+    public static byte byteValue(JsonLexer lexer)
     {
-        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
-        return Byte.parseByte(value);
+        String value = Jsons.removeStartEndQuotation(lexer.value());
+        return Byte.parseByte(!JsonLexer.NULL.equals(value) ? value : (lexer.tokenType() == JsonLexer.T_COMMA ? String.valueOf(JsonLexer.COMMA) : value));
     }
 
-    public static char charValue(Token token, String json)
+    public static char charValue(JsonLexer lexer)
     {
-        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
+        String value = Jsons.removeStartEndQuotation(lexer.value());
         return value == null ? (char)0 : value.charAt(0);
     }
     
-    public static short shortValue(Token token, String json)
+    public static short shortValue(JsonLexer lexer)
     {
-        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
-        return Short.parseShort(value);
+        String value = Jsons.removeStartEndQuotation(lexer.value());
+        return Short.parseShort(!JsonLexer.NULL.equals(value) ? value : (lexer.tokenType() == JsonLexer.T_COMMA ? String.valueOf(JsonLexer.COMMA) : value));
     }
     
-    public static int intValue(Token token, String json)
+    public static int intValue(JsonLexer lexer)
     {
-        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
-        return Integer.parseInt(value);
+        String value = Jsons.removeStartEndQuotation(lexer.value());
+        return Integer.parseInt(!JsonLexer.NULL.equals(value) ? value : (lexer.tokenType() == JsonLexer.T_COMMA ? String.valueOf(JsonLexer.COMMA) : value));
     }
     
-    public static long longValue(Token token, String json)
+    public static long longValue(JsonLexer lexer)
     {
-        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
-        return Long.parseLong(value);
+        String value = Jsons.removeStartEndQuotation(lexer.value());
+        return Long.parseLong(!JsonLexer.NULL.equals(value) ? value : (lexer.tokenType() == JsonLexer.T_COMMA ? String.valueOf(JsonLexer.COMMA) : value));
     }
     
-    public static float floatValue(Token token, String json)
+    public static float floatValue(JsonLexer lexer)
     {
-        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
-        return Float.parseFloat(value);
+        String value = Jsons.removeStartEndQuotation(lexer.value());
+        return Float.parseFloat(!JsonLexer.NULL.equals(value) ? value : (lexer.tokenType() == JsonLexer.T_COMMA ? String.valueOf(JsonLexer.COMMA) : value));
     }
     
-    public static double doubleValue(Token token, String json)
+    public static double doubleValue(JsonLexer lexer)
     {
-        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
-        return Double.parseDouble(value);
+        String value = Jsons.removeStartEndQuotation((lexer.value() == null) ? null : lexer.value());
+        return Double.parseDouble(!JsonLexer.NULL.equals(value) ? value : (lexer.tokenType() == JsonLexer.T_COMMA ? String.valueOf(JsonLexer.COMMA) : value));
     }
     
-    public static String stringValue(Token token, String json)
+    public static String stringValue(JsonLexer lexer)
     {
         // 去掉前后可能的引号
-        String value = Jsons.removeStartEndQuotation((token == null || json == null) ? null : token.toString(json));
+        String value = Jsons.removeStartEndQuotation((lexer.value() == null) ? null : lexer.value());
         return Jsons.removeEscapeChar(value);// 字符串要求删除转义
     }
 
     @Override
-    public Object toObject(String json, Token token, Class<?> cls)
+    public Object toObject(JsonLexer lexer, Class<?> cls)
     {
         if (cls == boolean.class || cls == Boolean.class)
-            return booleanValue(token, json);
+            return booleanValue(lexer);
         else if (cls == byte.class || cls == Byte.class)
-            return booleanValue(token, json);
+            return booleanValue(lexer);
         else if (cls == char.class || cls == Character.class)
-            return charValue(token, json);
+            return charValue(lexer);
         else if (cls == short.class || cls == Short.class)
-            return shortValue(token, json);
+            return shortValue(lexer);
         else if (cls == int.class || cls == Integer.class)
-            return intValue(token, json);
+            return intValue(lexer);
         else if (cls == long.class || cls == Long.class)
-            return longValue(token, json);
+            return longValue(lexer);
         else if (cls == float.class || cls == Float.class)
-            return floatValue(token, json);
+            return floatValue(lexer);
         else if (cls == double.class || cls == Double.class)
-            return doubleValue(token, json);
+            return doubleValue(lexer);
         else if (cls == String.class)
-            return stringValue(token, json);
+            return stringValue(lexer);
         return null;
     }
 }

@@ -505,7 +505,7 @@ public final class Jsons implements Serializable
      * @return 返回json字符串的首个token 值
      */
 
-    public static Token getTokens(String json)
+    public static TokenPool getTokens(String json)
     {
         return getTokens(json, null);
     }
@@ -530,8 +530,11 @@ public final class Jsons implements Serializable
      *         1. field = cc:ss时 token.getElements()[0] = ','
      *         token.getElements()[1] = ss
      */
-    public static Token getTokens(String json, String field)
+    public static TokenPool getTokens(String json, String field)
     {
+        if (field != null && json.indexOf(field) == -1)
+            return null;
+        
         int maxLenth = json == null ? 0 : json.length();
         for (; maxLenth > 0;)
         {// 剔除右边空白
@@ -549,11 +552,11 @@ public final class Jsons implements Serializable
         // 3.scope当前token所属范围，0=初始时，1=在对象{}里，2 =在数组[]里;
         // 4.valueType当前token所属范围，-1=初始时，参见 tokenType，
         // 5.root 跟节点，prevToken 上一个token, parent 所在范围的token,keyScope=字段所在token域
-        int arrNum = 0, objNum = 0, valueType = -1, scope = 0, context = -1;
-        Token root = null, current = null, last = null, scp = null;
-        if (field != null && json.indexOf(field) == -1)
-            return null;
+        int arrNum = 0, objNum = 0, valueType = -1, contextType = -1;
+        Token root = null, current = null, last = null, context = null;
         Token.json = json;
+        TokenPool.json = json;
+        TokenPool pool = new TokenPool(1000);
         List<Token> starts = new ArrayList<Token>();
         for (int pos = 0; pos < maxLenth; pos++)
         {
@@ -565,22 +568,21 @@ public final class Jsons implements Serializable
 
             if (current != null)
                 current = null;
-            
           
             switch (ch)
             {
                 case BRACE_L:
                 {
-                    scope = 1;
+                    contextType = 1;
                     current = Token.newToken(Token.BRACE_L, pos);
                     objNum++;
                     starts.add(current);
                     if (root == null)
                         last = root = current;//last = root;
                     else
-                        last = last.next(current).setContext(scp.begin());// last = current;
+                        last = current.context(context);// last = current;
                     
-                    scp = current;
+                    context = pool.add(last);
                     continue;
                 }
                 case BRACE_R:
@@ -595,23 +597,23 @@ public final class Jsons implements Serializable
                             starts.remove(ind).end(pos);// 设置结束负号
                         
 //                        last = current;
-                        scp = starts.isEmpty() ? root : starts.get(--ind);
-                        scope = scp.type() == Token.BRACE_L ? 1 : (scp.type() == Token.BRACKET_L ? 2 : 0);
+                        context = starts.isEmpty() ? root : starts.get(--ind);
+                        contextType = context.type() == Token.BRACE_L ? 1 : (context.type() == Token.BRACKET_L ? 2 : 0);
                     }
                     continue;
                 }
                 case BRACKET_L:
                 {
-                    scope = 2;
+                    contextType = 2;
                     current = Token.newToken(Token.BRACKET_L, pos);
                     arrNum++;
                     starts.add(current);
                     if (root == null)
                         last = root = current;//last = root;
                     else
-                        last = last.next(current).setContext(scp.begin());// last = current;
+                        last = current.context(context);// last = current;
                     
-                    scp = current;
+                    context = pool.add(last);
                     continue;
                 }
                 case BRACKET_R:
@@ -625,8 +627,8 @@ public final class Jsons implements Serializable
                             starts.remove(ind).end(pos);
     
 //                        last = current;
-                        scp = starts.isEmpty() ? root : starts.get(--ind);
-                        scope = scp.type() == Token.BRACE_L ? 1 : (scp.type() == Token.BRACKET_L ? 2 : 0);
+                        context = starts.isEmpty() ? root : starts.get(--ind);
+                        contextType = context.type() == Token.BRACE_L ? 1 : (context.type() == Token.BRACKET_L ? 2 : 0);
                     }
                     continue;
                 }
@@ -637,9 +639,9 @@ public final class Jsons implements Serializable
     
                     // 处理上一个是 冒号 当前为逗号，则当前值为null 列：{dd:,} 被整理 后为 {dd:null,}
                     if (last.type() == Token.COLON)
-                        last = last.next(Token.newToken(Token.STRING, pos).end(pos)).setContext(scp.begin());// 添加null值
+                        last = pool.add(Token.newToken(Token.STRING, pos).end(pos)).context(context);// 添加null值
     
-                    last = last.next(Token.newToken(Token.COMMA, pos).end(pos)).setContext(scp.begin());
+                    last = pool.add(Token.newToken(Token.COMMA, pos).end(pos)).context(context);
                     continue;
                 }
                 case COLON:
@@ -647,19 +649,20 @@ public final class Jsons implements Serializable
                     
                     if (last.type() == Token.STRING)
                     {//上一个token是String 则当前是冒号
-                        current = Token.newToken(Token.COLON, pos).end(pos).setContext(scp.begin());
-                        last = last.next(current);
+                        current = Token.newToken(Token.COLON, pos).end(pos).context(context);
+                        last = pool.add(current);
                     }
                     else
                     {
                         //如果上一个 不是String 型 则当前是 String键
-                        int length = getStringTokenLength(json, pos, scope, last);
-                        current = length == 0 ? null : Token.newToken(Token.STRING, pos).setContext(scp.begin());
+                        int length = getStringTokenLength(json, pos, contextType, last);
+                        current = length == 0 ? null : Token.newToken(Token.STRING, pos).context(context);
                         pos += (length - 1);
                         if (current != null)
+                        {
                             current.end(pos);// 设置结束位置
-                        
-                        last = last.next(current);
+                            last = pool.add(current);
+                        }
                     }
                     
                     continue;
@@ -669,12 +672,14 @@ public final class Jsons implements Serializable
                     if (isWhitespace(ch))
                         continue;
     
-                    int length = getStringTokenLength(json, pos, scope, last);
-                    current = length == 0 ? null : Token.newToken(Token.STRING, pos).setContext(scp.begin());
+                    int length = getStringTokenLength(json, pos, contextType, last);
+                    current = length == 0 ? null : Token.newToken(Token.STRING, pos).context(context);
                     pos += (length - 1);
                     if (current != null)
+                    {
                         current.end(pos);// 设置结束位置
-                    last = last.next(current);
+                        last = pool.add(current);
+                    }
                 }
             }
         }
@@ -682,7 +687,7 @@ public final class Jsons implements Serializable
         if (root != null)
             root.end(json.length() - 1);
        
-        return root;
+        return pool;
     }
 
     /**
@@ -694,7 +699,6 @@ public final class Jsons implements Serializable
      * @param prevToken 上一个token的类型
      * @return 返回String token 的字符长度
      */
-
     private static int getStringTokenLength(String json, int pos, int scope, Token prevToken)
     {
         int length = 0;
@@ -919,7 +923,7 @@ public final class Jsons implements Serializable
         if (NULL.equals(json))
             return null;
 
-        return (T) Jsons.getParser(clazz).toObject(json, getTokens(json), clazz);
+        return (T) Jsons.getParser(clazz).toObject(json, clazz);
     }
 
     /**

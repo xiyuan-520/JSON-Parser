@@ -1,9 +1,8 @@
 import java.io.File;
+import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.zhiqim.kernel.constants.CodeConstants;
 import org.zhiqim.kernel.constants.TypeConstants;
@@ -12,8 +11,10 @@ import org.zhiqim.kernel.util.Files;
 import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.xiyuan.util.json.JsonLexer;
 import com.xiyuan.util.json.Jsons;
 import com.xiyuan.util.json.Token;
+import com.xiyuan.util.json.TokenPool;
 
 import frame.model.OrdOrder;
 import frame.model.Person;
@@ -23,7 +24,7 @@ public class JsonMain implements TypeConstants, CodeConstants
 
     public static void main(String[] args) throws Exception
     {
-        int listSize = 10000;
+        int listSize = 100;
         String jsonPath = "./json/" + listSize + ".json";
         long l1 = System.currentTimeMillis();
         long l2 = l1;
@@ -32,35 +33,49 @@ public class JsonMain implements TypeConstants, CodeConstants
         l1 = System.currentTimeMillis();
         String json = new String(Files.read(new File(jsonPath), 1800 * MiB));
         l2 = System.currentTimeMillis();
-        System.out.println("文件加载完成，共耗时：" + (l2 - l1));
+        System.out.println("文件加载完成，共耗时：" + (l2 - l1)+" 毫秒，length:"+json.length());
 
         // testFastJson(json);
-        testMy(json, jsonString);
+         testMy(json, jsonString);
         // testZhiqim(json);
         // testGson(json);//145033459
         // Token root = Token.newToken(Token.BRACE_L, 0);
         // Token next = root.next(Token.STRING, 1);
         //
+
         // List<Integer> ls = new LinkedList<Integer>();
         // // List<Token> ls = new LinkedList<Token>();
-        // int count = 1200000;
-        // l1 = System.currentTimeMillis();
-        // for (int i = 2; i <= count; i++)
-        // {
-        // next = next.next(Token.STRING, i);
-        // // ls.add(i);
-        // }
-        // System.out.println(count+" - time:"+(System.currentTimeMillis()-l1));
-        // //
-        // System.out.println(root.size(null));
+        
+//        int count = 25033459;
+//        l1 = System.currentTimeMillis();
+//        TokenPool pool = new TokenPool(1000);
+//        for (int i = 0; i < count; i++)
+//        {
+//            pool.add(Token.newToken(Token.BRACE_L, i)).context(null);
+//        }
+//        System.out.println(count + " - time:" + (System.currentTimeMillis() - l1));
+//        System.out.println(pool.size());
+//        System.out.println(pool.get(count - 1).begin());
+
+        //
         // System.out.println(json.length());
         // System.out.println(ls.size()+2);
         // // System.out.println(Integer.MAX_VALUE);
+        
+    }
+    
+    public static Object getArr()
+    {
+        Boolean[] temp = {true, false};
+        boolean[] arr = new boolean[2];
+        System.arraycopy(temp, 0, arr, 0, 2);
+        return arr;
     }
 
     public static void testMy(String json, String jsonString)
     {
         Token token = Token.newToken((byte) 0, 0);
+        TokenPool pool = new TokenPool(1000);
         long l1 = 0, l2 = 0;
         List<OrdOrder> orders = new ArrayList<OrdOrder>();
         System.out.println("===========================================================================");
@@ -68,14 +83,14 @@ public class JsonMain implements TypeConstants, CodeConstants
         l1 = System.currentTimeMillis();
         // json =
         // "[{\"oid\":1970649346523,\"tids\":\"625421090979097318\",\"status\":\"2\"},{\"oid\":1970649256481,\"tids\":\"625345184971437955\",\"status\":\"2\",\"shopNick\":\"th办公旗舰店\"},{\"oid\":1970649176433,\"tids\":\"625470499260064842\",\"status\":\"1\",\"shopNick\":\"yawiiwen\",\"buyerNick\":\"许诺612\"},{\"oid\":1970649086392,\"tids\":\"625340544680873331\",\"status\":\"2\",\"servicesMessage\":\"\",\"isOldUser\":0},{\"oid\":1970649026370,\"tids\":\"555698372277719588\",\"status\":\"1\",\"shopNick\":\"th办公旗舰店\"\"isOldUser\":0}]";
-//        orders = Jsons.toList(json, OrdOrder.class);
+        // orders = Jsons.toList(json, OrdOrder.class);
         // orders = Jsons.toList2(json, OrdOrder.class);
-         token = Jsons.getTokens(json);
+//        pool = Jsons.getTokens(json);
         // Token[]ss = token.getElements();
         // token = Jsons.getTokens(json, "oid");
         l2 = System.currentTimeMillis();
         System.out.println("自己代码 共生成 " + (orders != null ? orders.size() : a) + "条数据，共耗时：" + (l2 - l1) + " 毫秒");
-        System.out.println(token.size());
+        System.out.println(pool.size());
         for (int i = 0; i < orders.size(); i++)
         {
             if (i > 0)
@@ -85,7 +100,7 @@ public class JsonMain implements TypeConstants, CodeConstants
         }
 
         // json = "";
-       
+
         Person p = new Person();
         p.setAge(18);
         p.setId(1);
@@ -95,11 +110,21 @@ public class JsonMain implements TypeConstants, CodeConstants
         System.out.println("============================================================");
 
         json = "[";
-        json += "{\"id\":1,\"name\":\"a\",\"age\":18,\"sex\":\"0\"}";
+        json += "{dd:{sddd:1354},\"id\":1,\"name\":\"a\",\"age\":18,\"sex\":\"0\"}";
         json += ",";
         json += "{\"id\":2,\"name\":\"b\",\"age\":19,\"sex\":\"1\"}";
         json += "]";
-
+        
+//        json = "[[ss,d]]";
+        System.out.println(json);
+        JsonLexer lexer = new JsonLexer(json);
+        while (lexer.hasNext())
+        {
+            String value = lexer.naxtToken();
+            System.out.println(lexer.scope()+"\t"+value);
+        }
+        
+        System.out.println((int)(1000*2.5));
         // List<Person> ls = Jsons.toList(json, Person.class);
         // for (Person person : ls)
         // System.out.println(person);

@@ -7,8 +7,6 @@
 package com.xiyuan.util.json;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * token标记符
@@ -46,8 +44,6 @@ public final class Token implements Serializable
     private int begin;
     private int end;
 
-    private int context = -1;// 当前token所在作用域
-    private Token next;
 
     private Token(byte type, int begin)
     {
@@ -55,6 +51,7 @@ public final class Token implements Serializable
         this.begin = begin;
         this.end = this.begin;
     }
+
 
     // /**
     // * 生成下一个 返回 下一个token 注：当下一个token类型为逗号时，不自动设置为当前的下一个token，需要手动社会
@@ -70,133 +67,134 @@ public final class Token implements Serializable
     //
     // return next(next);
     // }
-
-    /** 获取下一个token */
-    public Token next()
-    {
-        return this.next;
-    }
-
-    /**
-     * 设置下一个token 注：这里不是插入，可能会丢失数据，举例：token序列 =[1,2,3,4,5,6,7] this = 1,
-     * 目标next=5,然后 1.next(5) 之后，2，3，4将会丢失，而设置后的token序列=[1,5,6,7]
-     * */
-    public Token next(Token next)
-    {
-        this.next = next;
-        next.context = this.type == BRACE_L || this.type == BRACKET_L ? this.begin : this.context;
-        return this.next;
-    }
-
-    /***
-     * 获取所有子元素数量 除开逗号
-     */
-    public int size()
-    {
-        return size(COMMA);
-    }
-
-    /**
-     * 计算取子token的数量 注意：是实时遍历，有损性能
-     * 
-     * @param filters 过滤类型
-     * */
-    public int size(byte... filters)
-    {
-        Set<Byte> set = new HashSet<>();
-        if (filters != null)
-        {
-            for (byte b : filters)
-                set.add(b);
-        }
-        int size = 0;
-        Token next = this.next;
-        if (next == null)
-            return size;
-
-        int context = next.context;
-        while (next != null)
-        {
-            if (next.context != context || set.contains(next.type))
-            {// 子集子集里面跳过,或者 被过滤掉了
-                next = next.next;
-                continue;
-            }
-
-            if (isComplated(next))
-                break;// 和当前对象平级作用域，说明已经退出
-
-            size++;
-            next = next.next;
-        }
-
-        return size;
-    }
-
-    public Token setContext(int begin)
-    {
-        this.context = begin;
-        return this;
-    }
-
-    /***
-     * 获取子元素 过滤逗号
-     */
-    public Token[] getElements()
-    {
-        return getElements(COMMA);
-    }
-
-    public Token[] getStringElements()
-    {
-        return getElements(COMMA, COLON, BRACE_L, BRACKET_L, BRACE_R, BRACKET_R);
-    }
-
-    public Token[] getElements(byte... filters)
-    {
-
-        Token next = this.next;
-        if (next == null)
-            return new Token[0];
-
-        int size = size(filters);
-
-        Token[] ls = new Token[size];
-        Set<Byte> set = new HashSet<>();
-        if (filters != null)
-        {
-            for (byte b : filters)
-                set.add(b);
-        }
-
-        int index = 0;
-        int context = next.context;
-        while (next != null)
-        {
-            if (next.context != context || set.contains(next.type))
-            {// 子集子集里面跳过,或者 被过滤掉了
-                next = next.next;
-                continue;
-            }
-
-            if (isComplated(next))
-                break;// 和当前对象平级作用域，说明已经退出
-
-            ls[index++] = next;
-            if (index == size)
-                break;
-            next = next.next;
-        }
-        return ls;
-    }
-
-    private boolean isComplated(Token next)
-    {
-        if (next == null)
-            return true;
-        else
-            return next.context == this.context;
-    }
+    //
+    // /** 获取下一个同级token */
+    // public Token next(TokenPool pool)
+    // {
+    // return this.next;
+    // }
+    //
+    // /**
+    // * 设置下一个token 注：这里不是插入，可能会丢失数据，举例：token序列 =[1,2,3,4,5,6,7] this = 1,
+    // * 目标next=5,然后 1.next(5) 之后，2，3，4将会丢失，而设置后的token序列=[1,5,6,7]
+    // * */
+    // public Token next(Token next)
+    // {
+    // this.next = next;
+    // next.context = this.type == BRACE_L || this.type == BRACKET_L ?
+    // this.begin : this.context;
+    // return this.next;
+    // }
+    //
+    // /***
+    // * 获取所有子元素数量 除开逗号
+    // */
+    // public int size()
+    // {
+    // return size(COMMA);
+    // }
+    //
+    // /**
+    // * 计算取子token的数量 注意：是实时遍历，有损性能
+    // *
+    // * @param filters 过滤类型
+    // * */
+    // public int size(byte... filters)
+    // {
+    // Set<Byte> set = new HashSet<>();
+    // if (filters != null)
+    // {
+    // for (byte b : filters)
+    // set.add(b);
+    // }
+    // int size = 0;
+    // Token next = this.next;
+    // if (next == null)
+    // return size;
+    //
+    // int context = next.context;
+    // while (next != null)
+    // {
+    // if (next.context != context || set.contains(next.type))
+    // {// 子集子集里面跳过,或者 被过滤掉了
+    // next = next.next;
+    // continue;
+    // }
+    //
+    // if (isComplated(next))
+    // break;// 和当前对象平级作用域，说明已经退出
+    //
+    // size++;
+    // next = next.next;
+    // }
+    //
+    // return size;
+    // }
+    //
+    // public Token setContext(int begin)
+    // {
+    // this.context = begin;
+    // return this;
+    // }
+    //
+    // /***
+    // * 获取子元素 过滤逗号
+    // */
+    // public Token[] getElements()
+    // {
+    // return getElements(COMMA);
+    // }
+    //
+    // public Token[] getStringElements()
+    // {
+    // return getElements(COMMA, COLON, BRACE_L, BRACKET_L, BRACE_R, BRACKET_R);
+    // }
+    //
+    // public Token[] getElements(byte... filters)
+    // {
+    //
+    // Token next = this.next;
+    // if (next == null)
+    // return new Token[0];
+    //
+    // int size = size(filters);
+    //
+    // Token[] ls = new Token[size];
+    // Set<Byte> set = new HashSet<>();
+    // if (filters != null)
+    // {
+    // for (byte b : filters)
+    // set.add(b);
+    // }
+    //
+    // int index = 0;
+    // int context = next.context;
+    // while (next != null)
+    // {
+    // if (next.context != context || set.contains(next.type))
+    // {// 子集子集里面跳过,或者 被过滤掉了
+    // next = next.next;
+    // continue;
+    // }
+    //
+    // if (isComplated(next))
+    // break;// 和当前对象平级作用域，说明已经退出
+    //
+    // ls[index++] = next;
+    // if (index == size)
+    // break;
+    // next = next.next;
+    // }
+    // return ls;
+    // }
+    //
+    // private boolean isComplated(Token next)
+    // {
+    // if (next == null)
+    // return true;
+    // else
+    // return next.context == this.context;
+    // }
 
     /** 设置token结束索引 */
     public Token end(int end)
