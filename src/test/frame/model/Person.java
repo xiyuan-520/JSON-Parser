@@ -11,6 +11,9 @@
  */
 
 package frame.model;
+
+import com.xiyuan.util.json.Jsons;
+
 public class Person {
     public int id;
     public String name;
@@ -62,5 +65,9 @@ public class Person {
         this.sex = sex;
     }
     
-    
+    public String toString()
+    {
+        // TODO Auto-generated method stub
+        return Jsons.toString(this);
+    }
 }

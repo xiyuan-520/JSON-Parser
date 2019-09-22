@@ -16,15 +16,15 @@ import com.xiyuan.util.json.parser.ObjectParser;
 
 /***
  * JSON 主程序，对象转换成JSON和JSON转换成对象
- *
+ * 
  * @version v1.0.0 @author lgz 2019年8月31日 新建与整理
  */
 public final class Jsons implements Serializable
 {
-    
+
     private static final long serialVersionUID = 1L;
     public final static byte ZERO = 0;
-    
+
     /** 左大括号 { */
     public final static char BRACE_L = '{';
     /** 右大括号 } */
@@ -45,7 +45,7 @@ public final class Jsons implements Serializable
     public final static String QUOTE_S = String.valueOf(QUOTE);
     /** 双引号 " */
     public final static String DB_QUOTE_S = String.valueOf(DB_QUOTE);
-    
+
     /** null " */
     public final static String NULL = "null";
     /** "true" */
@@ -56,10 +56,10 @@ public final class Jsons implements Serializable
     public final static String EMPTY_OBJ = "{}";
     /** 空数组 [] */
     public final static String EMPTY_ARR = "[]";
-    
+
     public final static String INTEGER = "^(0|[\\+\\-]?[1-9]\\d*)$";// 整数，支持正负数
     public final static String FLOAT = "^(0|[\\+\\-]?[1-9]\\d*)(\\.\\d+)?$";// 浮点值，支持多位小数点，支持正负数
-    
+
     private static JsonParser baseParser = new BaseParser();
     private static JsonParser arrarParser = new ArrayParser();
     private static JsonParser listParser = new ListParser();
@@ -69,7 +69,7 @@ public final class Jsons implements Serializable
     /**************************************************/
     // 八大基本类型&封装类&数组&封装数组的class的哈希吗
     /**************************************************/
-    
+
     /**************************************************/
     // 基本类型
     /**************************************************/
@@ -153,7 +153,7 @@ public final class Jsons implements Serializable
      * = 761287205
      */
     public final static int DOUBLE_OBJ_CLS_HASH = 761287205;// Double.class.getName().hashCode();
-    
+
     /**************************************************/
     // 基本类型[]
     /**************************************************/
@@ -237,7 +237,7 @@ public final class Jsons implements Serializable
      * = -499457160
      */
     public final static int BOOL_OBJ_ARR_CLS_HASH = -499457160;// Boolean[].class.getName().hashCode();
-    
+
     /**************************************************/
     // String值相关
     /**************************************************/
@@ -251,7 +251,7 @@ public final class Jsons implements Serializable
      * = 392722245
      */
     public final static int STRING_ARR_CLS_HASH = 392722245;// String[].class.getName().hashCode();
-    
+
     /**************************************************/
     // 哈希表
     /**************************************************/
@@ -287,7 +287,7 @@ public final class Jsons implements Serializable
      * = 1131064094
      */
     public final static int TREEMAP_CLS_HASH = 1131064094;// TreeMap.class.getName().hashCode();
-    
+
     /**************************************************/
     // 链表
     /**************************************************/
@@ -316,7 +316,7 @@ public final class Jsons implements Serializable
      * = -1402716492
      */
     public final static int HASHSET_CLS_HASH = -1402716492;// HashSet.class.getName().hashCode();
-    
+
     /**************************************************/
     // Object值相关
     /**************************************************/
@@ -330,7 +330,7 @@ public final class Jsons implements Serializable
      * = 614832599
      */
     public final static int OBJECT_ARR_CLS_HASH = 614832599;// Object[].class.getName().hashCode();
-    
+
     // 时间
     /**
      * java.util.Calendar.class.getName().hashCode()<br>
@@ -357,92 +357,126 @@ public final class Jsons implements Serializable
      * = 1252880906
      */
     public final static int SQL_TIMESTAMP_CLS_HASH = 1252880906;// java.sql.Timestamp.class.getName().hashCode();
-    
+
     /** 根据类获取解析器 */
     public static JsonParser getParser(Class<?> clazz)
     {
         JsonParser parser = null;
         switch (clazz.getName().hashCode())
         {
-        
+
         // 八大基本类型+封装类+String
-            case BOOL_CLS_HASH:// = 64711720;//boolean.class.getName().hashCode();
-            case BOOL_OBJ_CLS_HASH:// = 344809556;//Boolean.class.getName().hashCode();
-            case BYTE_CLS_HASH:// = 3039496;//byte.class.getName().hashCode();
-            case BYTE_OBJ_CLS_HASH:// = 398507100;//Byte.class.getName().hashCode();
-            case CHAR_CLS_HASH:// :// = 3052374;// char.class.getName().hashCode();
-            case CHAR_OBJ_CLS_HASH:// = 155276373;//Character.class.getName().hashCode();
-            case SHORT_CLS_HASH:// = 109413500;//short.class.getName().hashCode();
-            case SHORT_OBJ_CLS_HASH:// = -515992664;//Short.class.getName().hashCode();
-            case INT_CLS_HASH:// = 104431;//int.class.getName().hashCode();
-            case INT_OBJ_CLS_HASH:// = -2056817302;//Integer.class.getName().hashCode();
-            case LONG_CLS_HASH:// = 3327612;//long.class.getName().hashCode();
-            case LONG_OBJ_CLS_HASH:// = 398795216;//Long.class.getName().hashCode();
-            case FLOAT_CLS_HASH:// = 97526364;//float.class.getName().hashCode();
-            case FLOAT_OBJ_CLS_HASH:// = -527879800;//Float.class.getName().hashCode();
-            case DOUBLE_CLS_HASH:// = -1325958191;//double.class.getName().hashCode();
-            case DOUBLE_OBJ_CLS_HASH:// = 761287205;//Double.class.getName().hashCode();
-            case STRING_CLS_HASH:// = 1195259493;//String.class.getName().hashCode();
-                parser = baseParser;
-                break;
-            
-            // 八大基本类型+封装类+String 的数组
-            case DOUBLE_ARR_CLS_HASH:// = 2889;//double[].class.getName().hashCode();
-            case DOUBLE_OBJ_ARR_CLS_HASH:// = -175516795;//Double[].class.getName().hashCode();
-            case FLOAT_ARR_CLS_HASH:// = 2891;//float[].class.getName().hashCode();
-            case FLOAT_OBJ_ARR_CLS_HASH:// = 48646404;//Float[].class.getName().hashCode();
-            case LONG_ARR_CLS_HASH:// = 2895;//long[].class.getName().hashCode();
-            case LONG_OBJ_ARR_CLS_HASH:// = -2071011078;//Long[].class.getName().hashCode();
-            case INT_ARR_CLS_HASH:// = 2894;//int[].class.getName().hashCode();
-            case INT_OBJ_ARR_CLS_HASH:// = -1935445726;//Integer[].class.getName().hashCode();
-            case SHORT_ARR_CLS_HASH:// = 2904;//short[].class.getName().hashCode();
-            case SHORT_OBJ_ARR_CLS_HASH:// = 417147620;//Short[].class.getName().hashCode();
-            case CHAR_ARR_CLS_HASH:// = 2888;//char[].class.getName().hashCode();
-            case CHAR_OBJ_ARR_CLS_HASH:// = -1378128041;//Character[].class.getName().hashCode();
-            case BYTE_ARR_CLS_HASH:// = 2887;//byte[].class.getName().hashCode();
-            case BYTE_OBJ_ARR_CLS_HASH:// = -2079942674;//Byte[].class.getName().hashCode();
-            case BOOL_ARR_CLS_HASH:// = 2911;//boolean[].class.getName().hashCode();
-            case BOOL_OBJ_ARR_CLS_HASH:// = -499457160;//Boolean[].class.getName().hashCode();
-            case STRING_ARR_CLS_HASH:// = 392722245;//String[].class.getName().hashCode();
-            case OBJECT_ARR_CLS_HASH:// = 614832599;// Object[].class.getName().hashCode();
-                parser = arrarParser;
-                break;
-            
-            // 哈希表
-            case MAP_CLS_HASH:// = -1383349348;// Map.class.getName().hashCode();
-            case HASHMAP_CLS_HASH:// = -1402722386;// HashMap.class.getName().hashCode();
-            case CONCURRENTMAP_CLS_HASH:// =-1419705938;// ConcurrentMap.class.getName().hashCode();
-            case CONCURRENTHASHMAP_CLS_HASH:// = 577244352;// ConcurrentHashMap.class.getName().hashCode();
-            case HASHTABLE_CLS_HASH:// = 639525312;// Hashtable.class.getName().hashCode();
-            case LINKEDHASHMAP_CLS_HASH:// = 1258621781;// LinkedHashMap.class.getName().hashCode();
-            case TREEMAP_CLS_HASH:// = 1131064094;// TreeMap.class.getName().hashCode();
-                parser = mapParser;
-                break;
-            
-            // 链表
-            case LIST_CLS_HASH:// = 65821278;// List.class.getName().hashCode();
-            case ARRAYLIST_CLS_HASH:// = -1114099497;// ArrayList.class.getName().hashCode();
-            case LINKEDLIST_CLS_HASH:// = -1899270121;// LinkedList.class.getName().hashCode();
-            case SET_CLS_HASH:// =-1383343454;// Set.class.getName().hashCode();
-            case HASHSET_CLS_HASH:// =-1402716492;// HashSet.class.getName().hashCode();
-                parser = listParser;
-                break;
-            
-            // 时间
-            case CALENDAR_CLS_HASH:// = -861027074;// java.util.Calendar.class.getName().hashCode();
-            case DATE_CLS_HASH:// = 65575278;// java.util.Date.class.getName().hashCode();
-            case SQL_DATE_CLS_HASH:// = 1087757882;// java.sql.Date.class.getName().hashCode();
-            case SQL_TIME_CLS_HASH:// = 1088242009;// java.sql.Time.class.getName().hashCode();
-            case SQL_TIMESTAMP_CLS_HASH:// = 1252880906;// java.sql.Timestamp.class.getName().hashCode();
-                parser = dateParser;
-                break;
-            
-            // 通用 object
-            case OBJECT_CLS_HASH:// = 1063877011;// Object.class.getName().hashCode();
-                parser = objParser;
-                break;
+        case BOOL_CLS_HASH:// = 64711720;//boolean.class.getName().hashCode();
+        case BOOL_OBJ_CLS_HASH:// =
+                               // 344809556;//Boolean.class.getName().hashCode();
+        case BYTE_CLS_HASH:// = 3039496;//byte.class.getName().hashCode();
+        case BYTE_OBJ_CLS_HASH:// = 398507100;//Byte.class.getName().hashCode();
+        case CHAR_CLS_HASH:// :// = 3052374;// char.class.getName().hashCode();
+        case CHAR_OBJ_CLS_HASH:// =
+                               // 155276373;//Character.class.getName().hashCode();
+        case SHORT_CLS_HASH:// = 109413500;//short.class.getName().hashCode();
+        case SHORT_OBJ_CLS_HASH:// =
+                                // -515992664;//Short.class.getName().hashCode();
+        case INT_CLS_HASH:// = 104431;//int.class.getName().hashCode();
+        case INT_OBJ_CLS_HASH:// =
+                              // -2056817302;//Integer.class.getName().hashCode();
+        case LONG_CLS_HASH:// = 3327612;//long.class.getName().hashCode();
+        case LONG_OBJ_CLS_HASH:// = 398795216;//Long.class.getName().hashCode();
+        case FLOAT_CLS_HASH:// = 97526364;//float.class.getName().hashCode();
+        case FLOAT_OBJ_CLS_HASH:// =
+                                // -527879800;//Float.class.getName().hashCode();
+        case DOUBLE_CLS_HASH:// =
+                             // -1325958191;//double.class.getName().hashCode();
+        case DOUBLE_OBJ_CLS_HASH:// =
+                                 // 761287205;//Double.class.getName().hashCode();
+        case STRING_CLS_HASH:// =
+                             // 1195259493;//String.class.getName().hashCode();
+            parser = baseParser;
+            break;
+
+        // 八大基本类型+封装类+String 的数组
+        case DOUBLE_ARR_CLS_HASH:// =
+                                 // 2889;//double[].class.getName().hashCode();
+        case DOUBLE_OBJ_ARR_CLS_HASH:// =
+                                     // -175516795;//Double[].class.getName().hashCode();
+        case FLOAT_ARR_CLS_HASH:// = 2891;//float[].class.getName().hashCode();
+        case FLOAT_OBJ_ARR_CLS_HASH:// =
+                                    // 48646404;//Float[].class.getName().hashCode();
+        case LONG_ARR_CLS_HASH:// = 2895;//long[].class.getName().hashCode();
+        case LONG_OBJ_ARR_CLS_HASH:// =
+                                   // -2071011078;//Long[].class.getName().hashCode();
+        case INT_ARR_CLS_HASH:// = 2894;//int[].class.getName().hashCode();
+        case INT_OBJ_ARR_CLS_HASH:// =
+                                  // -1935445726;//Integer[].class.getName().hashCode();
+        case SHORT_ARR_CLS_HASH:// = 2904;//short[].class.getName().hashCode();
+        case SHORT_OBJ_ARR_CLS_HASH:// =
+                                    // 417147620;//Short[].class.getName().hashCode();
+        case CHAR_ARR_CLS_HASH:// = 2888;//char[].class.getName().hashCode();
+        case CHAR_OBJ_ARR_CLS_HASH:// =
+                                   // -1378128041;//Character[].class.getName().hashCode();
+        case BYTE_ARR_CLS_HASH:// = 2887;//byte[].class.getName().hashCode();
+        case BYTE_OBJ_ARR_CLS_HASH:// =
+                                   // -2079942674;//Byte[].class.getName().hashCode();
+        case BOOL_ARR_CLS_HASH:// = 2911;//boolean[].class.getName().hashCode();
+        case BOOL_OBJ_ARR_CLS_HASH:// =
+                                   // -499457160;//Boolean[].class.getName().hashCode();
+        case STRING_ARR_CLS_HASH:// =
+                                 // 392722245;//String[].class.getName().hashCode();
+        case OBJECT_ARR_CLS_HASH:// = 614832599;//
+                                 // Object[].class.getName().hashCode();
+            parser = arrarParser;
+            break;
+
+        // 哈希表
+        case MAP_CLS_HASH:// = -1383349348;// Map.class.getName().hashCode();
+        case HASHMAP_CLS_HASH:// = -1402722386;//
+                              // HashMap.class.getName().hashCode();
+        case CONCURRENTMAP_CLS_HASH:// =-1419705938;//
+                                    // ConcurrentMap.class.getName().hashCode();
+        case CONCURRENTHASHMAP_CLS_HASH:// = 577244352;//
+                                        // ConcurrentHashMap.class.getName().hashCode();
+        case HASHTABLE_CLS_HASH:// = 639525312;//
+                                // Hashtable.class.getName().hashCode();
+        case LINKEDHASHMAP_CLS_HASH:// = 1258621781;//
+                                    // LinkedHashMap.class.getName().hashCode();
+        case TREEMAP_CLS_HASH:// = 1131064094;//
+                              // TreeMap.class.getName().hashCode();
+            parser = mapParser;
+            break;
+
+        // 链表
+        case LIST_CLS_HASH:// = 65821278;// List.class.getName().hashCode();
+        case ARRAYLIST_CLS_HASH:// = -1114099497;//
+                                // ArrayList.class.getName().hashCode();
+        case LINKEDLIST_CLS_HASH:// = -1899270121;//
+                                 // LinkedList.class.getName().hashCode();
+        case SET_CLS_HASH:// =-1383343454;// Set.class.getName().hashCode();
+        case HASHSET_CLS_HASH:// =-1402716492;//
+                              // HashSet.class.getName().hashCode();
+            parser = listParser;
+            break;
+
+        // 时间
+        case CALENDAR_CLS_HASH:// = -861027074;//
+                               // java.util.Calendar.class.getName().hashCode();
+        case DATE_CLS_HASH:// = 65575278;//
+                           // java.util.Date.class.getName().hashCode();
+        case SQL_DATE_CLS_HASH:// = 1087757882;//
+                               // java.sql.Date.class.getName().hashCode();
+        case SQL_TIME_CLS_HASH:// = 1088242009;//
+                               // java.sql.Time.class.getName().hashCode();
+        case SQL_TIMESTAMP_CLS_HASH:// = 1252880906;//
+                                    // java.sql.Timestamp.class.getName().hashCode();
+            parser = dateParser;
+            break;
+
+        // 通用 object
+        case OBJECT_CLS_HASH:// = 1063877011;//
+                             // Object.class.getName().hashCode();
+            parser = objParser;
+            break;
         }
-        
+
         if (parser == null)
         {
             if (isImplement(clazz, Collection.class))
@@ -454,10 +488,10 @@ public final class Jsons implements Serializable
             else
                 parser = objParser;
         }
-        
+
         return parser;
     }
-    
+
     /**
      * 解析字符串并生成token并json字符串的首个token<br>
      * 举例：字符串{"a":"a1", "b":[1,2,3]} 则返回 { 对应的token<br>
@@ -470,12 +504,12 @@ public final class Jsons implements Serializable
      * @param json json字符串
      * @return 返回json字符串的首个token 值
      */
-    
+
     public static Token getTokens(String json)
     {
         return getTokens(json, null);
     }
-    
+
     /**
      * 解析字符串并生成token并json字符串的首个token<br>
      * 举例：字符串{"a":"a1", "b":[1,2,3]} 则返回 { 对应的token<br>
@@ -485,12 +519,16 @@ public final class Jsons implements Serializable
      * ] 为当前作用范围 [ 的结束token<br>
      * } 为当前作用范围 { 的结束token<br>
      * 
-     * @param json  json字符串
+     * @param json json字符串
      * @param field 指定字段
-     * @return 返回json字符串的首个token 值,如果是指定字段 token.getElements()[0] = root,token.getElements()[1] = field的上一个token，token.getElements()[2] = field 的value <br>
+     * @return 返回json字符串的首个token 值,如果是指定字段 token.getElements()[0] =
+     *         root,token.getElements()[1] =
+     *         field的上一个token，token.getElements()[2] = field 的value <br>
      *         举例：json = {a:{s:b}, cc:ss} <br>
-     *         1. field = a时 token.getElements()[0] = '{' token.getElements()[1] = {s:b} <br>
-     *         1. field = cc:ss时 token.getElements()[0] = ',' token.getElements()[1] = ss
+     *         1. field = a时 token.getElements()[0] = '{' token.getElements()[1]
+     *         = {s:b} <br>
+     *         1. field = cc:ss时 token.getElements()[0] = ','
+     *         token.getElements()[1] = ss
      */
     public static Token getTokens(String json, String field)
     {
@@ -505,19 +543,17 @@ public final class Jsons implements Serializable
         }
         if (maxLenth <= 0)
             return null;
-        
-        TokenContext context = new TokenContext();
+
         // 1.arrNum 数组数量，
         // 2.objNum 对象数量，
-        // 3.scope当前token所属范围，-1=初始时，0=在对象{}里，2 =在数组[]里;
+        // 3.scope当前token所属范围，0=初始时，1=在对象{}里，2 =在数组[]里;
         // 4.valueType当前token所属范围，-1=初始时，参见 tokenType，
         // 5.root 跟节点，prevToken 上一个token, parent 所在范围的token,keyScope=字段所在token域
-        int arrNum = 0, objNum = 0, valueType = -1;
-        char end_char = json.charAt(maxLenth - 1);
-        Token root = null, current = null, prevToken = null, parent = null, keyScope = null;// , keyToken = null; keyToken 不需要了因为 既然ke所在的keyScope与范围都找到了跟定keyToken 也找到了
+        int arrNum = 0, objNum = 0, valueType = -1, scope = 0, context = -1;
+        Token root = null, current = null, last = null, scp = null;
         if (field != null && json.indexOf(field) == -1)
             return null;
-        
+        Token.json = json;
         List<Token> starts = new ArrayList<Token>();
         for (int pos = 0; pos < maxLenth; pos++)
         {
@@ -529,36 +565,23 @@ public final class Jsons implements Serializable
 
             if (current != null)
                 current = null;
-
+            
+          
             switch (ch)
             {
                 case BRACE_L:
                 {
+                    scope = 1;
                     current = Token.newToken(Token.BRACE_L, pos);
                     objNum++;
-
                     starts.add(current);
                     if (root == null)
-                    {
-                        root = current;
-                        parent = root;
-                    }
+                        last = root = current;//last = root;
                     else
-                    {
-//                        parent.addToken(current, true);
-                        parent = current;
-                        context.addIncrement(current, false);
-                    }
+                        last = last.next(current).setContext(scp.begin());// last = current;
                     
-                    context.context(parent, json);//设置context
-                    // if (field != null && keyToken != null && valueType == -1)
-                    if (field != null && keyScope != null && valueType == -1)
-                        valueType = Token.BRACE_L; // 指定字段值为对象是且当前为结束对象
-
-                    if (root.type() == Token.BRACE_L && end_char != BRACE_R)
-                        return root;
-
-                    break;
+                    scp = current;
+                    continue;
                 }
                 case BRACE_R:
                 {
@@ -566,49 +589,30 @@ public final class Jsons implements Serializable
                     {
                         current = Token.newToken(Token.BRACE_R, pos);
                         objNum--;
+    
                         int ind = starts.size() - 1;
                         if (!starts.isEmpty() && starts.get(ind).type() == Token.BRACE_L)
-                            starts.remove(ind);
-
-                        parent.end(pos);// 设置结束位置
-                        if (starts.isEmpty())
-                            parent = root;
-                        else
-                            parent = starts.get(starts.size() - 1);
+                            starts.remove(ind).end(pos);// 设置结束负号
                         
-                        context.context(parent, json);//设置context
-                        // if (field != null && keyScope != null && keyToken != null && parent.equals(keyScope))
-                        if (field != null && keyScope != null && keyScope != null && parent.equals(keyScope))
-                            return context.complated(parent.begin(), json); // 指定字段值为对象是且当前为结束对象
+//                        last = current;
+                        scp = starts.isEmpty() ? root : starts.get(--ind);
+                        scope = scp.type() == Token.BRACE_L ? 1 : (scp.type() == Token.BRACKET_L ? 2 : 0);
                     }
-                    break;
+                    continue;
                 }
                 case BRACKET_L:
                 {
+                    scope = 2;
                     current = Token.newToken(Token.BRACKET_L, pos);
                     arrNum++;
                     starts.add(current);
                     if (root == null)
-                    {// 第一个 token
-                        root = current;
-                        parent = root;
-                    }
+                        last = root = current;//last = root;
                     else
-                    {// 添加子元素
-//                        parent.addToken(current, true);
-                        context.addIncrement(current, false);
-                        parent = current;
-                    }
+                        last = last.next(current).setContext(scp.begin());// last = current;
                     
-                    context.context(parent, json);//设置context
-                    // if (field != null && keyToken != null && valueType == -1)
-                    if (field != null && keyScope != null && valueType == -1)
-                        valueType = Token.BRACKET_L; // 指定字段值类型数组
-
-                    if (root.type() == Token.BRACKET_L && end_char != BRACKET_R)
-                        return root;
-
-                    break;
+                    scp = current;
+                    continue;
                 }
                 case BRACKET_R:
                 {
@@ -618,173 +622,84 @@ public final class Jsons implements Serializable
                         arrNum--;
                         int ind = starts.size() - 1;
                         if (!starts.isEmpty() && starts.get(ind).type() == Token.BRACKET_L)
-                            starts.remove(ind);
-
-                        parent.end(pos);// 设置结束位置
-                        if (starts.isEmpty())
-                            parent = root;
-                        else
-                            parent = starts.get(starts.size() - 1);
-                        
-                        context.context(parent, json);//设置context
-                        // if (field != null && keyScope != null && keyToken != null && parent.equals(keyScope))
-                        if (field != null && keyScope != null && parent.equals(keyScope))
-                            return context.complated(parent.begin(), json); // 指定字段值为数组是且当前为结束数组
+                            starts.remove(ind).end(pos);
+    
+//                        last = current;
+                        scp = starts.isEmpty() ? root : starts.get(--ind);
+                        scope = scp.type() == Token.BRACE_L ? 1 : (scp.type() == Token.BRACKET_L ? 2 : 0);
                     }
-                    break;
+                    continue;
                 }
                 case COMMA:// 上一个token 不能为,
                 {// 前面token 必须是 对象结束 或者 数组结束 或者字符串
-                    if (prevToken != null && prevToken.type() == Token.COMMA)
+                    if (last.type() == Token.COMMA)
                         continue;
-
-                    current = Token.newToken(Token.COMMA, pos);
-                    current.end(pos);
-//                    parent.end(pos);// 设置结束位置
-                    break;
+    
+                    // 处理上一个是 冒号 当前为逗号，则当前值为null 列：{dd:,} 被整理 后为 {dd:null,}
+                    if (last.type() == Token.COLON)
+                        last = last.next(Token.newToken(Token.STRING, pos).end(pos)).setContext(scp.begin());// 添加null值
+    
+                    last = last.next(Token.newToken(Token.COMMA, pos).end(pos)).setContext(scp.begin());
+                    continue;
                 }
                 case COLON:
                 {
-                    if (prevToken != null && (prevToken.type() == Token.COMMA || prevToken.type() == Token.COLON))
-                    {// 如果上一个token为 逗号，则当前 冒号为键的开始部分 列{a::ss:sdcsdcs} 其中 :ss:sdcsdcs 为值
-
-                        int length = getStringTokenLength(json, pos, parent.type(), prevToken);
-                        current = length == 0 ? null : Token.newToken(Token.STRING, pos);// getStringToken(json, pos, scope, prevToken);
+                    
+                    if (last.type() == Token.STRING)
+                    {//上一个token是String 则当前是冒号
+                        current = Token.newToken(Token.COLON, pos).end(pos).setContext(scp.begin());
+                        last = last.next(current);
+                    }
+                    else
+                    {
+                        //如果上一个 不是String 型 则当前是 String键
+                        int length = getStringTokenLength(json, pos, scope, last);
+                        current = length == 0 ? null : Token.newToken(Token.STRING, pos).setContext(scp.begin());
                         pos += (length - 1);
                         if (current != null)
                             current.end(pos);// 设置结束位置
+                        
+                        last = last.next(current);
                     }
-                    else if (prevToken != null && prevToken.type() != Token.COLON && prevToken.type() != Token.BRACE_L && prevToken.type() != Token.BRACKET_L)
-                    {
-                        current = Token.newToken(Token.COLON, pos);
-                        current.end(pos);// 设置结束位置
-                    }
-
-                    break;
+                    
+                    continue;
                 }
                 default:
                 {
                     if (isWhitespace(ch))
                         continue;
-
-                    int length = getStringTokenLength(json, pos, parent.type(), prevToken);
-                    current = length == 0 ? null : Token.newToken(Token.STRING, pos);// getStringToken(json, pos, scope, prevToken);
-                    pos += length - 1;
-                    current.end(pos);// 设置结束位置
-                }
-            }
-
-            if (prevToken != null && current != null && prevToken.type() == current.type() && prevToken.type() == Token.COMMA)
-                continue;// 上一个是是逗号 当前也是逗号
-
-            if (prevToken != null && current != null && prevToken.type() == Token.COLON && current.type() == Token.COMMA)
-            {// 处理上一个是 冒号 当前为逗号，则当前值为null 列：{dd:,} 被整理 后为 {dd:null,}
-                prevToken = current;
-
-                if (parent != null && field == null)
-                {// 非指定字段查询放入父级token列表节省资源开销
-                    current = Token.newToken(Token.STRING, pos);// 上一个是 冒号 当前是逗号 则当前是空值
-//                    parent.addToken(current, true);
-//                    parent.addToken(prevToken, true);
-                    current.end(-1);// 小于0 表示该值为 null
-                    
-                    context.addIncrement(current, false);
-                    context.addIncrement(prevToken, true);
-                    
-                }
-                
-                if (field != null && keyScope != null)
-                {//找到字段
-//                    keyScope.addToken(current, false);
-                    context.addIncrement(current, false);
-                    return context.complated(keyScope.begin(), json);
-                }
-            }
-            else
-            {
-                // prevToken = current;//自地方注释因为指定字段是要保存字段的前一个token所以放到每个括号赋值
-                if (parent == null || current == null)
-                {
-                    prevToken = current;
-                    continue;
-                }
-
-                if (!(current.type() == Token.COLON || current.type() == Token.COMMA || current.type() == Token.STRING))
-                {
-                    prevToken = current;
-                    continue;
-                }
-
-                if (field == null)
-                {// 非指定字段查找{
-                    prevToken = current;
-//                    parent.addToken(current, true);
-                    context.addIncrement(current, true);
-                    continue;
-                }
-
-                /********************************/
-                // 以下是查找字段&字段值
-                /********************************/
-
-                // 一下是指定字段相关操作
-                if (keyScope == null && current.type() != Token.STRING)
-                {
-                    prevToken = current;
-                    continue;// 没找到字段 并且当前不是字符串
-                }
-
-                if (keyScope == null && prevToken.type() != Token.COLON && field.equals(removeStartEndQuotation(current.toString(json))))
-                {// 找到字段，但是上一个token 不是冒号
-                    keyScope = parent;
-//                    keyScope.addToken(prevToken, false);
-                    context.addIncrement(prevToken, false);
-                    prevToken = current;
-                    continue;
-                }
-
-                prevToken = current;
-                if (keyScope != null && current.type() == Token.STRING)
-                {// 已经找到字段
-
-                    if (valueType == Token.BRACE_L || valueType == Token.BRACKET_L)
-                    {// 值类型是对象或者数组
-//                        parent.addToken(current, true);
-                        context.addIncrement(current, false);
-                        continue;
-                    }
-
-                    // if (valueType == -1 && current.type() == Token.COLON)
-                    // continue;//{arr:{dddd:ccc}} 字段 = arr 当前 = ：
-
-//                    parent.addToken(current, true);
-                    context.addIncrement(current, false);
-                    return context.complated(parent.begin(), json);
+    
+                    int length = getStringTokenLength(json, pos, scope, last);
+                    current = length == 0 ? null : Token.newToken(Token.STRING, pos).setContext(scp.begin());
+                    pos += (length - 1);
+                    if (current != null)
+                        current.end(pos);// 设置结束位置
+                    last = last.next(current);
                 }
             }
         }
-
+        
         if (root != null)
             root.end(json.length() - 1);
-        
-        return context.complated(field == null ? root.begin() : keyScope.begin(), json);
+       
+        return root;
     }
-    
+
     /**
      * 生成从当前位置开始的 一个字符串token
      * 
-     * @param json      json 字符串
-     * @param pos       读取位置
-     * @param scope     token所属范围0=初始值,1=obj,2=arr
+     * @param json json 字符串
+     * @param pos 读取位置
+     * @param scope token所属范围0=初始值,1=obj,2=arr
      * @param prevToken 上一个token的类型
      * @return 返回String token 的字符长度
      */
-    
+
     private static int getStringTokenLength(String json, int pos, int scope, Token prevToken)
     {
         int length = 0;
         char quote = 0;// 字符串开始的引号值
-        for (; pos < json.length(); pos++ ,length++)
+        for (; pos < json.length(); pos++, length++)
         {
             char ch = json.charAt(pos);
             if (quote == 0)
@@ -792,34 +707,35 @@ public final class Jsons implements Serializable
                 quote = ch;// 记录开始符
                 continue;
             }
-            
+
             // 查找结束符， 非引号字符串结束的字符
             if (quote > 0 && quote != DB_QUOTE && quote != QUOTE && (ch == COLON || ch == COMMA || ch == BRACE_R || ch == BRACKET_R))
             {
                 if (scope == 2 && ch == COLON)// 如果是数组当前是冒号&所属范围是数组，则当前冒号为值
                     continue;
-                
-                if (ch == COLON && prevToken != null && prevToken.type() == Token.COLON)// 当前为冒号 上一个token的类型为冒号，则档前为值
+
+               // 当前为冒号上一个token的类型为冒号，则档前为值
+                if (ch == COLON && prevToken != null && prevToken.type() == Token.COLON)
                     continue;// {a::sss:sdcsdcs, b:wwww} 其中 sss:sdcsdcs 为值
                 else
                     return length;// 非引号开始 并且有结束负号
             }
-            
+
             // 查找结束符，引号开头&当前是引号 & 上一个字符不是不是转义符
             if ((ch == QUOTE || ch == DB_QUOTE) && ch == quote && json.charAt(pos - 1) != '\\')
                 return ++length;// 包含当前字符
         }
-        
+
         if (pos == json.length())
             return --length;// 遍历结束索引json最大索引
         else
             return length;
     }
-    
+
     /**
      * 增加JSON中的转义字符，使用双引号时，单引号不转义，使用单引号时双引号不转义，不使用引号时都转义
      * 
-     * @param str       原字符串
+     * @param str 原字符串
      * @param quotation 使用的引号 =0表示未使用,='表示单引号,="表示双引号
      * @return 对字符中需要转义的字符，增加转义符
      */
@@ -827,55 +743,55 @@ public final class Jsons implements Serializable
     {
         if (str == null)
             return null;
-        
+
         StringBuilder strb = new StringBuilder();
         for (int i = 0; i < str.length(); i++)
         {
             char c = str.charAt(i);
             switch (c)
             {
-                case '\\':
-                    strb.append("\\\\");
-                    break;
-                case DB_QUOTE:
-                    if (quotation == 0 || quotation == DB_QUOTE)
-                        strb.append("\\\"");
-                    else
-                        strb.append(c);
-                    break;
-                case QUOTE:
-                    if (quotation == 0 || quotation == QUOTE)
-                        strb.append("\\\'");
-                    else
-                        strb.append(c);
-                    break;// 单引号或无引号时单引号要转义，双引号下的单引号无需处理
-                case '\b':
-                    strb.append("\\b");
-                    break;
-                case '\f':
-                    strb.append("\\f");
-                    break;
-                case '\r':
-                    strb.append("\\r");
-                    break;
-                case '\n':
-                    strb.append("\\n");
-                    break;
-                case '\t':
-                    strb.append("\\t");
-                    break;
-                case '/':
-                    strb.append("\\/");
-                    break;
-                default:
+            case '\\':
+                strb.append("\\\\");
+                break;
+            case DB_QUOTE:
+                if (quotation == 0 || quotation == DB_QUOTE)
+                    strb.append("\\\"");
+                else
                     strb.append(c);
-                    break;
+                break;
+            case QUOTE:
+                if (quotation == 0 || quotation == QUOTE)
+                    strb.append("\\\'");
+                else
+                    strb.append(c);
+                break;// 单引号或无引号时单引号要转义，双引号下的单引号无需处理
+            case '\b':
+                strb.append("\\b");
+                break;
+            case '\f':
+                strb.append("\\f");
+                break;
+            case '\r':
+                strb.append("\\r");
+                break;
+            case '\n':
+                strb.append("\\n");
+                break;
+            case '\t':
+                strb.append("\\t");
+                break;
+            case '/':
+                strb.append("\\/");
+                break;
+            default:
+                strb.append(c);
+                break;
             }
         }
-        
+
         return strb.toString();
     }
-    
+
     /***
      * 去除JSON中的转义字符
      * 
@@ -886,7 +802,7 @@ public final class Jsons implements Serializable
     {
         if (str == null)
             return null;
-        
+
         StringBuilder strb = new StringBuilder();
         boolean isEscape = false;// 是否前一字符是转义字符
         for (int i = 0; i < str.length(); i++)
@@ -903,49 +819,49 @@ public final class Jsons implements Serializable
             {// 有转义
                 switch (c)
                 {
-                    case '\\':
-                        strb.append('\\');
-                        break;
-                    case '\"':
-                        strb.append('\"');
-                        break;
-                    case QUOTE:
-                        strb.append(QUOTE);
-                        break;
-                    case 'b':
-                        strb.append('\b');
-                        break;
-                    case 'f':
-                        strb.append('\f');
-                        break;
-                    case 'n':
-                        strb.append('\n');
-                        break;
-                    case 'r':
-                        strb.append('\r');
-                        break;
-                    case 't':
-                        strb.append('\t');
-                        break;
-                    case '/':
-                        strb.append('/');
-                        break;
-                    default:
-                        strb.append("\\").append(c);
-                        break;// 如果未找到匹配,则返原值
+                case '\\':
+                    strb.append('\\');
+                    break;
+                case '\"':
+                    strb.append('\"');
+                    break;
+                case QUOTE:
+                    strb.append(QUOTE);
+                    break;
+                case 'b':
+                    strb.append('\b');
+                    break;
+                case 'f':
+                    strb.append('\f');
+                    break;
+                case 'n':
+                    strb.append('\n');
+                    break;
+                case 'r':
+                    strb.append('\r');
+                    break;
+                case 't':
+                    strb.append('\t');
+                    break;
+                case '/':
+                    strb.append('/');
+                    break;
+                default:
+                    strb.append("\\").append(c);
+                    break;// 如果未找到匹配,则返原值
                 }
                 isEscape = false;// 重置转义为结束
             }
         }
-        
+
         if (isEscape)
         {// 最后一个字符是\
             strb.append("\\");
         }
-        
+
         return strb.toString();
     }
-    
+
     /***
      * 去除JSON键和值的前后成对引号
      * 
@@ -956,24 +872,24 @@ public final class Jsons implements Serializable
     {
         if (str == null)
             return null;
-        
+
         if (str.length() >= 2 && str.startsWith(DB_QUOTE_S) && str.endsWith(DB_QUOTE_S))
         {// 有双引号删除退出
             str = str.substring(1, str.length() - 1);
             return str;
         }
-        
+
         // 没有双引号则判断单引号
         if (str.length() >= 2 && str.startsWith(QUOTE_S) && str.endsWith(QUOTE_S))
             str = str.substring(1, str.length() - 1);
-        
+
         return str;
     }
-    
+
     /*****************************************************************************/
     // 以下是json解析或转json相关方法
     /*****************************************************************************/
-    
+
     /**
      * 对象转换成JSON字符串
      * 
@@ -986,11 +902,11 @@ public final class Jsons implements Serializable
             return Jsons.NULL;
         return Jsons.getParser(obj.getClass()).toString(obj);
     }
-    
+
     /**
      * JSON字符串转换成对象
      * 
-     * @param json  JSON字符串
+     * @param json JSON字符串
      * @param clazz 转换成对象的类
      * @return obj对象
      */
@@ -999,56 +915,40 @@ public final class Jsons implements Serializable
     {
         if (json == null || clazz == null)
             return null;
-        
+
         if (NULL.equals(json))
             return null;
-        
+
         return (T) Jsons.getParser(clazz).toObject(json, getTokens(json), clazz);
     }
-    
+
     /**
      * 提供泛型，得到列表
      * 
-     * @param json        JSON字符串
+     * @param json JSON字符串
      * @param resultClass 泛型
      * @return List<T>
      */
     @SuppressWarnings("unchecked")
     public static <T> List<T> toList(String json, Class<T> resultClass)
     {
-        
+
         Token token = getTokens(json);
         if (token == null || token.type() != Token.BRACKET_L)
             return new ArrayList<T>(0);
-        
-        List<Token> elems = token.getElements(Token.COMMA);
-        List<T> list = new ArrayList<T>(elems.size());
-        for (Token t : elems)
-            list.add((T) getParser(resultClass).toObject(json, t, resultClass));
-        
+
+        Token[] elems = token.getElements(Token.COMMA);
+        List<T> list = new ArrayList<T>(elems.length);
+        for (int i = 0; i < elems.length; i++)
+            list.add((T) getParser(resultClass).toObject(json, elems[i], resultClass));
+
         return list;
     }
-    
-    @SuppressWarnings("unchecked")
-    public static <T> List<T> toList2(String json, Class<T> resultClass)
-    {
-        
-        Token token = getTokens2(json, null);
-        if (token == null || token.type() != Token.BRACKET_L)
-            return new ArrayList<T>(0);
-        
-        List<Token> elems = token.getElements(Token.COMMA);
-        List<T> list = new ArrayList<T>(elems.size());
-        for (Token t : elems)
-            list.add((T) getParser(resultClass).toObject(json, t, resultClass));
-        
-        return list;
-    }
-    
+
     /**
      * 获取字段对应的数组字符串值，得到结果为[]开头和结束
      * 
-     * @param json  JSON字符串
+     * @param json JSON字符串
      * @param field 字段名
      * @return 得到的字符串值，[]开头和结束
      */
@@ -1057,15 +957,15 @@ public final class Jsons implements Serializable
         String arrText = getString(json, field);
         if (arrText == null || arrText.length() <= 1 || arrText.charAt(0) != BRACKET_L || arrText.charAt(arrText.length() - 1) != BRACKET_R)
             return null;
-        
+
         return arrText;
     }
-    
+
     /**
      * 获取字段对应的数组字符串值，得到结果为[]开头和结束
      * 
      * @param <T>
-     * @param json  JSON字符串
+     * @param json JSON字符串
      * @param field 字段名
      * @return 得到的字符串值，[]开头和结束
      */
@@ -1074,14 +974,14 @@ public final class Jsons implements Serializable
     {//
         if (resultClass == null)
             return null;
-        
+
         String arrJson = getString(json, field);
         if (arrJson == null || arrJson.length() <= 1 || arrJson.charAt(0) != BRACKET_L || arrJson.charAt(arrJson.length() - 1) != BRACKET_R)
             return null;
-        
+
         return (T[]) toList(arrJson, resultClass).toArray();
     }
-    
+
     /**
      * 获取boolean 如果 值为1，结果也返回true
      */
@@ -1090,7 +990,7 @@ public final class Jsons implements Serializable
         String value = getString(json, field);
         return TRUE.equalsIgnoreCase(value) ? true : "1".equals(value);
     }
-    
+
     /**
      * 指定字段获取int值，若没有对应值则返回0
      */
@@ -1110,11 +1010,11 @@ public final class Jsons implements Serializable
         else
             return 0;
     }
-    
+
     /***
      * 指定json字段获取一个long值
      * 
-     * @param json  源json字符串
+     * @param json 源json字符串
      * @param field 指定字段名
      * @return
      */
@@ -1128,32 +1028,32 @@ public final class Jsons implements Serializable
             {
                 if (value.startsWith("-"))
                     isNegative = true;
-                
+
                 // 剔除负号
                 if (value.length() >= 2)
                     value = value.substring(1);
             }
-            
+
             // 如果是数字
             String longMaxStr = Long.toString(Long.MAX_VALUE);
             String longMinStr = String.valueOf(Long.toString(Long.MIN_VALUE)).substring(1);// 去掉负号
             if (value.length() >= longMaxStr.length())
             {// 比较每一位是否超出最大限制
-            
+
                 for (int i = 0; i < value.length(); i++)
                 {
                     char val = value.charAt(i);
-                    
+
                     char max = 0;
                     if (isNegative)
                         max = longMinStr.charAt(i);
                     else
                         max = longMaxStr.charAt(i);
-                    
+
                     if (val > max)
                         return 0;
                 }
-                
+
                 return Long.parseLong(value);
             }
             else
@@ -1161,14 +1061,14 @@ public final class Jsons implements Serializable
         }
         else
             return 0;
-        
+
     }
-    
+
     /**
      * 从一个对象或MAP的json中增加或更新指定的一个KEY
      * 
-     * @param json  对象或MAP对应的JSON字符串
-     * @param key   对象的字段或MAP的键
+     * @param json 对象或MAP对应的JSON字符串
+     * @param key 对象的字段或MAP的键
      * @param value 值
      * @return 增加或更新KEY之后的json
      */
@@ -1178,8 +1078,9 @@ public final class Jsons implements Serializable
             return null;
         if (isEmptyBlank(key) || json.length() < 2)
             return json;// json 字符串必须大于2个字符
-            
-        // token.getElements()[0] = field的上一个token，token.getElements()[1] = field 的value
+
+        // token.getElements()[0] = field的上一个token，token.getElements()[1] =
+        // field 的value
         Token token = getTokens(json, key);
         if (token == null || token.size() < 2)
         {// 找不到字段
@@ -1189,7 +1090,7 @@ public final class Jsons implements Serializable
                 char ch = json.charAt(pos);
                 if (!isWhitespace(ch) && ch != BRACE_L)
                     return json;
-                
+
                 if (ch == BRACE_L)
                     break;
             }
@@ -1210,11 +1111,11 @@ public final class Jsons implements Serializable
             return sb.toString();
         }
     }
-    
+
     /**
      * 提供两个键值生成JSON字符串，对应MAP的两次put
      * 
-     * @param key   第一个键
+     * @param key 第一个键
      * @param value 第一个值
      * @return 生成后的JSON字符串
      */
@@ -1222,36 +1123,37 @@ public final class Jsons implements Serializable
     {
         if (isEmptyBlank(key))
             return NULL;
-        
+
         return new StringBuilder().append(BRACE_L).append(toString(trim(key))).append(COLON).append(toString(value)).append(BRACE_R).toString();
     }
-    
+
     /**
      * 从json字符串中删除字段 当前只删除 一级字段<br>
      * 
-     * @param json  源json字符串
+     * @param json 源json字符串
      * @param field 指定删除字段
      * @retun 返回删除后的字符串
      */
     public static String remove(String json, String key)
     {
-        
+
         Token token = getTokens(json, key);
         if (token == null || token.size() < 2)
             return json;
-        
-        // token.getElements()[0] = field的上一个token，token.getElements()[1] = field 的value
+
+        // token.getElements()[0] = field的上一个token，token.getElements()[1] =
+        // field 的value
         Token[] tokens = token.getElements();
         StringBuilder sb = new StringBuilder(json.length());
         sb.append(json.substring(0, (tokens[0] != null && tokens[0].type() == Token.COMMA) ? tokens[0].begin() : tokens[1].begin()));
         sb.append(json.substring(tokens[1].end() + 1));
         return sb.toString();
     }
-    
+
     /**
      * 指定字段查找json字符串的数据
      * 
-     * @param json  JSON字符串
+     * @param json JSON字符串
      * @param field 字段名
      * @return 得到的字符串值
      */
@@ -1262,10 +1164,10 @@ public final class Jsons implements Serializable
         Token token = getTokens(json, field);
         if (token == null || token.size() < 2)
             return null;
-        
+
         return removeStartEndQuotation(field == null ? token.toString(json) : token.getElements()[1].toString(json));
     }
-    
+
     /**************************************************************************/
     // 以下提供验证方法
     /**************************************************************************/
@@ -1279,11 +1181,11 @@ public final class Jsons implements Serializable
     {// 中文空格 =12288=0x3000, BOM空格 =65279=0xFEFF，英文空格 = 32
         return ch <= 32 || ch == 12288 || ch == 65279;
     }
-    
+
     /**
      * 判断类结构，是否实现指定的接口（含本类）
      * 
-     * @param cls   类结构
+     * @param cls 类结构
      * @param iface 接口
      * @return =true表示实现,=false表示未实现
      */
@@ -1291,10 +1193,10 @@ public final class Jsons implements Serializable
     {
         if (iface == null || cls == null || cls == Object.class || isPrimitiveBase(cls) || !iface.isInterface())
             return false;
-        
+
         if (cls == iface)
             return true;
-        
+
         // 先判断接口是否实现，或实现的接口是否继承
         for (Class<?> c : cls.getInterfaces())
         {
@@ -1303,28 +1205,28 @@ public final class Jsons implements Serializable
                 Class<?>[] cs = c.getInterfaces();
                 if (cs.length == 0)
                     break;
-                
+
                 c = cs[0];
             }
-            
+
             // 最后判断是否实现
             if (c == iface)
                 return true;
         }
-        
+
         // 再判断继承是否实现接口，有可能cls本身是接口
         Class<?> c = cls.getSuperclass();
         while (c != null && c != Object.class)
         {
             if (isImplement(c, iface))
                 return true;
-            
+
             c = c.getSuperclass();
         }
-        
+
         return false;
     }
-    
+
     /**
      * 是否八种基本原型基本类型，仅支持byte/short/int/long/float/double/boolean/char
      * 
@@ -1335,7 +1237,7 @@ public final class Jsons implements Serializable
     {
         if (clazz == null)
             return false;
-        
+
         if (clazz == int.class)
             return true;
         else if (clazz == long.class)
@@ -1355,7 +1257,7 @@ public final class Jsons implements Serializable
         else
             return false;
     }
-    
+
     /**
      * 判断是否为空
      * 
@@ -1366,12 +1268,12 @@ public final class Jsons implements Serializable
     {
         return (s == null || s.length() == 0);
     }
-    
+
     public static boolean isEmptyBlank(String s)
     {
         if (s == null || s.length() == 0)
             return true;
-        
+
         for (char ch : s.toCharArray())
         {
             if (!isWhitespace(ch))
@@ -1379,297 +1281,20 @@ public final class Jsons implements Serializable
         }
         return true;
     }
-    
+
     public static String trim(String s)
     {
         if (s == null)
             return null;
-        
+
         StringBuilder sb = new StringBuilder(s.length());
         for (char ch : s.toCharArray())
         {
             if (isWhitespace(ch))
                 continue;
-            
+
             sb.append(ch);
         }
         return sb.toString();
     }
-
-    /**
-         * 解析字符串并生成token并json字符串的首个token<br>
-         * 举例：字符串{"a":"a1", "b":[1,2,3]} 则返回 { 对应的token<br>
-         * 备注：其中每个token可能有多个子token<br>
-         * token { 的子token 有 "a"， :， "a1"， , ，"b" : , [<br>
-         * 其中 1，,，2，3为 token 的子token<br>
-         * ] 为当前作用范围 [ 的结束token<br>
-         * } 为当前作用范围 { 的结束token<br>
-         * 
-         * @param json  json字符串
-         * @param field 指定字段
-         * @return 返回json字符串的首个token 值,如果是指定字段 token.getElements()[0] = root,token.getElements()[1] = field的上一个token，token.getElements()[2] = field 的value <br>
-         *         举例：json = {a:{s:b}, cc:ss} <br>
-         *         1. field = a时 token.getElements()[0] = '{' token.getElements()[1] = {s:b} <br>
-         *         1. field = cc:ss时 token.getElements()[0] = ',' token.getElements()[1] = ss
-         */
-        public static Token getTokens2(String json, String field)
-        {
-            int maxLenth = json == null ? 0 : json.length();
-            for (; maxLenth > 0;)
-            {// 剔除右边空白
-                char ch = json.charAt(maxLenth - 1);
-                if (!isWhitespace(ch))
-                    break;
-    
-                maxLenth--;
-            }
-            if (maxLenth <= 0)
-                return null;
-    
-            // 1.arrNum 数组数量，
-            // 2.objNum 对象数量，
-            // 3.scope当前token所属范围，-1=初始时，0=在对象{}里，2 =在数组[]里;
-            // 4.valueType当前token所属范围，-1=初始时，参见 tokenType，
-            // 5.root 跟节点，prevToken 上一个token, parent 所在范围的token,keyScope=字段所在token域
-            int arrNum = 0, objNum = 0, valueType = -1;
-            char end_char = json.charAt(maxLenth - 1);
-            Token root = null, current = null, prevToken = null, parent = null, keyScope = null;// , keyToken = null; keyToken 不需要了因为 既然ke所在的keyScope与范围都找到了跟定keyToken 也找到了
-            if (field != null && json.indexOf(field) == -1)
-                return null;
-            
-            List<Token> starts = new ArrayList<Token>();
-            for (int pos = 0; pos < maxLenth; pos++)
-            {
-                char ch = json.charAt(pos);
-                if (root == null && isWhitespace(ch))
-                    continue;// 空白字符开头
-                if (root == null && BRACE_L != ch && ch != BRACKET_L)
-                    continue;// json 数据格式只有两种，1.对象使用{} 括起，2.数组[] 括起。所以非 {或者[开头的数据
-    
-                if (current != null)
-                    current = null;
-    
-                switch (ch)
-                {
-                    case BRACE_L:
-                    {
-                        current = Token.newToken(Token.BRACE_L, pos);
-                        objNum++;
-    
-                        starts.add(current);
-                        if (root == null)
-                        {
-                            root = current;
-                            parent = root;
-                        }
-                        else
-                        {
-                            parent.addToken(current, true);
-                            parent = current;
-                        }
-    
-                        // if (field != null && keyToken != null && valueType == -1)
-                        if (field != null && keyScope != null && valueType == -1)
-                            valueType = Token.BRACE_L; // 指定字段值为对象是且当前为结束对象
-    
-                        if (root.type() == Token.BRACE_L && end_char != BRACE_R)
-                            return root;
-    
-                        break;
-                    }
-                    case BRACE_R:
-                    {
-                        if (objNum > 0)
-                        {
-                            current = Token.newToken(Token.BRACE_R, pos);
-                            objNum--;
-                            int ind = starts.size() - 1;
-                            if (!starts.isEmpty() && starts.get(ind).type() == Token.BRACE_L)
-                                starts.remove(ind);
-    
-                            parent.end(pos);// 设置结束位置
-                            if (starts.isEmpty())
-                                parent = root;
-                            else
-                                parent = starts.get(starts.size() - 1);
-    
-                            // if (field != null && keyScope != null && keyToken != null && parent.equals(keyScope))
-                            if (field != null && keyScope != null && keyScope != null && parent.equals(keyScope))
-                                return parent; // 指定字段值为对象是且当前为结束对象
-                        }
-                        break;
-                    }
-                    case BRACKET_L:
-                    {
-                        current = Token.newToken(Token.BRACKET_L, pos);
-                        arrNum++;
-                        starts.add(current);
-                        if (root == null)
-                        {// 第一个 token
-                            root = current;
-                            parent = root;
-                        }
-                        else
-                        {// 添加子元素
-                            parent.addToken(current, true);
-                            parent = current;
-                        }
-    
-                        // if (field != null && keyToken != null && valueType == -1)
-                        if (field != null && keyScope != null && valueType == -1)
-                            valueType = Token.BRACKET_L; // 指定字段值类型数组
-    
-                        if (root.type() == Token.BRACKET_L && end_char != BRACKET_R)
-                            return root;
-    
-                        break;
-                    }
-                    case BRACKET_R:
-                    {
-                        if (arrNum > 0)
-                        {
-                            current = Token.newToken(Token.BRACKET_R, pos);
-                            arrNum--;
-                            int ind = starts.size() - 1;
-                            if (!starts.isEmpty() && starts.get(ind).type() == Token.BRACKET_L)
-                                starts.remove(ind);
-    
-                            parent.end(pos);// 设置结束位置
-                            if (starts.isEmpty())
-                                parent = root;
-                            else
-                                parent = starts.get(starts.size() - 1);
-    
-                            // if (field != null && keyScope != null && keyToken != null && parent.equals(keyScope))
-                            if (field != null && keyScope != null && parent.equals(keyScope))
-                                return parent; // 指定字段值为数组是且当前为结束数组
-                        }
-                        break;
-                    }
-                    case COMMA:// 上一个token 不能为,
-                    {// 前面token 必须是 对象结束 或者 数组结束 或者字符串
-                        if (prevToken != null && prevToken.type() == Token.COMMA)
-                            continue;
-    
-                        current = Token.newToken(Token.COMMA, pos);
-                        current.end(pos);
-    //                    parent.end(pos);// 设置结束位置
-                        break;
-                    }
-                    case COLON:
-                    {
-                        if (prevToken != null && (prevToken.type() == Token.COMMA || prevToken.type() == Token.COLON))
-                        {// 如果上一个token为 逗号，则当前 冒号为键的开始部分 列{a::ss:sdcsdcs} 其中 :ss:sdcsdcs 为值
-    
-                            int length = getStringTokenLength(json, pos, parent.type(), prevToken);
-                            current = length == 0 ? null : Token.newToken(Token.STRING, pos);// getStringToken(json, pos, scope, prevToken);
-                            pos += (length - 1);
-                            if (current != null)
-                                current.end(pos);// 设置结束位置
-                        }
-                        else if (prevToken != null && prevToken.type() != Token.COLON && prevToken.type() != Token.BRACE_L && prevToken.type() != Token.BRACKET_L)
-                        {
-                            current = Token.newToken(Token.COLON, pos);
-                            current.end(pos);// 设置结束位置
-                        }
-    
-                        break;
-                    }
-                    default:
-                    {
-                        if (isWhitespace(ch))
-                            continue;
-    
-                        int length = getStringTokenLength(json, pos, parent.type(), prevToken);
-                        current = length == 0 ? null : Token.newToken(Token.STRING, pos);// getStringToken(json, pos, scope, prevToken);
-                        pos += length - 1;
-                        current.end(pos);// 设置结束位置
-                    }
-                }
-    
-                if (prevToken != null && current != null && prevToken.type() == current.type() && prevToken.type() == Token.COMMA)
-                    continue;// 上一个是是逗号 当前也是逗号
-    
-                if (prevToken != null && current != null && prevToken.type() == Token.COLON && current.type() == Token.COMMA)
-                {// 处理上一个是 冒号 当前为逗号，则当前值为null 列：{dd:,} 被整理 后为 {dd:null,}
-                    prevToken = current;
-    
-                    if (parent != null && field == null)
-                    {// 非指定字段查询放入父级token列表节省资源开销
-                        current = Token.newToken(Token.STRING, pos);// 上一个是 冒号 当前是逗号 则当前是空值
-                        parent.addToken(current, true);
-                        parent.addToken(prevToken, true);
-                        current.end(-1);// 小于0 表示该值为 null
-                    }
-                    
-                    if (field != null && keyScope != null)
-                    {//找到字段
-                        keyScope.addToken(current, false);
-                        return keyScope;
-                    }
-                }
-                else
-                {
-                    // prevToken = current;//自地方注释因为指定字段是要保存字段的前一个token所以放到每个括号赋值
-                    if (parent == null || current == null)
-                    {
-                        prevToken = current;
-                        continue;
-                    }
-    
-                    if (!(current.type() == Token.COLON || current.type() == Token.COMMA || current.type() == Token.STRING))
-                    {
-                        prevToken = current;
-                        continue;
-                    }
-    
-                    if (field == null)
-                    {// 非指定字段查找{
-                        prevToken = current;
-                        parent.addToken(current, true);
-                        continue;
-                    }
-    
-                    /********************************/
-                    // 以下是查找字段&字段值
-                    /********************************/
-    
-                    // 一下是指定字段相关操作
-                    if (keyScope == null && current.type() != Token.STRING)
-                    {
-                        prevToken = current;
-                        continue;// 没找到字段 并且当前不是字符串
-                    }
-    
-                    if (keyScope == null && prevToken.type() != Token.COLON && field.equals(removeStartEndQuotation(current.toString(json))))
-                    {// 找到字段，但是上一个token 不是冒号
-                        keyScope = parent;
-                        keyScope.addToken(prevToken, false);
-                        prevToken = current;
-                        continue;
-                    }
-    
-                    prevToken = current;
-                    if (keyScope != null && current.type() == Token.STRING)
-                    {// 已经找到字段
-    
-                        if (valueType == Token.BRACE_L || valueType == Token.BRACKET_L)
-                        {// 值类型是对象或者数组
-                            parent.addToken(current, true);
-                            continue;
-                        }
-    
-                        // if (valueType == -1 && current.type() == Token.COLON)
-                        // continue;//{arr:{dddd:ccc}} 字段 = arr 当前 = ：
-    
-                        parent.addToken(current, true);
-                        return parent;
-                    }
-                }
-            }
-    
-            if (root != null)
-                root.end(json.length() - 1);
-            return field == null ? root : keyScope;
-        }
 }

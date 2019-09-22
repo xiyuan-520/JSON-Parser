@@ -37,149 +37,149 @@ public final class ArrayParser extends JsonParser implements Serializable
         return sb.toString();
     }
     
-    public static boolean[] fromJsonBoolean(List<Token> values, String json)
+    public static boolean[] fromJsonBoolean(Token[] values, String json)
     {
         
-        boolean[] val = new boolean[values.size()];
+        boolean[] val = new boolean[values.length];
         for (int i = 0; i < val.length; i++)
-            val[i] = BaseParser.booleanValue(values.get(i), json);
+            val[i] = BaseParser.booleanValue(values[i], json);
         return val;
     }
     
-    public static Boolean[] fromJsonBooleanObj(List<Token> values, String json)
+    public static Boolean[] fromJsonBooleanObj(Token[] values, String json)
     {
-        Boolean[] val = new Boolean[values.size()];
+        Boolean[] val = new Boolean[values.length];
         for (int i = 0; i < val.length; i++)
-            val[i] = BaseParser.booleanValue(values.get(i), json) ? Boolean.TRUE : Boolean.FALSE;
+            val[i] = BaseParser.booleanValue(values[i], json) ? Boolean.TRUE : Boolean.FALSE;
         return val;
     }
     
-    public static byte[] fromJsonByte(List<Token> values, String json)
+    public static byte[] fromJsonByte(Token[] values, String json)
     {
-        byte[] val = new byte[values.size()];
+        byte[] val = new byte[values.length];
         for (int i = 0; i < val.length; i++)
-            val[i] = BaseParser.byteValue(values.get(i), json);
-        
-        return val;
-    }
-    
-    public static Byte[] fromJsonByteObj(List<Token> values, String json)
-    {
-        Byte[] val = new Byte[values.size()];
-        for (int i = 0; i < val.length; i++)
-            val[i] = Byte.valueOf(BaseParser.byteValue(values.get(i), json));
+            val[i] = BaseParser.byteValue(values[i], json);
         
         return val;
     }
     
-    public static char[] fromJsonChar(List<Token> values, String json)
+    public static Byte[] fromJsonByteObj(Token[] values, String json)
     {
-        char[] val = new char[values.size()];
+        Byte[] val = new Byte[values.length];
         for (int i = 0; i < val.length; i++)
-            val[i] = BaseParser.charValue(values.get(i), json);
+            val[i] = Byte.valueOf(BaseParser.byteValue(values[i], json));
         
         return val;
     }
     
-    public static Character[] fromJsonCharObj(List<Token> values, String json)
+    public static char[] fromJsonChar(Token[] values, String json)
     {
-        Character[] val = new Character[values.size()];
+        char[] val = new char[values.length];
         for (int i = 0; i < val.length; i++)
-            val[i] = Character.valueOf(BaseParser.charValue(values.get(i),json));
+            val[i] = BaseParser.charValue(values[i], json);
         
         return val;
     }
     
-    public static short[] fromJsonShort(List<Token> values, String json)
+    public static Character[] fromJsonCharObj(Token[] values, String json)
     {
-        short[] val = new short[values.size()];
+        Character[] val = new Character[values.length];
         for (int i = 0; i < val.length; i++)
-            val[i] = BaseParser.shortValue(values.get(i), json);
-        return val;
-    }
-    
-    public static Short[] fromJsonShortObj(List<Token> values, String json)
-    {
-        Short[] val = new Short[values.size()];
-        for (int i = 0; i < val.length; i++)
-            val[i] = Short.valueOf(BaseParser.shortValue(values.get(i), json));
-        return val;
-    }
-    
-    public static int[] fromJsonInt(List<Token> values, String json)
-    {
-        int[] val = new int[values.size()];
-        for (int i = 0; i < val.length; i++)
-            val[i] = BaseParser.intValue(values.get(i), json);
-        return val;
-    }
-    
-    public static Integer[] fromJsonIntObj(List<Token> values, String json)
-    {
-        Integer[] val = new Integer[values.size()];
-        for (int i = 0; i < val.length; i++)
-            val[i] = Integer.valueOf(BaseParser.intValue(values.get(i), json));
-        return val;
-    }
-    
-    public static long[] fromJsonLong(List<Token> values, String json)
-    {
-        long[] val = new long[values.size()];
-        for (int i = 0; i < val.length; i++)
-            val[i] = BaseParser.longValue(values.get(i), json);
+            val[i] = Character.valueOf(BaseParser.charValue(values[i],json));
         
         return val;
     }
     
-    public static Long[] fromJsonLongObj(List<Token> values, String json)
+    public static short[] fromJsonShort(Token[] values, String json)
     {
-        Long[] val = new Long[values.size()];
+        short[] val = new short[values.length];
         for (int i = 0; i < val.length; i++)
-            val[i] = Long.valueOf(BaseParser.longValue(values.get(i), json));
+            val[i] = BaseParser.shortValue(values[i], json);
         return val;
     }
     
-    public static float[] fromJsonFloat(List<Token> values, String json)
+    public static Short[] fromJsonShortObj(Token[] values, String json)
     {
-        float[] val = new float[values.size()];
+        Short[] val = new Short[values.length];
         for (int i = 0; i < val.length; i++)
-            val[i] = BaseParser.floatValue(values.get(i), json);
+            val[i] = Short.valueOf(BaseParser.shortValue(values[i], json));
+        return val;
+    }
+    
+    public static int[] fromJsonInt(Token[] values, String json)
+    {
+        int[] val = new int[values.length];
+        for (int i = 0; i < val.length; i++)
+            val[i] = BaseParser.intValue(values[i], json);
+        return val;
+    }
+    
+    public static Integer[] fromJsonIntObj(Token[] values, String json)
+    {
+        Integer[] val = new Integer[values.length];
+        for (int i = 0; i < val.length; i++)
+            val[i] = Integer.valueOf(BaseParser.intValue(values[i], json));
+        return val;
+    }
+    
+    public static long[] fromJsonLong(Token[] values, String json)
+    {
+        long[] val = new long[values.length];
+        for (int i = 0; i < val.length; i++)
+            val[i] = BaseParser.longValue(values[i], json);
         
         return val;
     }
     
-    public static Float[] fromJsonFloatObj(List<Token> values, String json)
+    public static Long[] fromJsonLongObj(Token[] values, String json)
     {
-        Float[] val = new Float[values.size()];
+        Long[] val = new Long[values.length];
         for (int i = 0; i < val.length; i++)
-            val[i] = Float.valueOf(BaseParser.floatValue(values.get(i), json));
+            val[i] = Long.valueOf(BaseParser.longValue(values[i], json));
+        return val;
+    }
+    
+    public static float[] fromJsonFloat(Token[] values, String json)
+    {
+        float[] val = new float[values.length];
+        for (int i = 0; i < val.length; i++)
+            val[i] = BaseParser.floatValue(values[i], json);
         
         return val;
     }
     
-    public static double[] fromJsonDouble(List<Token> values, String json)
+    public static Float[] fromJsonFloatObj(Token[] values, String json)
     {
-        double[] val = new double[values.size()];
+        Float[] val = new Float[values.length];
         for (int i = 0; i < val.length; i++)
-            val[i] = BaseParser.doubleValue(values.get(i), json);
+            val[i] = Float.valueOf(BaseParser.floatValue(values[i], json));
         
         return val;
     }
     
-    public static Double[] fromJsonDoubleObj(List<Token> values, String json)
+    public static double[] fromJsonDouble(Token[] values, String json)
     {
-        Double[] val = new Double[values.size()];
+        double[] val = new double[values.length];
         for (int i = 0; i < val.length; i++)
-            val[i] = Double.valueOf(BaseParser.doubleValue(values.get(i), json));
+            val[i] = BaseParser.doubleValue(values[i], json);
         
         return val;
     }
     
-    public static String[] fromJsonString(List<Token> values, String json)
+    public static Double[] fromJsonDoubleObj(Token[] values, String json)
     {
-        String[] val = new String[values.size()];
+        Double[] val = new Double[values.length];
         for (int i = 0; i < val.length; i++)
-            val[i] = BaseParser.stringValue(values.get(i), json);
+            val[i] = Double.valueOf(BaseParser.doubleValue(values[i], json));
+        
+        return val;
+    }
+    
+    public static String[] fromJsonString(Token[] values, String json)
+    {
+        String[] val = new String[values.length];
+        for (int i = 0; i < val.length; i++)
+            val[i] = BaseParser.stringValue(values[i], json);
         return val;
     }
     
@@ -188,7 +188,7 @@ public final class ArrayParser extends JsonParser implements Serializable
     {
         if (isPrimitiveArray(cls) || isPrimitiveObjArray(cls))
         {// 基础类型 和 String型
-            List<Token> values = (token == null || token.type() != Token.BRACKET_L) ? new ArrayList<Token>() : token.getStringElements();
+            Token[] values = (token == null || token.type() != Token.BRACKET_L) ? new Token[0] : token.getStringElements();
             
             if (cls == boolean[].class || cls == Boolean[].class)
                 return fromJsonBooleanObj(values, json);
@@ -211,7 +211,7 @@ public final class ArrayParser extends JsonParser implements Serializable
         }
         else if (cls == String[].class)
         {
-            List<Token> values = (token == null || token.type() != Token.BRACKET_L) ? new ArrayList<Token>() : token.getElements(Token.COMMA);
+            Token[] values = (token == null || token.type() != Token.BRACKET_L) ? new Token[0] : token.getElements(Token.COMMA);
             return fromJsonString(values, json);
         }
         else
@@ -220,10 +220,10 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (token == null || token.type() != Token.BRACKET_L)
                 return (Object[]) Array.newInstance(type, 0);// 不是 数组类型
                 
-            List<Token> values = token.getElements(Token.COMMA);// 过滤逗号token
-            Object[] objs = (Object[]) Array.newInstance(type, values.size());
+            Token[] values = token.getElements(Token.COMMA);// 过滤逗号token
+            Object[] objs = (Object[]) Array.newInstance(type, values.length);
             for (int i = 0; i < objs.length; i++)
-                objs[i] = Jsons.getParser(type).toObject(json, values.get(i), type);
+                objs[i] = Jsons.getParser(type).toObject(json, values[i], type);
             
             return objs;
         }
