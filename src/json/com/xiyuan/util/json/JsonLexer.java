@@ -497,49 +497,133 @@ public class JsonLexer
     }
 
     /**
-     * 生成从当前位置开始的 一个字符串token
+     * 增加JSON中的转义字符，使用双引号时，单引号不转义，使用单引号时双引号不转义，不使用引号时都转义
      * 
-     * @param json json 字符串
-     * @param pos 读取位置
-     * @param scope token所属范围类型
-     * @param prevToken 上一个token的类型
-     * @return 返回String token 的字符长度
+     * @param str 原字符串
+     * @param quotation 使用的引号 =0表示未使用,='表示单引号,="表示双引号
+     * @return 对字符中需要转义的字符，增加转义符
      */
-    private static int getStringTokenLength(String json, int pos, int scope, byte prevType)
+    public static String addEscapeChar(String str, char quotation)
     {
-        int length = 0;
-        char quote = 0;// 字符串开始的引号值
-        for (; pos < json.length(); pos++, length++)
+        if (str == null)
+            return null;
+
+        StringBuilder strb = new StringBuilder();
+        for (int i = 0; i < str.length(); i++)
         {
-            char ch = json.charAt(pos);
-            if (quote == 0)
+            char c = str.charAt(i);
+            switch (c)
             {
-                quote = ch;// 记录开始符
-                continue;
-            }
-
-            // 查找结束符， 非引号字符串结束的字符
-            if (quote > 0 && quote != DB_QUOTE && quote != QUOTE && (ch == COLON || ch == COMMA || ch == BRACE_R || ch == BRACKET_R))
-            {
-                if (scope == BRACKET_L && ch == COLON)// 如果是数组当前是冒号&所属范围是数组，则当前冒号为值
-                    continue;
-
-                // 当前为冒号上一个token的类型为冒号，则档前为值
-                if (ch == COLON && prevType == Token.COLON)
-                    continue;// {a::sss:sdcsdcs, b:wwww} 其中 sss:sdcsdcs 为值
+            case '\\':
+                strb.append("\\\\");
+                break;
+            case DB_QUOTE:
+                if (quotation == 0 || quotation == DB_QUOTE)
+                    strb.append("\\\"");
                 else
-                    return length;// 非引号开始 并且有结束负号
+                    strb.append(c);
+                break;
+            case QUOTE:
+                if (quotation == 0 || quotation == QUOTE)
+                    strb.append("\\\'");
+                else
+                    strb.append(c);
+                break;// 单引号或无引号时单引号要转义，双引号下的单引号无需处理
+            case '\b':
+                strb.append("\\b");
+                break;
+            case '\f':
+                strb.append("\\f");
+                break;
+            case '\r':
+                strb.append("\\r");
+                break;
+            case '\n':
+                strb.append("\\n");
+                break;
+            case '\t':
+                strb.append("\\t");
+                break;
+            case '/':
+                strb.append("\\/");
+                break;
+            default:
+                strb.append(c);
+                break;
             }
-
-            // 查找结束符，引号开头&当前是引号 & 上一个字符不是不是转义符
-            if ((ch == QUOTE || ch == DB_QUOTE) && ch == quote && json.charAt(pos - 1) != '\\')
-                return ++length;// 包含当前字符
         }
 
-        if (pos == json.length())
-            return --length;// 遍历结束索引json最大索引
-        else
-            return length;
+        return strb.toString();
+    }
+
+    /***
+     * 去除JSON中的转义字符
+     * 
+     * @param str 原字符串
+     * @return 去除成对引号之后的字符串
+     */
+    public static String removeEscapeChar(String str)
+    {
+        if (str == null)
+            return null;
+
+        StringBuilder strb = new StringBuilder();
+        boolean isEscape = false;// 是否前一字符是转义字符
+        for (int i = 0; i < str.length(); i++)
+        {
+            char c = str.charAt(i);
+            if (!isEscape)
+            {// 未转义
+                if (c == '\\')
+                    isEscape = true;// 设为有转义
+                else
+                    strb.append(c);
+            }
+            else
+            {// 有转义
+                switch (c)
+                {
+                case '\\':
+                    strb.append('\\');
+                    break;
+                case '\"':
+                    strb.append('\"');
+                    break;
+                case QUOTE:
+                    strb.append(QUOTE);
+                    break;
+                case 'b':
+                    strb.append('\b');
+                    break;
+                case 'f':
+                    strb.append('\f');
+                    break;
+                case 'n':
+                    strb.append('\n');
+                    break;
+                case 'r':
+                    strb.append('\r');
+                    break;
+                case 't':
+                    strb.append('\t');
+                    break;
+                case '/':
+                    strb.append('/');
+                    break;
+                default:
+                    strb.append("\\").append(c);
+                    break;// 如果未找到匹配,则返原值
+                }
+                isEscape = false;// 重置转义为结束
+            }
+        }
+
+        if (isEscape)
+        {// 最后一个字符是\
+            strb.append("\\");
+        }
+
+        return strb.toString();
     }
 
     /**
@@ -552,7 +636,32 @@ public class JsonLexer
     {// 中文空格 =12288=0x3000, BOM空格 =65279=0xFEFF，英文空格 = 32
         return ch <= 32 || ch == 12288 || ch == 65279;
     }
+    
+    /***
+     * 去除JSON键和值的前后成对引号
+     * 
+     * @param str 原字符串
+     * @return 去除成对引号之后的字符串
+     */
+    public static String removeStartEndQuotation(String str)
+    {
+        if (str == null)
+            return null;
 
+        if (str.length() >= 2 && str.startsWith(DB_QUOTE_S) && str.endsWith(DB_QUOTE_S))
+        {// 有双引号删除退出
+            str = str.substring(1, str.length() - 1);
+            return str;
+        }
+
+        // 没有双引号则判断单引号
+        if (str.length() >= 2 && str.startsWith(QUOTE_S) && str.endsWith(QUOTE_S))
+            str = str.substring(1, str.length() - 1);
+
+        return str;
+    }
+    
+    
     /***********************************************************************/
     // 以下是类的定义及对象的调用方法
     /***********************************************************************/
@@ -577,29 +686,32 @@ public class JsonLexer
     {
         return this.baseParser;
     }
-    
+
     public JsonParser ArrayParser()
     {
         return this.arrayParser;
     }
-    
+
     public JsonParser ListParser()
     {
         return this.listParser;
     }
-    
+
     public JsonParser MapParser()
     {
         return this.mapParser;
     }
+
     public JsonParser DateParser()
     {
         return this.dateParser;
     }
+
     public JsonParser ObjectParser()
     {
         return this.objParser;
     }
+
     public JsonLexer(String input)
     {
         this.json = input;
@@ -773,6 +885,55 @@ public class JsonLexer
         return this.value;
     }
 
+    /**
+     * 生成从当前位置开始的 一个字符串token
+     * 
+     * @param json json 字符串
+     * @param pos 读取位置
+     * @param scope token所属范围类型
+     * @param prevToken 上一个token的类型
+     * @return 返回String token 的字符长度
+     */
+    private int getStringTokenLength(String json, int pos, int scope, byte prevType)
+    {
+        int length = 0;
+        char quote = 0;// 字符串开始的引号值
+        for (; pos < json.length(); pos++, length++)
+        {
+            char ch = json.charAt(pos);
+            if (quote == 0)
+            {
+                quote = ch;// 记录开始符
+                continue;
+            }
+
+            // 查找结束符， 非引号字符串结束的字符
+            if (quote > 0 && quote != DB_QUOTE && quote != QUOTE && (ch == COLON || ch == COMMA || ch == BRACE_R || ch == BRACKET_R))
+            {
+                if (scope == BRACKET_L && ch == COLON)// 如果是数组当前是冒号&所属范围是数组，则当前冒号为值
+                    continue;
+
+                // 当前为冒号上一个token的类型为冒号，则档前为值
+                if (ch == COLON && prevType == Token.COLON)
+                    continue;// {a::sss:sdcsdcs, b:wwww} 其中 sss:sdcsdcs 为值
+                else
+                    return length;// 非引号开始 并且有结束负号
+            }
+
+            // 查找结束符，引号开头&当前是引号 & 上一个字符不是不是转义符
+            if ((ch == QUOTE || ch == DB_QUOTE) && ch == quote && json.charAt(pos - 1) != '\\')
+                return ++length;// 包含当前字符
+        }
+
+        if (pos == json.length())
+            return --length;// 遍历结束索引json最大索引
+        else
+            return length;
+    }
+
+    /**
+     * 获取当前作用于 注意：第一个开始符返回0，最后一个返回-1表示结束
+     */
     public int scope()
     {
         return scopeIndex;
@@ -868,7 +1029,7 @@ public class JsonLexer
                                  // 392722245;//String[].class.getName().hashCode();
         case OBJECT_ARR_CLS_HASH:// = 614832599;//
                                  // Object[].class.getName().hashCode();
-            parser = arrarParser;
+            parser = arrayParser;
             break;
 
         // 哈希表
@@ -928,7 +1089,7 @@ public class JsonLexer
             else if (isImplement(clazz, Map.class))
                 parser = mapParser;
             else if (clazz.isArray())
-                parser = arrarParser;
+                parser = arrayParser;
             else
                 parser = objParser;
         }
