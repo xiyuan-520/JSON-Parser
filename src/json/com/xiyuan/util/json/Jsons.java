@@ -23,672 +23,195 @@ public final class Jsons implements Serializable
 {
 
     private static final long serialVersionUID = 1L;
-    public final static byte ZERO = 0;
-
-    /** 左大括号 { */
-    public final static char BRACE_L = '{';
-    /** 右大括号 } */
-    public final static char BRACE_R = '}';
-    /** 左中括号 [ */
-    public final static char BRACKET_L = '[';
-    /** 右中括号 ] */
-    public final static char BRACKET_R = ']';
-    /** 冒号 : */
-    public final static char COLON = ':';
-    /** 逗号 , */
-    public final static char COMMA = ',';
-    /** 单引号 ' */
-    public final static char QUOTE = '\'';
-    /** 双引号 " */
-    public final static char DB_QUOTE = '"';
-    /** 单引号 ' */
-    public final static String QUOTE_S = String.valueOf(QUOTE);
-    /** 双引号 " */
-    public final static String DB_QUOTE_S = String.valueOf(DB_QUOTE);
-
-    /** null " */
-    public final static String NULL = "null";
-    /** "true" */
-    public final static String TRUE = "true";
-    /** "false" */
-    public final static String FALSE = "false";
-    /** 空对象 {} */
-    public final static String EMPTY_OBJ = "{}";
-    /** 空数组 [] */
-    public final static String EMPTY_ARR = "[]";
 
     public final static String INTEGER = "^(0|[\\+\\-]?[1-9]\\d*)$";// 整数，支持正负数
     public final static String FLOAT = "^(0|[\\+\\-]?[1-9]\\d*)(\\.\\d+)?$";// 浮点值，支持多位小数点，支持正负数
 
-    private static JsonParser baseParser = new BaseParser();
-    private static JsonParser arrarParser = new ArrayParser();
-    private static JsonParser listParser = new ListParser();
-    private static JsonParser mapParser = new MapParser();
-    private static JsonParser dateParser = new DateParser();
-    private static JsonParser objParser = new ObjectParser();
-    /**************************************************/
-    // 八大基本类型&封装类&数组&封装数组的class的哈希吗
-    /**************************************************/
-
-    /**************************************************/
-    // 基本类型
-    /**************************************************/
-    /**
-     * boolean.class.getName().hashCode()<br>
-     * = 64711720;
-     */
-    public final static int BOOL_CLS_HASH = 64711720;// boolean.class.getName().hashCode();
-    /**
-     * Boolean.class.getName().hashCode()<br>
-     * = 344809556
-     */
-    public final static int BOOL_OBJ_CLS_HASH = 344809556;// Boolean.class.getName().hashCode();
-    /**
-     * byte.class.getName().hashCode()<br>
-     * = 3039496
-     */
-    public final static int BYTE_CLS_HASH = 3039496;// byte.class.getName().hashCode();
-    /**
-     * Byte.class.getName().hashCode()<br>
-     * = 398507100
-     */
-    public final static int BYTE_OBJ_CLS_HASH = 398507100;// Byte.class.getName().hashCode();
-    /**
-     * char.class.getName().hashCode()<br>
-     * = 3052374
-     */
-    public final static int CHAR_CLS_HASH = 3052374;// char.class.getName().hashCode();
-    /**
-     * Character.class.getName().hashCode()<br>
-     * = 155276373
-     */
-    public final static int CHAR_OBJ_CLS_HASH = 155276373;// Character.class.getName().hashCode();
-    /**
-     * short.class.getName().hashCode()<br>
-     * = 109413500
-     */
-    public final static int SHORT_CLS_HASH = 109413500;// short.class.getName().hashCode();
-    /**
-     * Short.class.getName().hashCode()<br>
-     * = -515992664
-     */
-    public final static int SHORT_OBJ_CLS_HASH = -515992664;// Short.class.getName().hashCode();
-    /**
-     * int.class.getName().hashCode()<br>
-     * = 104431
-     */
-    public final static int INT_CLS_HASH = 104431;// int.class.getName().hashCode();
-    /**
-     * Integer.class.getName().hashCode()<br>
-     * = -2056817302
-     */
-    public final static int INT_OBJ_CLS_HASH = -2056817302;// Integer.class.getName().hashCode();
-    /**
-     * long.class.getName().hashCode()<br>
-     * = 3327612
-     */
-    public final static int LONG_CLS_HASH = 3327612;// long.class.getName().hashCode();
-    /**
-     * Long.class.getName().hashCode()<br>
-     * = 398795216
-     */
-    public final static int LONG_OBJ_CLS_HASH = 398795216;// Long.class.getName().hashCode();
-    /**
-     * float.class.getName().hashCode()<br>
-     * = 97526364
-     */
-    public final static int FLOAT_CLS_HASH = 97526364;// float.class.getName().hashCode();
-    /**
-     * Float.class.getName().hashCode()<br>
-     * = -527879800
-     */
-    public final static int FLOAT_OBJ_CLS_HASH = -527879800;// Float.class.getName().hashCode();
-    /**
-     * double.class.getName().hashCode()<br>
-     * = -1325958191
-     */
-    public final static int DOUBLE_CLS_HASH = -1325958191;// double.class.getName().hashCode();
-    /**
-     * Double.class.getName().hashCode()<br>
-     * = 761287205
-     */
-    public final static int DOUBLE_OBJ_CLS_HASH = 761287205;// Double.class.getName().hashCode();
-
-    /**************************************************/
-    // 基本类型[]
-    /**************************************************/
-    /**
-     * double[].class.getName().hashCode()<br>
-     * = 2889
-     */
-    public final static int DOUBLE_ARR_CLS_HASH = 2889;// double[].class.getName().hashCode();
-    /**
-     * Double[].class.getName().hashCode()<br>
-     * = 175516795
-     */
-    public final static int DOUBLE_OBJ_ARR_CLS_HASH = -175516795;// Double[].class.getName().hashCode();
-    /**
-     * float[].class.getName().hashCode()<br>
-     * = 2891
-     */
-    public final static int FLOAT_ARR_CLS_HASH = 2891;// float[].class.getName().hashCode();
-    /**
-     * Float[].class.getName().hashCode()<br>
-     * = 48646404
-     */
-    public final static int FLOAT_OBJ_ARR_CLS_HASH = 48646404;// Float[].class.getName().hashCode();
-    /**
-     * long[].class.getName().hashCode()<br>
-     * = 2895
-     **/
-    public final static int LONG_ARR_CLS_HASH = 2895;// long[].class.getName().hashCode();
-    /**
-     * Long[].class.getName().hashCode()<br>
-     * = -2071011078
-     */
-    public final static int LONG_OBJ_ARR_CLS_HASH = -2071011078;// Long[].class.getName().hashCode();
-    /**
-     * int[].class.getName().hashCode()<br>
-     * = 2894
-     */
-    public final static int INT_ARR_CLS_HASH = 2894;// int[].class.getName().hashCode();
-    /**
-     * Integer[].class.getName().hashCode()<br>
-     * = -1935445726
-     */
-    public final static int INT_OBJ_ARR_CLS_HASH = -1935445726;// Integer[].class.getName().hashCode();
-    /**
-     * short[].class.getName().hashCode()<br>
-     * = 2904
-     */
-    public final static int SHORT_ARR_CLS_HASH = 2904;// short[].class.getName().hashCode();
-    /**
-     * Short[].class.getName().hashCode()<br>
-     * = 417147620
-     */
-    public final static int SHORT_OBJ_ARR_CLS_HASH = 417147620;// Short[].class.getName().hashCode();
-    /**
-     * char[].class.getName().hashCode()<br>
-     * = 2888
-     */
-    public final static int CHAR_ARR_CLS_HASH = 2888;// char[].class.getName().hashCode();
-    /**
-     * Character[].class.getName().hashCode()<br>
-     * = -1378128041
-     */
-    public final static int CHAR_OBJ_ARR_CLS_HASH = -1378128041;// Character[].class.getName().hashCode();
-    /**
-     * byte[].class.getName().hashCode()<br>
-     * = 2887
-     */
-    public final static int BYTE_ARR_CLS_HASH = 2887;// byte[].class.getName().hashCode();
-    /**
-     * Byte[].class.getName().hashCode()<br>
-     * = 2079942674
-     */
-    public final static int BYTE_OBJ_ARR_CLS_HASH = -2079942674;// Byte[].class.getName().hashCode();
-    /**
-     * boolean[].class.getName().hashCode()<br>
-     * = 2911
-     */
-    public final static int BOOL_ARR_CLS_HASH = 2911;// boolean[].class.getName().hashCode();
-    /**
-     * Boolean[].class.getName().hashCode()<br>
-     * = -499457160
-     */
-    public final static int BOOL_OBJ_ARR_CLS_HASH = -499457160;// Boolean[].class.getName().hashCode();
-
-    /**************************************************/
-    // String值相关
-    /**************************************************/
-    /**
-     * String.class.getName().hashCode()<br>
-     * = 1195259493
-     */
-    public final static int STRING_CLS_HASH = 1195259493;// String.class.getName().hashCode();
-    /**
-     * String[].class.getName().hashCode()<br>
-     * = 392722245
-     */
-    public final static int STRING_ARR_CLS_HASH = 392722245;// String[].class.getName().hashCode();
-
-    /**************************************************/
-    // 哈希表
-    /**************************************************/
-    /** Map.class.getName().hashCode() = 1383349348 */
-    public final static int MAP_CLS_HASH = -1383349348;// Map.class.getName().hashCode();
-    /**
-     * HashMap.class.getName().hashCode()<br>
-     * = -1402722386
-     */
-    public final static int HASHMAP_CLS_HASH = -1402722386;// HashMap.class.getName().hashCode();
-    /**
-     * ConcurrentMap.class.getName().hashCode()<br>
-     * = -1419705938
-     */
-    public final static int CONCURRENTMAP_CLS_HASH = -1419705938;// ConcurrentMap.class.getName().hashCode();
-    /**
-     * ConcurrentHashMap.class.getName().hashCode()<br>
-     * = 577244352
-     */
-    public final static int CONCURRENTHASHMAP_CLS_HASH = 577244352;// ConcurrentHashMap.class.getName().hashCode();
-    /**
-     * Hashtable.class.getName().hashCode()<br>
-     * = 639525312
-     */
-    public final static int HASHTABLE_CLS_HASH = 639525312;// Hashtable.class.getName().hashCode();
-    /**
-     * LinkedHashMap.class.getName().hashCode()<br>
-     * = 1258621781
-     */
-    public final static int LINKEDHASHMAP_CLS_HASH = 1258621781;// LinkedHashMap.class.getName().hashCode();
-    /**
-     * TreeMap.class.getName().hashCode()<br>
-     * = 1131064094
-     */
-    public final static int TREEMAP_CLS_HASH = 1131064094;// TreeMap.class.getName().hashCode();
-
-    /**************************************************/
-    // 链表
-    /**************************************************/
-    /**
-     * List.class.getName().hashCode()<br>
-     * = 65821278
-     */
-    public final static int LIST_CLS_HASH = 65821278;// List.class.getName().hashCode();
-    /**
-     * ArrayList.class.getName().hashCode()<br>
-     * = -1114099497
-     */
-    public final static int ARRAYLIST_CLS_HASH = -1114099497;// ArrayList.class.getName().hashCode();
-    /**
-     * LinkedList.class.getName().hashCode()<br>
-     * = -1899270121
-     */
-    public final static int LINKEDLIST_CLS_HASH = -1899270121;// LinkedList.class.getName().hashCode();
-    /**
-     * Set.class.getName().hashCode()<br>
-     * = -1383343454
-     */
-    public final static int SET_CLS_HASH = -1383343454;// Set.class.getName().hashCode();
-    /**
-     * HashSet.class.getName().hashCode()<br>
-     * = -1402716492
-     */
-    public final static int HASHSET_CLS_HASH = -1402716492;// HashSet.class.getName().hashCode();
-
-    /**************************************************/
-    // Object值相关
-    /**************************************************/
-    /**
-     * Object.class.getName().hashCode()<br>
-     * = 1063877011
-     */
-    public final static int OBJECT_CLS_HASH = 1063877011;// Object.class.getName().hashCode();
-    /**
-     * Object[].class.getName().hashCode()<br>
-     * = 614832599
-     */
-    public final static int OBJECT_ARR_CLS_HASH = 614832599;// Object[].class.getName().hashCode();
-
-    // 时间
-    /**
-     * java.util.Calendar.class.getName().hashCode()<br>
-     * = -861027074
-     */
-    public final static int CALENDAR_CLS_HASH = -861027074;// java.util.Calendar.class.getName().hashCode();
-    /**
-     * java.util.Date.class.getName().hashCode()<br>
-     * = 65575278
-     */
-    public final static int DATE_CLS_HASH = 65575278;// java.util.Date.class.getName().hashCode();
-    /**
-     * java.sql.Date.class.getName().hashCode()<br>
-     * = 1087757882
-     */
-    public final static int SQL_DATE_CLS_HASH = 1087757882;// java.sql.Date.class.getName().hashCode();
-    /**
-     * java.sql.Time.class.getName().hashCode()<br>
-     * = 1088242009
-     */
-    public final static int SQL_TIME_CLS_HASH = 1088242009;// java.sql.Time.class.getName().hashCode();
-    /**
-     * java.sql.Timestamp.class.getName().hashCode()<br>
-     * = 1252880906
-     */
-    public final static int SQL_TIMESTAMP_CLS_HASH = 1252880906;// java.sql.Timestamp.class.getName().hashCode();
-
-    /** 根据类获取解析器 */
-    public static JsonParser getParser(Class<?> clazz)
-    {
-        JsonParser parser = null;
-        switch (clazz.getName().hashCode())
-        {
-
-        // 八大基本类型+封装类+String
-        case BOOL_CLS_HASH:// = 64711720;//boolean.class.getName().hashCode();
-        case BOOL_OBJ_CLS_HASH:// =
-                               // 344809556;//Boolean.class.getName().hashCode();
-        case BYTE_CLS_HASH:// = 3039496;//byte.class.getName().hashCode();
-        case BYTE_OBJ_CLS_HASH:// = 398507100;//Byte.class.getName().hashCode();
-        case CHAR_CLS_HASH:// :// = 3052374;// char.class.getName().hashCode();
-        case CHAR_OBJ_CLS_HASH:// =
-                               // 155276373;//Character.class.getName().hashCode();
-        case SHORT_CLS_HASH:// = 109413500;//short.class.getName().hashCode();
-        case SHORT_OBJ_CLS_HASH:// =
-                                // -515992664;//Short.class.getName().hashCode();
-        case INT_CLS_HASH:// = 104431;//int.class.getName().hashCode();
-        case INT_OBJ_CLS_HASH:// =
-                              // -2056817302;//Integer.class.getName().hashCode();
-        case LONG_CLS_HASH:// = 3327612;//long.class.getName().hashCode();
-        case LONG_OBJ_CLS_HASH:// = 398795216;//Long.class.getName().hashCode();
-        case FLOAT_CLS_HASH:// = 97526364;//float.class.getName().hashCode();
-        case FLOAT_OBJ_CLS_HASH:// =
-                                // -527879800;//Float.class.getName().hashCode();
-        case DOUBLE_CLS_HASH:// =
-                             // -1325958191;//double.class.getName().hashCode();
-        case DOUBLE_OBJ_CLS_HASH:// =
-                                 // 761287205;//Double.class.getName().hashCode();
-        case STRING_CLS_HASH:// =
-                             // 1195259493;//String.class.getName().hashCode();
-            parser = baseParser;
-            break;
-
-        // 八大基本类型+封装类+String 的数组
-        case DOUBLE_ARR_CLS_HASH:// =
-                                 // 2889;//double[].class.getName().hashCode();
-        case DOUBLE_OBJ_ARR_CLS_HASH:// =
-                                     // -175516795;//Double[].class.getName().hashCode();
-        case FLOAT_ARR_CLS_HASH:// = 2891;//float[].class.getName().hashCode();
-        case FLOAT_OBJ_ARR_CLS_HASH:// =
-                                    // 48646404;//Float[].class.getName().hashCode();
-        case LONG_ARR_CLS_HASH:// = 2895;//long[].class.getName().hashCode();
-        case LONG_OBJ_ARR_CLS_HASH:// =
-                                   // -2071011078;//Long[].class.getName().hashCode();
-        case INT_ARR_CLS_HASH:// = 2894;//int[].class.getName().hashCode();
-        case INT_OBJ_ARR_CLS_HASH:// =
-                                  // -1935445726;//Integer[].class.getName().hashCode();
-        case SHORT_ARR_CLS_HASH:// = 2904;//short[].class.getName().hashCode();
-        case SHORT_OBJ_ARR_CLS_HASH:// =
-                                    // 417147620;//Short[].class.getName().hashCode();
-        case CHAR_ARR_CLS_HASH:// = 2888;//char[].class.getName().hashCode();
-        case CHAR_OBJ_ARR_CLS_HASH:// =
-                                   // -1378128041;//Character[].class.getName().hashCode();
-        case BYTE_ARR_CLS_HASH:// = 2887;//byte[].class.getName().hashCode();
-        case BYTE_OBJ_ARR_CLS_HASH:// =
-                                   // -2079942674;//Byte[].class.getName().hashCode();
-        case BOOL_ARR_CLS_HASH:// = 2911;//boolean[].class.getName().hashCode();
-        case BOOL_OBJ_ARR_CLS_HASH:// =
-                                   // -499457160;//Boolean[].class.getName().hashCode();
-        case STRING_ARR_CLS_HASH:// =
-                                 // 392722245;//String[].class.getName().hashCode();
-        case OBJECT_ARR_CLS_HASH:// = 614832599;//
-                                 // Object[].class.getName().hashCode();
-            parser = arrarParser;
-            break;
-
-        // 哈希表
-        case MAP_CLS_HASH:// = -1383349348;// Map.class.getName().hashCode();
-        case HASHMAP_CLS_HASH:// = -1402722386;//
-                              // HashMap.class.getName().hashCode();
-        case CONCURRENTMAP_CLS_HASH:// =-1419705938;//
-                                    // ConcurrentMap.class.getName().hashCode();
-        case CONCURRENTHASHMAP_CLS_HASH:// = 577244352;//
-                                        // ConcurrentHashMap.class.getName().hashCode();
-        case HASHTABLE_CLS_HASH:// = 639525312;//
-                                // Hashtable.class.getName().hashCode();
-        case LINKEDHASHMAP_CLS_HASH:// = 1258621781;//
-                                    // LinkedHashMap.class.getName().hashCode();
-        case TREEMAP_CLS_HASH:// = 1131064094;//
-                              // TreeMap.class.getName().hashCode();
-            parser = mapParser;
-            break;
-
-        // 链表
-        case LIST_CLS_HASH:// = 65821278;// List.class.getName().hashCode();
-        case ARRAYLIST_CLS_HASH:// = -1114099497;//
-                                // ArrayList.class.getName().hashCode();
-        case LINKEDLIST_CLS_HASH:// = -1899270121;//
-                                 // LinkedList.class.getName().hashCode();
-        case SET_CLS_HASH:// =-1383343454;// Set.class.getName().hashCode();
-        case HASHSET_CLS_HASH:// =-1402716492;//
-                              // HashSet.class.getName().hashCode();
-            parser = listParser;
-            break;
-
-        // 时间
-        case CALENDAR_CLS_HASH:// = -861027074;//
-                               // java.util.Calendar.class.getName().hashCode();
-        case DATE_CLS_HASH:// = 65575278;//
-                           // java.util.Date.class.getName().hashCode();
-        case SQL_DATE_CLS_HASH:// = 1087757882;//
-                               // java.sql.Date.class.getName().hashCode();
-        case SQL_TIME_CLS_HASH:// = 1088242009;//
-                               // java.sql.Time.class.getName().hashCode();
-        case SQL_TIMESTAMP_CLS_HASH:// = 1252880906;//
-                                    // java.sql.Timestamp.class.getName().hashCode();
-            parser = dateParser;
-            break;
-
-        // 通用 object
-        case OBJECT_CLS_HASH:// = 1063877011;//
-                             // Object.class.getName().hashCode();
-            parser = objParser;
-            break;
-        }
-
-        if (parser == null)
-        {
-            if (isImplement(clazz, Collection.class))
-                parser = listParser;
-            else if (isImplement(clazz, Map.class))
-                parser = mapParser;
-            else if (clazz.isArray())
-                parser = arrarParser;
-            else
-                parser = objParser;
-        }
-
-        return parser;
-    }
-
-    /**
-     * 解析字符串并生成token并json字符串的首个token<br>
-     * 举例：字符串{"a":"a1", "b":[1,2,3]} 则返回 { 对应的token<br>
-     * 备注：其中每个token可能有多个子token<br>
-     * token { 的子token 有 "a"， :， "a1"， , ，"b" : , [<br>
-     * 其中 1，,，2，3为 token 的子token<br>
-     * ] 为当前作用范围 [ 的结束token<br>
-     * } 为当前作用范围 { 的结束token<br>
-     * 
-     * @param json json字符串
-     * @return 返回json字符串的首个token 值
-     */
-
-    public static TokenPool getTokens(String json)
-    {
-        return getTokens(json, null);
-    }
-
-    /**
-     * 解析字符串并生成token并json字符串的首个token<br>
-     * 举例：字符串{"a":"a1", "b":[1,2,3]} 则返回 { 对应的token<br>
-     * 备注：其中每个token可能有多个子token<br>
-     * token { 的子token 有 "a"， :， "a1"， , ，"b" : , [<br>
-     * 其中 1，,，2，3为 token 的子token<br>
-     * ] 为当前作用范围 [ 的结束token<br>
-     * } 为当前作用范围 { 的结束token<br>
-     * 
-     * @param json json字符串
-     * @param field 指定字段
-     * @return 返回json字符串的首个token 值,如果是指定字段 token.getElements()[0] =
-     *         root,token.getElements()[1] =
-     *         field的上一个token，token.getElements()[2] = field 的value <br>
-     *         举例：json = {a:{s:b}, cc:ss} <br>
-     *         1. field = a时 token.getElements()[0] = '{' token.getElements()[1]
-     *         = {s:b} <br>
-     *         1. field = cc:ss时 token.getElements()[0] = ','
-     *         token.getElements()[1] = ss
-     */
-    public static TokenPool getTokens(String json, String field)
-    {
-        if (field != null && json.indexOf(field) == -1)
-            return null;
-        
-        int maxLenth = json == null ? 0 : json.length();
-        for (; maxLenth > 0;)
-        {// 剔除右边空白
-            char ch = json.charAt(maxLenth - 1);
-            if (!isWhitespace(ch))
-                break;
-
-            maxLenth--;
-        }
-        if (maxLenth <= 0)
-            return null;
-
-        // 1.arrNum 数组数量，
-        // 2.objNum 对象数量，
-        // 3.scope当前token所属范围，0=初始时，1=在对象{}里，2 =在数组[]里;
-        // 4.valueType当前token所属范围，-1=初始时，参见 tokenType，
-        // 5.root 跟节点，prevToken 上一个token, parent 所在范围的token,keyScope=字段所在token域
-        int arrNum = 0, objNum = 0, valueType = -1, contextType = -1;
-        Token root = null, current = null, last = null, context = null;
-        Token.json = json;
-        TokenPool.json = json;
-        TokenPool pool = new TokenPool(1000);
-        List<Token> starts = new ArrayList<Token>();
-        for (int pos = 0; pos < maxLenth; pos++)
-        {
-            char ch = json.charAt(pos);
-            if (root == null && isWhitespace(ch))
-                continue;// 空白字符开头
-            if (root == null && BRACE_L != ch && ch != BRACKET_L)
-                continue;// json 数据格式只有两种，1.对象使用{} 括起，2.数组[] 括起。所以非 {或者[开头的数据
-
-            if (current != null)
-                current = null;
-          
-            switch (ch)
-            {
-                case BRACE_L:
-                {
-                    contextType = 1;
-                    current = Token.newToken(Token.BRACE_L, pos);
-                    objNum++;
-                    starts.add(current);
-                    if (root == null)
-                        last = root = current;//last = root;
-                    else
-                        last = current.context(context);// last = current;
-                    
-                    context = pool.add(last);
-                    continue;
-                }
-                case BRACE_R:
-                {
-                    if (objNum > 0)
-                    {
-                        current = Token.newToken(Token.BRACE_R, pos);
-                        objNum--;
-    
-                        int ind = starts.size() - 1;
-                        if (!starts.isEmpty() && starts.get(ind).type() == Token.BRACE_L)
-                            starts.remove(ind).end(pos);// 设置结束负号
-                        
-//                        last = current;
-                        context = starts.isEmpty() ? root : starts.get(--ind);
-                        contextType = context.type() == Token.BRACE_L ? 1 : (context.type() == Token.BRACKET_L ? 2 : 0);
-                    }
-                    continue;
-                }
-                case BRACKET_L:
-                {
-                    contextType = 2;
-                    current = Token.newToken(Token.BRACKET_L, pos);
-                    arrNum++;
-                    starts.add(current);
-                    if (root == null)
-                        last = root = current;//last = root;
-                    else
-                        last = current.context(context);// last = current;
-                    
-                    context = pool.add(last);
-                    continue;
-                }
-                case BRACKET_R:
-                {
-                    if (arrNum > 0)
-                    {
-                        current = Token.newToken(Token.BRACKET_R, pos);
-                        arrNum--;
-                        int ind = starts.size() - 1;
-                        if (!starts.isEmpty() && starts.get(ind).type() == Token.BRACKET_L)
-                            starts.remove(ind).end(pos);
-    
-//                        last = current;
-                        context = starts.isEmpty() ? root : starts.get(--ind);
-                        contextType = context.type() == Token.BRACE_L ? 1 : (context.type() == Token.BRACKET_L ? 2 : 0);
-                    }
-                    continue;
-                }
-                case COMMA:// 上一个token 不能为,
-                {// 前面token 必须是 对象结束 或者 数组结束 或者字符串
-                    if (last.type() == Token.COMMA)
-                        continue;
-    
-                    // 处理上一个是 冒号 当前为逗号，则当前值为null 列：{dd:,} 被整理 后为 {dd:null,}
-                    if (last.type() == Token.COLON)
-                        last = pool.add(Token.newToken(Token.STRING, pos).end(pos)).context(context);// 添加null值
-    
-                    last = pool.add(Token.newToken(Token.COMMA, pos).end(pos)).context(context);
-                    continue;
-                }
-                case COLON:
-                {
-                    
-                    if (last.type() == Token.STRING)
-                    {//上一个token是String 则当前是冒号
-                        current = Token.newToken(Token.COLON, pos).end(pos).context(context);
-                        last = pool.add(current);
-                    }
-                    else
-                    {
-                        //如果上一个 不是String 型 则当前是 String键
-                        int length = getStringTokenLength(json, pos, contextType, last);
-                        current = length == 0 ? null : Token.newToken(Token.STRING, pos).context(context);
-                        pos += (length - 1);
-                        if (current != null)
-                        {
-                            current.end(pos);// 设置结束位置
-                            last = pool.add(current);
-                        }
-                    }
-                    
-                    continue;
-                }
-                default:
-                {
-                    if (isWhitespace(ch))
-                        continue;
-    
-                    int length = getStringTokenLength(json, pos, contextType, last);
-                    current = length == 0 ? null : Token.newToken(Token.STRING, pos).context(context);
-                    pos += (length - 1);
-                    if (current != null)
-                    {
-                        current.end(pos);// 设置结束位置
-                        last = pool.add(current);
-                    }
-                }
-            }
-        }
-        
-        if (root != null)
-            root.end(json.length() - 1);
-       
-        return pool;
-    }
+    // /**
+    // * 解析字符串并生成token并json字符串的首个token<br>
+    // * 举例：字符串{"a":"a1", "b":[1,2,3]} 则返回 { 对应的token<br>
+    // * 备注：其中每个token可能有多个子token<br>
+    // * token { 的子token 有 "a"， :， "a1"， , ，"b" : , [<br>
+    // * 其中 1，,，2，3为 token 的子token<br>
+    // * ] 为当前作用范围 [ 的结束token<br>
+    // * } 为当前作用范围 { 的结束token<br>
+    // *
+    // * @param json json字符串
+    // * @param field 指定字段
+    // * @return 返回json字符串的首个token 值,如果是指定字段 token.getElements()[0] =
+    // * root,token.getElements()[1] =
+    // * field的上一个token，token.getElements()[2] = field 的value <br>
+    // * 举例：json = {a:{s:b}, cc:ss} <br>
+    // * 1. field = a时 token.getElements()[0] = '{' token.getElements()[1]
+    // * = {s:b} <br>
+    // * 1. field = cc:ss时 token.getElements()[0] = ','
+    // * token.getElements()[1] = ss
+    // */
+    // public static TokenPool getTokens(String json, String field)
+    // {
+    // if (field != null && json.indexOf(field) == -1)
+    // return null;
+    //
+    // int maxLenth = json == null ? 0 : json.length();
+    // for (; maxLenth > 0;)
+    // {// 剔除右边空白
+    // char ch = json.charAt(maxLenth - 1);
+    // if (!isWhitespace(ch))
+    // break;
+    //
+    // maxLenth--;
+    // }
+    // if (maxLenth <= 0)
+    // return null;
+    //
+    // // 1.arrNum 数组数量，
+    // // 2.objNum 对象数量，
+    // // 3.scope当前token所属范围，0=初始时，1=在对象{}里，2 =在数组[]里;
+    // // 4.valueType当前token所属范围，-1=初始时，参见 tokenType，
+    // // 5.root 跟节点，prevToken 上一个token, parent 所在范围的token,keyScope=字段所在token域
+    // int arrNum = 0, objNum = 0, valueType = -1, contextType = -1;
+    // Token root = null, current = null, last = null, context = null;
+    // Token.json = json;
+    // TokenPool.json = json;
+    // TokenPool pool = new TokenPool(1000);
+    // List<Token> starts = new ArrayList<Token>();
+    // for (int pos = 0; pos < maxLenth; pos++)
+    // {
+    // char ch = json.charAt(pos);
+    // if (root == null && isWhitespace(ch))
+    // continue;// 空白字符开头
+    // if (root == null && BRACE_L != ch && ch != BRACKET_L)
+    // continue;// json 数据格式只有两种，1.对象使用{} 括起，2.数组[] 括起。所以非 {或者[开头的数据
+    //
+    // if (current != null)
+    // current = null;
+    //
+    // switch (ch)
+    // {
+    // case BRACE_L:
+    // {
+    // contextType = 1;
+    // current = Token.newToken(Token.BRACE_L, pos);
+    // objNum++;
+    // starts.add(current);
+    // if (root == null)
+    // last = root = current;// last = root;
+    // else
+    // last = current.context(context);// last = current;
+    //
+    // context = pool.add(last);
+    // continue;
+    // }
+    // case BRACE_R:
+    // {
+    // if (objNum > 0)
+    // {
+    // current = Token.newToken(Token.BRACE_R, pos);
+    // objNum--;
+    //
+    // int ind = starts.size() - 1;
+    // if (!starts.isEmpty() && starts.get(ind).type() == Token.BRACE_L)
+    // starts.remove(ind).end(pos);// 设置结束负号
+    //
+    // // last = current;
+    // context = starts.isEmpty() ? root : starts.get(--ind);
+    // contextType = context.type() == Token.BRACE_L ? 1 : (context.type() ==
+    // Token.BRACKET_L ? 2 : 0);
+    // }
+    // continue;
+    // }
+    // case BRACKET_L:
+    // {
+    // contextType = 2;
+    // current = Token.newToken(Token.BRACKET_L, pos);
+    // arrNum++;
+    // starts.add(current);
+    // if (root == null)
+    // last = root = current;// last = root;
+    // else
+    // last = current.context(context);// last = current;
+    //
+    // context = pool.add(last);
+    // continue;
+    // }
+    // case BRACKET_R:
+    // {
+    // if (arrNum > 0)
+    // {
+    // current = Token.newToken(Token.BRACKET_R, pos);
+    // arrNum--;
+    // int ind = starts.size() - 1;
+    // if (!starts.isEmpty() && starts.get(ind).type() == Token.BRACKET_L)
+    // starts.remove(ind).end(pos);
+    //
+    // // last = current;
+    // context = starts.isEmpty() ? root : starts.get(--ind);
+    // contextType = context.type() == Token.BRACE_L ? 1 : (context.type() ==
+    // Token.BRACKET_L ? 2 : 0);
+    // }
+    // continue;
+    // }
+    // case COMMA:// 上一个token 不能为,
+    // {// 前面token 必须是 对象结束 或者 数组结束 或者字符串
+    // if (last.type() == Token.COMMA)
+    // continue;
+    //
+    // // 处理上一个是 冒号 当前为逗号，则当前值为null 列：{dd:,} 被整理 后为 {dd:null,}
+    // if (last.type() == Token.COLON)
+    // last = pool.add(Token.newToken(Token.STRING,
+    // pos).end(pos)).context(context);// 添加null值
+    //
+    // last = pool.add(Token.newToken(Token.COMMA,
+    // pos).end(pos)).context(context);
+    // continue;
+    // }
+    // case COLON:
+    // {
+    //
+    // if (last.type() == Token.STRING)
+    // {// 上一个token是String 则当前是冒号
+    // current = Token.newToken(Token.COLON, pos).end(pos).context(context);
+    // last = pool.add(current);
+    // }
+    // else
+    // {
+    // // 如果上一个 不是String 型 则当前是 String键
+    // int length = getStringTokenLength(json, pos, contextType, last);
+    // current = length == 0 ? null : Token.newToken(Token.STRING,
+    // pos).context(context);
+    // pos += (length - 1);
+    // if (current != null)
+    // {
+    // current.end(pos);// 设置结束位置
+    // last = pool.add(current);
+    // }
+    // }
+    //
+    // continue;
+    // }
+    // default:
+    // {
+    // if (isWhitespace(ch))
+    // continue;
+    //
+    // int length = getStringTokenLength(json, pos, contextType, last);
+    // current = length == 0 ? null : Token.newToken(Token.STRING,
+    // pos).context(context);
+    // pos += (length - 1);
+    // if (current != null)
+    // {
+    // current.end(pos);// 设置结束位置
+    // last = pool.add(current);
+    // }
+    // }
+    // }
+    // }
+    //
+    // if (root != null)
+    // root.end(json.length() - 1);
+    //
+    // return pool;
+    // }
 
     /**
      * 生成从当前位置开始的 一个字符串token
@@ -713,20 +236,20 @@ public final class Jsons implements Serializable
             }
 
             // 查找结束符， 非引号字符串结束的字符
-            if (quote > 0 && quote != DB_QUOTE && quote != QUOTE && (ch == COLON || ch == COMMA || ch == BRACE_R || ch == BRACKET_R))
+            if (quote > 0 && quote != JsonLexer.DB_QUOTE && quote != JsonLexer.QUOTE && (ch == JsonLexer.COLON || ch == JsonLexer.COMMA || ch == JsonLexer.BRACE_R || ch == JsonLexer.BRACKET_R))
             {
-                if (scope == 2 && ch == COLON)// 如果是数组当前是冒号&所属范围是数组，则当前冒号为值
+                if (scope == 2 && ch == JsonLexer.COLON)// 如果是数组当前是冒号&所属范围是数组，则当前冒号为值
                     continue;
 
-               // 当前为冒号上一个token的类型为冒号，则档前为值
-                if (ch == COLON && prevToken != null && prevToken.type() == Token.COLON)
+                // 当前为冒号上一个token的类型为冒号，则档前为值
+                if (ch == JsonLexer.COLON && prevToken != null && prevToken.type() == Token.COLON)
                     continue;// {a::sss:sdcsdcs, b:wwww} 其中 sss:sdcsdcs 为值
                 else
                     return length;// 非引号开始 并且有结束负号
             }
 
             // 查找结束符，引号开头&当前是引号 & 上一个字符不是不是转义符
-            if ((ch == QUOTE || ch == DB_QUOTE) && ch == quote && json.charAt(pos - 1) != '\\')
+            if ((ch == JsonLexer.QUOTE || ch == JsonLexer.DB_QUOTE) && ch == quote && json.charAt(pos - 1) != '\\')
                 return ++length;// 包含当前字符
         }
 
@@ -745,55 +268,7 @@ public final class Jsons implements Serializable
      */
     public static String addEscapeChar(String str, char quotation)
     {
-        if (str == null)
-            return null;
-
-        StringBuilder strb = new StringBuilder();
-        for (int i = 0; i < str.length(); i++)
-        {
-            char c = str.charAt(i);
-            switch (c)
-            {
-            case '\\':
-                strb.append("\\\\");
-                break;
-            case DB_QUOTE:
-                if (quotation == 0 || quotation == DB_QUOTE)
-                    strb.append("\\\"");
-                else
-                    strb.append(c);
-                break;
-            case QUOTE:
-                if (quotation == 0 || quotation == QUOTE)
-                    strb.append("\\\'");
-                else
-                    strb.append(c);
-                break;// 单引号或无引号时单引号要转义，双引号下的单引号无需处理
-            case '\b':
-                strb.append("\\b");
-                break;
-            case '\f':
-                strb.append("\\f");
-                break;
-            case '\r':
-                strb.append("\\r");
-                break;
-            case '\n':
-                strb.append("\\n");
-                break;
-            case '\t':
-                strb.append("\\t");
-                break;
-            case '/':
-                strb.append("\\/");
-                break;
-            default:
-                strb.append(c);
-                break;
-            }
-        }
-
-        return strb.toString();
+        return JsonLexer.addEscapeChar(str, quotation);
     }
 
     /***
@@ -804,66 +279,7 @@ public final class Jsons implements Serializable
      */
     public static String removeEscapeChar(String str)
     {
-        if (str == null)
-            return null;
-
-        StringBuilder strb = new StringBuilder();
-        boolean isEscape = false;// 是否前一字符是转义字符
-        for (int i = 0; i < str.length(); i++)
-        {
-            char c = str.charAt(i);
-            if (!isEscape)
-            {// 未转义
-                if (c == '\\')
-                    isEscape = true;// 设为有转义
-                else
-                    strb.append(c);
-            }
-            else
-            {// 有转义
-                switch (c)
-                {
-                case '\\':
-                    strb.append('\\');
-                    break;
-                case '\"':
-                    strb.append('\"');
-                    break;
-                case QUOTE:
-                    strb.append(QUOTE);
-                    break;
-                case 'b':
-                    strb.append('\b');
-                    break;
-                case 'f':
-                    strb.append('\f');
-                    break;
-                case 'n':
-                    strb.append('\n');
-                    break;
-                case 'r':
-                    strb.append('\r');
-                    break;
-                case 't':
-                    strb.append('\t');
-                    break;
-                case '/':
-                    strb.append('/');
-                    break;
-                default:
-                    strb.append("\\").append(c);
-                    break;// 如果未找到匹配,则返原值
-                }
-                isEscape = false;// 重置转义为结束
-            }
-        }
-
-        if (isEscape)
-        {// 最后一个字符是\
-            strb.append("\\");
-        }
-
-        return strb.toString();
+            return JsonLexer.removeEscapeChar(str);
     }
 
     /***
@@ -874,20 +290,7 @@ public final class Jsons implements Serializable
      */
     public static String removeStartEndQuotation(String str)
     {
-        if (str == null)
-            return null;
-
-        if (str.length() >= 2 && str.startsWith(DB_QUOTE_S) && str.endsWith(DB_QUOTE_S))
-        {// 有双引号删除退出
-            str = str.substring(1, str.length() - 1);
-            return str;
-        }
-
-        // 没有双引号则判断单引号
-        if (str.length() >= 2 && str.startsWith(QUOTE_S) && str.endsWith(QUOTE_S))
-            str = str.substring(1, str.length() - 1);
-
-        return str;
+            return JsonLexer.removeStartEndQuotation(str);
     }
 
     /*****************************************************************************/
@@ -903,8 +306,8 @@ public final class Jsons implements Serializable
     public static String toString(Object obj)
     {
         if (obj == null)
-            return Jsons.NULL;
-        return Jsons.getParser(obj.getClass()).toString(obj);
+            return JsonLexer.NULL;
+        return new JsonLexer(null).getParser(obj.getClass()).toString(obj);
     }
 
     /**
@@ -920,10 +323,11 @@ public final class Jsons implements Serializable
         if (json == null || clazz == null)
             return null;
 
-        if (NULL.equals(json))
+        if (JsonLexer.NULL.equals(json))
             return null;
 
-        return (T) Jsons.getParser(clazz).toObject(json, clazz);
+        JsonLexer lexer = new JsonLexer(json);
+        return (T) lexer.getParser(clazz).toObject(clazz);
     }
 
     /**
@@ -936,17 +340,8 @@ public final class Jsons implements Serializable
     @SuppressWarnings("unchecked")
     public static <T> List<T> toList(String json, Class<T> resultClass)
     {
-
-        Token token = getTokens(json);
-        if (token == null || token.type() != Token.BRACKET_L)
-            return new ArrayList<T>(0);
-
-        Token[] elems = token.getElements(Token.COMMA);
-        List<T> list = new ArrayList<T>(elems.length);
-        for (int i = 0; i < elems.length; i++)
-            list.add((T) getParser(resultClass).toObject(json, elems[i], resultClass));
-
-        return list;
+        JsonLexer lexer = new JsonLexer(json);// DOTO
+        return (List<T>) lexer.getParser(resultClass).toObject(resultClass);
     }
 
     /**
@@ -959,7 +354,7 @@ public final class Jsons implements Serializable
     public static String getArray(String json, String field)
     {//
         String arrText = getString(json, field);
-        if (arrText == null || arrText.length() <= 1 || arrText.charAt(0) != BRACKET_L || arrText.charAt(arrText.length() - 1) != BRACKET_R)
+        if (arrText == null || arrText.length() <= 1 || arrText.charAt(0) != JsonLexer.BRACKET_L || arrText.charAt(arrText.length() - 1) != JsonLexer.BRACKET_R)
             return null;
 
         return arrText;
@@ -980,7 +375,7 @@ public final class Jsons implements Serializable
             return null;
 
         String arrJson = getString(json, field);
-        if (arrJson == null || arrJson.length() <= 1 || arrJson.charAt(0) != BRACKET_L || arrJson.charAt(arrJson.length() - 1) != BRACKET_R)
+        if (arrJson == null || arrJson.length() <= 1 || arrJson.charAt(0) != JsonLexer.BRACKET_L || arrJson.charAt(arrJson.length() - 1) != JsonLexer.BRACKET_R)
             return null;
 
         return (T[]) toList(arrJson, resultClass).toArray();
@@ -992,7 +387,7 @@ public final class Jsons implements Serializable
     public static boolean getBoolean(String json, String field)
     {
         String value = getString(json, field);
-        return TRUE.equalsIgnoreCase(value) ? true : "1".equals(value);
+        return JsonLexer.TRUE.equalsIgnoreCase(value) ? true : "1".equals(value);
     }
 
     /**
@@ -1078,42 +473,46 @@ public final class Jsons implements Serializable
      */
     public static String toStringAddOrUpdate(String json, String key, Object value)
     {
-        if (json == null)
-            return null;
-        if (isEmptyBlank(key) || json.length() < 2)
-            return json;// json 字符串必须大于2个字符
-
-        // token.getElements()[0] = field的上一个token，token.getElements()[1] =
-        // field 的value
-        Token token = getTokens(json, key);
-        if (token == null || token.size() < 2)
-        {// 找不到字段
-            int pos = 0;
-            for (; pos < json.length(); pos++)
-            {
-                char ch = json.charAt(pos);
-                if (!isWhitespace(ch) && ch != BRACE_L)
-                    return json;
-
-                if (ch == BRACE_L)
-                    break;
-            }
-            key = addEscapeChar(key, DB_QUOTE);
-            String val = toString(value);
-            StringBuilder sb = new StringBuilder(json.length() + key.length() + 3 + val.length());
-            sb.append(json.substring(0, pos + 1));// 添加根token
-            sb.append(DB_QUOTE).append(key).append(DB_QUOTE).append(COLON).append(val).append(COMMA);// 添加键值;
-            sb.append(json.substring(pos + 1));
-            return sb.toString();
-        }
-        else
-        {// 找到字段了
-            StringBuilder sb = new StringBuilder(json.length());
-            sb.append(json.substring(0, token.getElements()[1].begin()));
-            sb.append(toString(value));// 更新值
-            sb.append(json.substring(token.getElements()[1].end() + 1));
-            return sb.toString();
-        }
+        // if (json == null)
+        // return null;
+        // if (isEmptyBlank(key) || json.length() < 2)
+        // return json;// json 字符串必须大于2个字符
+        //
+        // // token.getElements()[0] = field的上一个token，token.getElements()[1] =
+        // // field 的value
+        // Token token = getTokens(json, key);
+        // if (token == null || token.size() < 2)
+        // {// 找不到字段
+        // int pos = 0;
+        // for (; pos < json.length(); pos++)
+        // {
+        // char ch = json.charAt(pos);
+        // if (!isWhitespace(ch) && ch != BRACE_L)
+        // return json;
+        //
+        // if (ch == BRACE_L)
+        // break;
+        // }
+        // key = addEscapeChar(key, DB_QUOTE);
+        // String val = toString(value);
+        // StringBuilder sb = new StringBuilder(json.length() + key.length() + 3
+        // + val.length());
+        // sb.append(json.substring(0, pos + 1));// 添加根token
+        // sb.append(DB_QUOTE).append(key).append(DB_QUOTE).append(COLON).append(val).append(COMMA);//
+        // 添加键值;
+        // sb.append(json.substring(pos + 1));
+        // return sb.toString();
+        // }
+        // else
+        // {// 找到字段了
+        // StringBuilder sb = new StringBuilder(json.length());
+        // sb.append(json.substring(0, token.getElements()[1].begin()));
+        // sb.append(toString(value));// 更新值
+        // sb.append(json.substring(token.getElements()[1].end() + 1));
+        // return sb.toString();
+        // }
+        
+        return null;
     }
 
     /**
@@ -1126,9 +525,9 @@ public final class Jsons implements Serializable
     public static String toString(String key, Object value)
     {
         if (isEmptyBlank(key))
-            return NULL;
+            return JsonLexer.NULL;
 
-        return new StringBuilder().append(BRACE_L).append(toString(trim(key))).append(COLON).append(toString(value)).append(BRACE_R).toString();
+        return new StringBuilder().append(JsonLexer.BRACE_L).append(toString(trim(key))).append(JsonLexer.COLON).append(toString(value)).append(JsonLexer.BRACE_R).toString();
     }
 
     /**
@@ -1141,17 +540,19 @@ public final class Jsons implements Serializable
     public static String remove(String json, String key)
     {
 
-        Token token = getTokens(json, key);
-        if (token == null || token.size() < 2)
-            return json;
-
-        // token.getElements()[0] = field的上一个token，token.getElements()[1] =
-        // field 的value
-        Token[] tokens = token.getElements();
-        StringBuilder sb = new StringBuilder(json.length());
-        sb.append(json.substring(0, (tokens[0] != null && tokens[0].type() == Token.COMMA) ? tokens[0].begin() : tokens[1].begin()));
-        sb.append(json.substring(tokens[1].end() + 1));
-        return sb.toString();
+        // Token token = getTokens(json, key);
+        // if (token == null || token.size() < 2)
+        // return json;
+        //
+        // // token.getElements()[0] = field的上一个token，token.getElements()[1] =
+        // // field 的value
+        // Token[] tokens = token.getElements();
+        // StringBuilder sb = new StringBuilder(json.length());
+        // sb.append(json.substring(0, (tokens[0] != null && tokens[0].type() ==
+        // Token.COMMA) ? tokens[0].begin() : tokens[1].begin()));
+        // sb.append(json.substring(tokens[1].end() + 1));
+        // return sb.toString();
+        return null;
     }
 
     /**
@@ -1163,13 +564,14 @@ public final class Jsons implements Serializable
      */
     public static String getString(String json, String field)
     {//
-        if (json == null)
-            return null;
-        Token token = getTokens(json, field);
-        if (token == null || token.size() < 2)
-            return null;
+     // if (json == null)
+    // return null;
+    // Token token = getTokens(json, field);
+    // if (token == null || token.size() < 2)
+        return null;
 
-        return removeStartEndQuotation(field == null ? token.toString(json) : token.getElements()[1].toString(json));
+        // return removeStartEndQuotation(field == null ? token.toString(json) :
+        // token.getElements()[1].toString(json));
     }
 
     /**************************************************************************/

@@ -5,7 +5,6 @@ import java.lang.reflect.Array;
 
 import com.xiyuan.util.json.JsonLexer;
 import com.xiyuan.util.json.JsonParser;
-import com.xiyuan.util.json.Jsons;
 
 /***
  * 数组解析器,8种基本类型数组、字符串数组和对象数组
@@ -19,81 +18,36 @@ public final class ArrayParser extends JsonParser implements Serializable
     private static final long serialVersionUID = 1L;
     private static final int defult_capacity = 10;// 初始化大小
     private static final double capacity_multiple = 1.5;// 1.5增长倍数
-    
+    public ArrayParser(JsonLexer lexer)
+    {
+        super(lexer);
+    }
+
     public String toString(Object obj)
     {
         if (obj == null)
             return null;
-        
+
         Object[] arr = toArray(obj);
-        StringBuilder sb = new StringBuilder().append(Jsons.BRACKET_L);
+        StringBuilder sb = new StringBuilder().append(JsonLexer.BRACKET_L);
         for (int i = 0; i < arr.length; i++)
         {
             if (i > 0)
-                sb.append(Jsons.COMMA);
-            
+                sb.append(JsonLexer.COMMA);
+
             Object o = arr[i];
-            sb.append(o == null ? Jsons.NULL : Jsons.getParser(o.getClass()).toString(o));
+            sb.append(o == null ? JsonLexer.NULL : lexer.getParser(o.getClass()).toString(o));
         }
-        sb.append(Jsons.BRACKET_R);
+        sb.append(JsonLexer.BRACKET_R);
         return sb.toString();
     }
-    
-    /***
-     * 
-     * @param lexer 分析器
-     * @param cls 组件类型
-     * @param parser 组件类型 对饮的解析器
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    private Object fromArr(JsonLexer lexer, Class<?> cls, JsonParser parser)
-    {
-        // Class<?> type = cls.getComponentType();
-        if (lexer.tokenType() != JsonLexer.T_BRACKET_L)
-            return  Array.newInstance(cls, 0);
-        
-        int poolSize = defult_capacity;
-        int length = 0;
-        int scope = lexer.scope();
-        Object obj = null;
-        Object temp = Array.newInstance(cls, poolSize);
-        while (lexer.hasNext())
-        {
-            lexer.naxtToken();
-            if (lexer.scope() < scope)
-                break;// 碰到结束符
-                
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
-                continue;// 逗号跳过
-                
-            if (length == poolSize)
-            {
-                poolSize = (int) (poolSize * capacity_multiple);
-                obj = Array.newInstance(cls, poolSize);
-                System.arraycopy(temp, 0, obj, 0, length);
-                temp = obj;
-                obj = null;
-            }
-            
-            Object value = parser.toObject(lexer, cls);
-            Array.set(temp, length++, value);
-        }
-        
-        obj = Array.newInstance(cls, length);
-        if (length > 0)
-        {
-            System.arraycopy(temp, 0, obj, 0, length);
-            temp = null;
-        }
-        
-        return obj;
-    }
-    
+
     @Override
-    public Object toObject(JsonLexer lexer, Class<?> cls)
+    public Object toObject(Class<?> cls)
     {
-        
+        if (!cls.isArray())
+            return null;
+
         if (cls == boolean[].class)
             return fromArr(lexer, boolean.class, lexer.BaseParser());
         else if (cls == Boolean[].class)
@@ -128,10 +82,61 @@ public final class ArrayParser extends JsonParser implements Serializable
             return fromArr(lexer, Double.class, lexer.BaseParser());
         else if (cls == String[].class)
             return fromArr(lexer, String.class, lexer.BaseParser());
-        
-        if (cls.isArray())
-            return fromArr(lexer, cls.getComponentType(), lexer.getParser(cls.getComponentType()));
         else
-            return null;
+            return fromArr(lexer, cls.getComponentType(), lexer.getParser(cls.getComponentType()));
     }
+
+    
+    /***
+     * 
+     * @param lexer 分析器
+     * @param cls 组件类型
+     * @param parser 组件类型 对饮的解析器
+     * @return
+     */
+    private Object fromArr(JsonLexer lexer, Class<?> cls, JsonParser parser)
+    {
+        if (lexer.isEOF())
+            return null;
+
+        if (!lexer.isArr())// 非 数组开始符 [
+            return Array.newInstance(cls, 0);
+
+        int poolSize = defult_capacity;
+        int length = 0;
+        int scope = lexer.scope();
+        Object obj = null;
+        Object temp = Array.newInstance(cls, poolSize);
+        while (lexer.hasNext())
+        {
+            lexer.naxtToken();
+            if (lexer.scope() < scope)
+                break;// 碰到结束符
+
+            if (lexer.tokenType() == JsonLexer.T_COMMA)
+                continue;// 逗号跳过
+
+            if (length == poolSize)
+            {
+                poolSize = (int) (poolSize * capacity_multiple);
+                obj = Array.newInstance(cls, poolSize);
+                System.arraycopy(temp, 0, obj, 0, length);
+                temp = obj;
+                obj = null;
+            }
+
+            Object value = parser.toObject(cls);
+            Array.set(temp, length++, value);
+        }
+
+        obj = Array.newInstance(cls, length);
+        if (length > 0)
+        {
+            System.arraycopy(temp, 0, obj, 0, length);
+            temp = null;
+        }
+
+        return obj;
+    }
+
 }

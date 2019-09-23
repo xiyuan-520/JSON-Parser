@@ -37,8 +37,10 @@ import com.xiyuan.util.json.parser.ObjectParser;
 public class JsonLexer
 {
 
-    /** 未知类型 0 token */
-    public final static byte T_ZERO = 0;
+    /** 默认类型 -1 token */
+    // public final static byte T_DEFAULT = -1;
+
+    public final static byte T_UNKNOWN = 0;
     /** 左大括号类型 1 = { */
     public final static byte T_BRACE_L = 1;// "{"
     /** 右大括号类型 2 = } */
@@ -77,7 +79,7 @@ public class JsonLexer
     /** 双引号 " */
     public final static String DB_QUOTE_S = String.valueOf(DB_QUOTE);
 
-    /** null " */
+    /**  "null" */
     public final static String NULL = "null";
     /** "true" */
     public final static String TRUE = "true";
@@ -495,7 +497,7 @@ public class JsonLexer
         }
         return sb.toString();
     }
-    
+
     /**
      * 增加JSON中的转义字符，使用双引号时，单引号不转义，使用单引号时双引号不转义，不使用引号时都转义
      * 
@@ -636,7 +638,7 @@ public class JsonLexer
     {// 中文空格 =12288=0x3000, BOM空格 =65279=0xFEFF，英文空格 = 32
         return ch <= 32 || ch == 12288 || ch == 65279;
     }
-    
+
     /***
      * 去除JSON键和值的前后成对引号
      * 
@@ -660,28 +662,42 @@ public class JsonLexer
 
         return str;
     }
-    
-    
+
     /***********************************************************************/
     // 以下是类的定义及对象的调用方法
     /***********************************************************************/
-    private JsonParser baseParser = new BaseParser();
-    private JsonParser arrayParser = new ArrayParser();
-    private JsonParser listParser = new ListParser();
-    private JsonParser mapParser = new MapParser();
-    private JsonParser dateParser = new DateParser();
-    private JsonParser objParser = new ObjectParser();
+    private JsonParser baseParser;
+    private JsonParser arrayParser;
+    private JsonParser listParser;
+    private JsonParser mapParser;
+    private JsonParser dateParser;
+    private JsonParser objParser;
 
     private int pos = -1;
     private String json = null;
     private List<Byte> contextLs = new ArrayList<Byte>();// 当前token 所在的作用范围类型
-    private byte curType = T_ZERO;// 上一个token 的类型
+    private byte curType = T_UNKNOWN;// 上一个token 的类型
     private char ch;// 循环的当前字符
     private int objNum = 0;
     private int arrNum = 0;
     private String value = NULL;
     private int scopeIndex = -1;
+    private char quote = 0;// 字符串开始的引号值
+    private int length = 0;
     
+
+    public JsonLexer(String input)
+    {
+        this.json = input;
+        this.value = null;
+        this.baseParser = new BaseParser(this);
+        this.arrayParser = new ArrayParser(this);
+        this.listParser = new ListParser(this);
+        this.mapParser = new MapParser(this);
+        this.dateParser = new DateParser(this);
+        this.objParser = new ObjectParser(this);
+    }
+
     public JsonParser BaseParser()
     {
         return this.baseParser;
@@ -712,14 +728,6 @@ public class JsonLexer
         return this.objParser;
     }
 
-    public JsonLexer(String input)
-    {
-        this.json = input;
-        this.value = null;
-        if (hasNext())
-            naxtToken();
-    }
-
     public String value()
     {
         return this.value;
@@ -737,7 +745,7 @@ public class JsonLexer
     {
         return this.pos + 1;
     }
-    
+
     /**
      * 获取当前字符的索引
      * @return
@@ -746,20 +754,21 @@ public class JsonLexer
     {
         return this.pos;
     }
-    
+
     public byte tokenType()
     {
         return this.curType;
     }
 
-    public String naxtToken()
+    public JsonLexer naxtToken()
     {
         this.value = NULL;
 
         if (!hasNext())
         {
             curType = T_EOF;
-            return null;
+            this.scopeIndex = -1;
+            return this;
         }
 
         this.pos = nextPos();
@@ -767,13 +776,13 @@ public class JsonLexer
         if (isWhitespace(ch))
         {
             naxtToken();
-            return this.value;// 空白字符开头
+            return this;// 空白字符开头
         }
 
         if (pos == 0 && BRACE_L != ch && ch != BRACKET_L)
         {
             naxtToken();
-            return this.value;// json 数据格式只有两种，1.对象使用{} 括起，2.数组[] 括起。所以非
+            return this;// json 数据格式只有两种，1.对象使用{} 括起，2.数组[] 括起。所以非
                               // {或者[开头的数据
         }
 
@@ -792,16 +801,18 @@ public class JsonLexer
             if (objNum > 0)
             {
                 objNum--;
-                if (!contextLs.isEmpty() && contextLs.get(scopeIndex) == T_BRACE_L)
+                if (!contextLs.isEmpty() && scopeType() == T_BRACE_L)
                     removeScope();// 设置结束当前context
 
                 value = String.valueOf(ch);
-                curType = contextLs.isEmpty() ? T_ZERO : contextLs.get(scopeIndex);
+                curType = scopeType();
             }
             else
             {
-                naxtToken();
-                return this.value;
+                // naxtToken();
+                // return this.value;
+
+                pos = buildStringToken(pos, scopeType(), curType);
             }
 
             break;
@@ -820,16 +831,17 @@ public class JsonLexer
             if (arrNum > 0)
             {
                 arrNum--;
-                if (!contextLs.isEmpty() && contextLs.get(scopeIndex) == T_BRACKET_L)
+                if (!contextLs.isEmpty() && scopeType() == T_BRACKET_L)
                     removeScope();// 设置结束当前context
 
                 value = String.valueOf(ch);
-                curType = contextLs.isEmpty() ? T_ZERO : contextLs.get(scopeIndex);
+                curType = scopeType();
             }
             else
             {
-                naxtToken();
-                return this.value;
+                // naxtToken();
+                // return this.value;
+                pos = buildStringToken(pos, scopeType(), curType);
             }
 
             break;
@@ -840,7 +852,7 @@ public class JsonLexer
             if (curType == T_COMMA)
             {
                 naxtToken();
-                return this.value;// 上一个token类型是逗号
+                return this;// 上一个token类型是逗号
             }
 
             // 处理上一个是 冒号 当前为逗号，则当前值为null 列：{dd:,} 被整理 后为 {dd:null,}
@@ -867,51 +879,60 @@ public class JsonLexer
             else
             {
                 // 如果上一个 不是String 型 则当前是 String键或者值
-                int length = getStringTokenLength(json, pos, contextLs.get(scopeIndex), curType);
-                if (length > 0)
-                {
-                    pos += (length - 1);
-                    this.value = String.valueOf(json.subSequence(pos, pos + length));
-                }
-
-                curType = T_STRING;
+                // int length = getStringTokenLength(json, pos, scopeType(),
+                // curType);
+                // if (length > 0)
+                // {
+                // pos += (length - 1);
+                // this.value = String.valueOf(json.subSequence(pos, pos +
+                // length));
+                // }
+                // curType = T_STRING;
+                pos = buildStringToken(pos, scopeType(), curType);
             }
 
             break;
         }
         default:
         {
-
-            int length = getStringTokenLength(json, pos, contextLs.get(scopeIndex), curType);
-            if (length > 0)
-            {
-                this.value = String.valueOf(json.subSequence(pos, pos + length));
-                pos += (length - 1);
-            }
-
-            curType = T_STRING;
+            pos = buildStringToken(pos, scopeType(), curType);
             break;
         }
         }
-        return this.value;
+        return this;
+    }
+
+    private int buildStringToken(int pos, int scope, byte prevType)
+    {
+        getStringTokenLength(pos, scopeType(), curType);
+        if (length > 0)
+        {
+            this.value = json.substring(pos, pos + length);
+            pos += (length - 1);
+        }
+
+        curType = T_STRING;
+        return pos;
     }
 
     /**
      * 生成从当前位置开始的 一个字符串token
      * 
-     * @param json json 字符串
      * @param pos 读取位置
      * @param scope token所属范围类型
      * @param prevToken 上一个token的类型
      * @return 返回String token 的字符长度
      */
-    private int getStringTokenLength(String json, int pos, int scope, byte prevType)
+    private int getStringTokenLength(int pos, byte contextType, byte prevType)
     {
-        int length = 0;
-        char quote = 0;// 字符串开始的引号值
+        length = 0;
+        quote = 0;
+        if (scope() < 0)//当前没有作用域 则视为String字符 一直到json末尾
+            return length = json.length() -pos;//
+        
         for (; pos < json.length(); pos++, length++)
         {
-            char ch = json.charAt(pos);
+            ch = json.charAt(pos);
             if (quote == 0)
             {
                 quote = ch;// 记录开始符
@@ -921,25 +942,21 @@ public class JsonLexer
             // 查找结束符， 非引号字符串结束的字符
             if (quote > 0 && quote != DB_QUOTE && quote != QUOTE && (ch == COLON || ch == COMMA || ch == BRACE_R || ch == BRACKET_R))
             {
-                if (scope == BRACKET_L && ch == COLON)// 如果是数组当前是冒号&所属范围是数组，则当前冒号为值
+                if (contextType == T_BRACKET_L && ch == COLON)// 如果是数组当前是冒号&所属范围是数组，则当前冒号为值
                     continue;
 
                 // 当前为冒号上一个token的类型为冒号，则档前为值
                 if (ch == COLON && prevType == Token.COLON)
                     continue;// {a::sss:sdcsdcs, b:wwww} 其中 sss:sdcsdcs 为值
                 else
-                    return length;// 非引号开始 并且有结束负号
+                    return length;// 非引号开始 并且有结束负号&作用域不是-1
             }
 
             // 查找结束符，引号开头&当前是引号 & 上一个字符不是不是转义符
             if ((ch == QUOTE || ch == DB_QUOTE) && ch == quote && json.charAt(pos - 1) != '\\')
                 return ++length;// 包含当前字符
         }
-
-        if (pos == json.length())
-            return --length;// 遍历结束索引json最大索引
-        else
-            return length;
+        return length;
     }
 
     /**
@@ -948,6 +965,14 @@ public class JsonLexer
     public int scope()
     {
         return scopeIndex;
+    }
+
+    public byte scopeType()
+    {
+        if (contextLs.isEmpty())
+            return T_UNKNOWN;
+        else
+            return contextLs.get(scopeIndex);
     }
 
     /***
@@ -959,11 +984,6 @@ public class JsonLexer
         scopeIndex++;
     }
 
-    public boolean isEmptyScope()
-    {
-        return this.contextLs.size() == 1;
-    }
-
     /** 删除当前context */
     public int removeScope()
     {
@@ -971,7 +991,10 @@ public class JsonLexer
             return scopeIndex;
 
         contextLs.remove(scopeIndex);
-        return --scopeIndex;
+        if (contextLs.isEmpty())
+            return this.scopeIndex = -1;
+        else
+            return --scopeIndex;
     }
 
     /** 根据类获取解析器 */
@@ -1107,18 +1130,58 @@ public class JsonLexer
 
         return parser;
     }
-    
+
+    /***
+     * 判断当前是否结束
+     */
+    public boolean isEOF()
+    {
+        return tokenType() == JsonLexer.T_EOF;
+    }
+
+    /***
+     * 判断当前是否为 数组（开始符）
+     */
+    public boolean isArr()
+    {
+        return tokenType() == JsonLexer.T_BRACKET_L;
+    }
+
+    /**
+     * 判断当前是否为 数组（结束符）
+     */
+    public boolean isEndArr()
+    {
+        return tokenType() == JsonLexer.T_BRACKET_R;
+    }
+
+    /***
+     * 判断当前是否为 数组（开始符）
+     */
+    public boolean isObj()
+    {
+        return tokenType() == JsonLexer.T_BRACE_L;
+    }
+
+    /**
+     * 判断当前是否为 数组（结束符）
+     */
+    public boolean isEndObj()
+    {
+        return tokenType() == JsonLexer.T_BRACE_R;
+    }
+
     /**
      * json字符串截取
-     * @param pos           开始索引
-     * @param endPos        结束索引
+     * @param pos 开始索引
+     * @param endPos 结束索引
      * @return
      */
     public String string(int pos, int endPos)
     {
-        if (pos <0 || json == null || pos > json.length() || endPos < pos)
+        if (pos < 0 || json == null || pos > json.length() || endPos < pos)
             return null;
-        
+
         return json.substring(pos, endPos > json.length() ? json.length() : endPos);
     }
 }

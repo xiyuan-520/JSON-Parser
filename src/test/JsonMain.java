@@ -1,7 +1,5 @@
 import java.io.File;
-import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.zhiqim.kernel.constants.CodeConstants;
@@ -14,7 +12,6 @@ import com.google.gson.reflect.TypeToken;
 import com.xiyuan.util.json.JsonLexer;
 import com.xiyuan.util.json.Jsons;
 import com.xiyuan.util.json.Token;
-import com.xiyuan.util.json.TokenPool;
 
 import frame.model.OrdOrder;
 import frame.model.Person;
@@ -75,7 +72,6 @@ public class JsonMain implements TypeConstants, CodeConstants
     public static void testMy(String json, String jsonString)
     {
         Token token = Token.newToken((byte) 0, 0);
-        TokenPool pool = new TokenPool(1000);
         long l1 = 0, l2 = 0;
         List<OrdOrder> orders = new ArrayList<OrdOrder>();
         System.out.println("===========================================================================");
@@ -90,7 +86,6 @@ public class JsonMain implements TypeConstants, CodeConstants
         // token = Jsons.getTokens(json, "oid");
         l2 = System.currentTimeMillis();
         System.out.println("自己代码 共生成 " + (orders != null ? orders.size() : a) + "条数据，共耗时：" + (l2 - l1) + " 毫秒");
-        System.out.println(pool.size());
         for (int i = 0; i < orders.size(); i++)
         {
             if (i > 0)
@@ -112,8 +107,9 @@ public class JsonMain implements TypeConstants, CodeConstants
         json = "[";
 //        json += "{dd:{sddd:1354},\"id\":1,\"name\":\"a\",\"age\":18,\"sex\":\"0\"}";
 //        json += ",";
-        json += "{\"id\":2,\"name\":\"b\",\"age\":19,\"sex\":\"1\"}";
-        json += "]".hashCode();
+//        json += "{\"id\":2,\"name\":\"b\",\"age\":19,\"sex\":\"1\"}";
+        json += "{\"id\":2}";
+        json += "]},:{}}";
         
 //        json = "[1,g,3,1,c3]";
 //        
@@ -130,8 +126,8 @@ public class JsonMain implements TypeConstants, CodeConstants
         lexer = new JsonLexer(json);
         while (lexer.hasNext())
         {
-            String value = lexer.naxtToken();
-            System.out.println(lexer.scope()+"\t"+value);
+            String value = lexer.naxtToken().value();
+            System.out.println(lexer.scope()+"\t"+lexer.tokenType()+"\t"+value);
         }
 //        
         // List<Person> ls = Jsons.toList(json, Person.class);
@@ -172,20 +168,7 @@ public class JsonMain implements TypeConstants, CodeConstants
         // System.out.println(jsonString);
         // System.out.println(MyJsons.getString(jsonString, "arr"));
     }
-    public static final int hash(Object k) {
-        int h = hashSeed;
-        if (0 != h && k instanceof String) {
-            return sun.misc.Hashing.stringHash32((String) k);
-        }
-
-        h ^= k.hashCode();
-
-        // This function ensures that hashCodes that differ only by
-        // constant multiples at each bit position have a bounded
-        // number of collisions (approximately 8 at default load factor).
-        h ^= (h >>> 20) ^ (h >>> 12);
-        return h ^ (h >>> 7) ^ (h >>> 4);
-    }
+   
     public static void testFastJson(String json)
     {
         long l1 = 0, l2 = 0;

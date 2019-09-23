@@ -20,7 +20,14 @@ public abstract class JsonParser implements Serializable
 {
     private static final long serialVersionUID = 1L;
     public static final long JS_MAX_LONG_VALUE = (long) Math.pow(2, 53);// 2^53//9007199254740992
-
+    
+    
+    protected JsonLexer lexer;
+    public JsonParser(JsonLexer lexer)
+    {
+        this.lexer = lexer;
+    }
+    
     /**
      * 解析对象成JSON字符串
      * 
@@ -37,7 +44,7 @@ public abstract class JsonParser implements Serializable
      * @param cls 对象类结构
      * @return 返回对象
      */
-    public abstract Object toObject(JsonLexer lexer, Class<?> cls);
+    public abstract Object toObject(Class<?> cls);
 
     /***********************************************/
     // 以下提供子类调用方法
