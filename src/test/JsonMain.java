@@ -113,18 +113,27 @@ public class JsonMain implements TypeConstants, CodeConstants
         json += "{dd:{sddd:1354},\"id\":1,\"name\":\"a\",\"age\":18,\"sex\":\"0\"}";
         json += ",";
         json += "{\"id\":2,\"name\":\"b\",\"age\":19,\"sex\":\"1\"}";
-        json += "]";
+        json += "]".hashCode();
         
+//        json = "[1,g,3,1,c3]";
+//        
 //        json = "[[ss,d]]";
         System.out.println(json);
         JsonLexer lexer = new JsonLexer(json);
-        while (lexer.hasNext())
+        Object[] str = (String[]) lexer.getParser(String[].class).toObject(lexer, String[].class);
+        for (Object object : str)
         {
-            String value = lexer.naxtToken();
-            System.out.println(lexer.scope()+"\t"+value);
+            System.out.println(object);
         }
-        
-        System.out.println((int)(1000*2.5));
+//        System.out.println("sss:" +str);
+//        System.out.println("===============");
+//        lexer = new JsonLexer(json);
+//        while (lexer.hasNext())
+//        {
+//            String value = lexer.naxtToken();
+//            System.out.println(lexer.scope()+"\t"+value);
+//        }
+//        
         // List<Person> ls = Jsons.toList(json, Person.class);
         // for (Person person : ls)
         // System.out.println(person);
@@ -163,7 +172,20 @@ public class JsonMain implements TypeConstants, CodeConstants
         // System.out.println(jsonString);
         // System.out.println(MyJsons.getString(jsonString, "arr"));
     }
+    public static final int hash(Object k) {
+        int h = hashSeed;
+        if (0 != h && k instanceof String) {
+            return sun.misc.Hashing.stringHash32((String) k);
+        }
 
+        h ^= k.hashCode();
+
+        // This function ensures that hashCodes that differ only by
+        // constant multiples at each bit position have a bounded
+        // number of collisions (approximately 8 at default load factor).
+        h ^= (h >>> 20) ^ (h >>> 12);
+        return h ^ (h >>> 7) ^ (h >>> 4);
+    }
     public static void testFastJson(String json)
     {
         long l1 = 0, l2 = 0;

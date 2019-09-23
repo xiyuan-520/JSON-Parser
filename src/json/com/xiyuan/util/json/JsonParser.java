@@ -31,6 +31,7 @@ public abstract class JsonParser implements Serializable
 
     /**
      * 解析JSON字符串成对象
+     * @param <T>
      * 
      * @param json json字符串 // * @param token Json token流
      * @param cls 对象类结构

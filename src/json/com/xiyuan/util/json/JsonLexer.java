@@ -495,7 +495,7 @@ public class JsonLexer
         }
         return sb.toString();
     }
-
+    
     /**
      * 增加JSON中的转义字符，使用双引号时，单引号不转义，使用单引号时双引号不转义，不使用引号时都转义
      * 
@@ -681,7 +681,7 @@ public class JsonLexer
     private int arrNum = 0;
     private String value = NULL;
     private int scopeIndex = -1;
-
+    
     public JsonParser BaseParser()
     {
         return this.baseParser;
@@ -716,6 +716,8 @@ public class JsonLexer
     {
         this.json = input;
         this.value = null;
+        if (hasNext())
+            naxtToken();
     }
 
     public String value()
@@ -735,7 +737,16 @@ public class JsonLexer
     {
         return this.pos + 1;
     }
-
+    
+    /**
+     * 获取当前字符的索引
+     * @return
+     */
+    public int pos()
+    {
+        return this.pos;
+    }
+    
     public byte tokenType()
     {
         return this.curType;
@@ -1096,5 +1107,18 @@ public class JsonLexer
 
         return parser;
     }
-
+    
+    /**
+     * json字符串截取
+     * @param pos           开始索引
+     * @param endPos        结束索引
+     * @return
+     */
+    public String string(int pos, int endPos)
+    {
+        if (pos <0 || json == null || pos > json.length() || endPos < pos)
+            return null;
+        
+        return json.substring(pos, endPos > json.length() ? json.length() : endPos);
+    }
 }

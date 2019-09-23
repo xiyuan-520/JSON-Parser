@@ -19,26 +19,26 @@ public final class ArrayParser extends JsonParser implements Serializable
     private static final long serialVersionUID = 1L;
     private static final int defult_capacity = 10;// 初始化大小
     private static final double capacity_multiple = 1.5;// 1.5增长倍数
-
+    
     public String toString(Object obj)
     {
         if (obj == null)
             return null;
-
+        
         Object[] arr = toArray(obj);
         StringBuilder sb = new StringBuilder().append(Jsons.BRACKET_L);
         for (int i = 0; i < arr.length; i++)
         {
             if (i > 0)
                 sb.append(Jsons.COMMA);
-
+            
             Object o = arr[i];
             sb.append(o == null ? Jsons.NULL : Jsons.getParser(o.getClass()).toString(o));
         }
         sb.append(Jsons.BRACKET_R);
         return sb.toString();
     }
-
+    
     /***
      * 
      * @param lexer 分析器
@@ -46,50 +46,54 @@ public final class ArrayParser extends JsonParser implements Serializable
      * @param parser 组件类型 对饮的解析器
      * @return
      */
-    private static <T> Object fromArr(JsonLexer lexer, Class<T> cls, JsonParser parser)
+    @SuppressWarnings("unchecked")
+    private Object fromArr(JsonLexer lexer, Class<?> cls, JsonParser parser)
     {
-        Class<?> type = cls.getComponentType();
+        // Class<?> type = cls.getComponentType();
         if (lexer.tokenType() != JsonLexer.T_BRACKET_L)
-            return Array.newInstance(type, 0);
-
+            return  Array.newInstance(cls, 0);
+        
+        int poolSize = defult_capacity;
         int length = 0;
         int scope = lexer.scope();
-        Object[] val = null;
-        Object[] temp = (Object[]) Array.newInstance(type, defult_capacity);
+        Object obj = null;
+        Object temp = Array.newInstance(cls, poolSize);
         while (lexer.hasNext())
         {
             lexer.naxtToken();
             if (lexer.scope() < scope)
                 break;// 碰到结束符
-
-            if (lexer.tokenType() != JsonLexer.T_COMMA)
+                
+            if (lexer.tokenType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
-
-            if (length == temp.length)
+                
+            if (length == poolSize)
             {
-                val = (Object[]) Array.newInstance(type, (int) (temp.length * capacity_multiple));
-                System.arraycopy(val, 0, val, 0, length);
-                temp = val;
-                val = null;
+                poolSize = (int) (poolSize * capacity_multiple);
+                obj = Array.newInstance(cls, poolSize);
+                System.arraycopy(temp, 0, obj, 0, length);
+                temp = obj;
+                obj = null;
             }
-
-            temp[length++] = parser.toObject(lexer, cls);
+            
+            Object value = parser.toObject(lexer, cls);
+            Array.set(temp, length++, value);
         }
-
-        val = (Object[]) Array.newInstance(type, length);
+        
+        obj = Array.newInstance(cls, length);
         if (length > 0)
         {
-            System.arraycopy(temp, 0, val, 0, length);
+            System.arraycopy(temp, 0, obj, 0, length);
             temp = null;
         }
-
-        return val;
+        
+        return obj;
     }
-
+    
     @Override
     public Object toObject(JsonLexer lexer, Class<?> cls)
     {
-
+        
         if (cls == boolean[].class)
             return fromArr(lexer, boolean.class, lexer.BaseParser());
         else if (cls == Boolean[].class)
@@ -122,6 +126,12 @@ public final class ArrayParser extends JsonParser implements Serializable
             return fromArr(lexer, double.class, lexer.BaseParser());
         else if (cls == Double[].class)
             return fromArr(lexer, Double.class, lexer.BaseParser());
-        return fromArr(lexer, cls, lexer.getParser(cls));
+        else if (cls == String[].class)
+            return fromArr(lexer, String.class, lexer.BaseParser());
+        
+        if (cls.isArray())
+            return fromArr(lexer, cls.getComponentType(), lexer.getParser(cls.getComponentType()));
+        else
+            return null;
     }
 }

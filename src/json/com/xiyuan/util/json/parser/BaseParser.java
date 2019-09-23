@@ -1,6 +1,8 @@
 package com.xiyuan.util.json.parser;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.concurrent.atomic.AtomicLongArray;
 
 import com.xiyuan.util.json.JsonLexer;
 import com.xiyuan.util.json.JsonParser;
@@ -14,12 +16,12 @@ import com.xiyuan.util.json.Jsons;
 public final class BaseParser extends JsonParser implements Serializable
 {
     private static final long serialVersionUID = 1L;
-
+    
     public String toString(Object obj)
     {
         if (obj == null)
             return null;
-
+        
         if (obj instanceof Long)
         {// 对long型进行判断，超过JS支持的最大值时行字符串处理，防止JS数值不准
             long l = (Long) obj;
@@ -31,65 +33,80 @@ public final class BaseParser extends JsonParser implements Serializable
             String str = Jsons.addEscapeChar((String) obj, JsonLexer.DB_QUOTE);
             return new StringBuilder().append(Jsons.DB_QUOTE).append(str).append(Jsons.DB_QUOTE).toString();
         }
-
+        
         return String.valueOf(obj);
     }
-
+    
     public static boolean booleanValue(JsonLexer lexer)
     {
         String value = Jsons.removeStartEndQuotation(lexer.value());
         return Boolean.parseBoolean(value) ? true : ("1".equals(value) ? true : false);
     }
-
+    
     public static byte byteValue(JsonLexer lexer)
     {
         String value = Jsons.removeStartEndQuotation(lexer.value());
         return Byte.parseByte(!JsonLexer.NULL.equals(value) ? value : (lexer.tokenType() == JsonLexer.T_COMMA ? String.valueOf(JsonLexer.COMMA) : value));
     }
-
+    
     public static char charValue(JsonLexer lexer)
     {
         String value = Jsons.removeStartEndQuotation(lexer.value());
         return value == null ? (char) 0 : value.charAt(0);
     }
-
+    
     public static short shortValue(JsonLexer lexer)
     {
         String value = Jsons.removeStartEndQuotation(lexer.value());
         return Short.parseShort(!JsonLexer.NULL.equals(value) ? value : (lexer.tokenType() == JsonLexer.T_COMMA ? String.valueOf(JsonLexer.COMMA) : value));
     }
-
+    
     public static int intValue(JsonLexer lexer)
     {
         String value = Jsons.removeStartEndQuotation(lexer.value());
         return Integer.parseInt(!JsonLexer.NULL.equals(value) ? value : (lexer.tokenType() == JsonLexer.T_COMMA ? String.valueOf(JsonLexer.COMMA) : value));
     }
-
+    
     public static long longValue(JsonLexer lexer)
     {
         String value = Jsons.removeStartEndQuotation(lexer.value());
         return Long.parseLong(!JsonLexer.NULL.equals(value) ? value : (lexer.tokenType() == JsonLexer.T_COMMA ? String.valueOf(JsonLexer.COMMA) : value));
     }
-
+    
     public static float floatValue(JsonLexer lexer)
     {
         String value = Jsons.removeStartEndQuotation(lexer.value());
         return Float.parseFloat(!JsonLexer.NULL.equals(value) ? value : (lexer.tokenType() == JsonLexer.T_COMMA ? String.valueOf(JsonLexer.COMMA) : value));
     }
-
+    
     public static double doubleValue(JsonLexer lexer)
     {
         String value = Jsons.removeStartEndQuotation((lexer.value() == null) ? null : lexer.value());
         return Double.parseDouble(!JsonLexer.NULL.equals(value) ? value : (lexer.tokenType() == JsonLexer.T_COMMA ? String.valueOf(JsonLexer.COMMA) : value));
     }
-
+    
     public static String stringValue(JsonLexer lexer)
     {
         // 去掉前后可能的引号
-        String value = JsonLexer.removeStartEndQuotation((lexer.value() == null) ? null : lexer.value());
-        return JsonLexer.removeEscapeChar(value);// 字符串要求删除转义
+        if (lexer.tokenType() == JsonLexer.T_BRACE_L || lexer.tokenType() == JsonLexer.T_BRACKET_L)
+        {// 对象行
+            int scope = lexer.scope();
+            int pos = lexer.pos();
+            while (lexer.hasNext())
+            {
+                lexer.naxtToken();
+                if (lexer.scope() < scope)
+                    break;// 碰到结束符
+            }
+            return JsonLexer.removeEscapeChar(JsonLexer.removeStartEndQuotation(lexer.string(pos, lexer.pos()+1)));
+        }
+        else
+        {
+            // 去除引号&字符串要求删除转义 然后返回
+            return JsonLexer.removeEscapeChar(JsonLexer.removeStartEndQuotation((lexer.value() == null) ? null : lexer.value()));
+        }
     }
-
+    
     @Override
     public Object toObject(JsonLexer lexer, Class<?> cls)
     {
@@ -127,7 +144,7 @@ public final class BaseParser extends JsonParser implements Serializable
             return Double.valueOf(doubleValue(lexer));
         else if (cls == String.class)
             return stringValue(lexer);
-
+        
         return null;
     }
 }
