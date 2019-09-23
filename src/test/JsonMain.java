@@ -110,29 +110,29 @@ public class JsonMain implements TypeConstants, CodeConstants
         System.out.println("============================================================");
 
         json = "[";
-        json += "{dd:{sddd:1354},\"id\":1,\"name\":\"a\",\"age\":18,\"sex\":\"0\"}";
-        json += ",";
+//        json += "{dd:{sddd:1354},\"id\":1,\"name\":\"a\",\"age\":18,\"sex\":\"0\"}";
+//        json += ",";
         json += "{\"id\":2,\"name\":\"b\",\"age\":19,\"sex\":\"1\"}";
         json += "]".hashCode();
         
 //        json = "[1,g,3,1,c3]";
 //        
 //        json = "[[ss,d]]";
-        System.out.println(json);
+//        System.out.println(json);
         JsonLexer lexer = new JsonLexer(json);
-        Object[] str = (String[]) lexer.getParser(String[].class).toObject(lexer, String[].class);
-        for (Object object : str)
-        {
-            System.out.println(object);
-        }
-//        System.out.println("sss:" +str);
-//        System.out.println("===============");
-//        lexer = new JsonLexer(json);
-//        while (lexer.hasNext())
+//        Object[] str = (String[]) lexer.getParser(String[].class).toObject(lexer, String[].class);
+//        for (Object object : str)
 //        {
-//            String value = lexer.naxtToken();
-//            System.out.println(lexer.scope()+"\t"+value);
+//            System.out.println(object);
 //        }
+//        System.out.println("sss:" +str);
+        System.out.println("===============");
+        lexer = new JsonLexer(json);
+        while (lexer.hasNext())
+        {
+            String value = lexer.naxtToken();
+            System.out.println(lexer.scope()+"\t"+value);
+        }
 //        
         // List<Person> ls = Jsons.toList(json, Person.class);
         // for (Person person : ls)
