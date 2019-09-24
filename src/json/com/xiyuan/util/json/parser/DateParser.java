@@ -54,7 +54,7 @@ public final class DateParser extends JsonParser implements Serializable
 //            return null;
         
         String value = JsonLexer.removeStartEndQuotation(lexer.value());
-        switch (cls.getName().hashCode())
+        switch ((value == null || JsonLexer.NULL.equals(value)) ? -1 : cls.getName().hashCode())
         {
             case JsonLexer.SQL_DATE_CLS_HASH:
                 return toDate(value);

@@ -60,11 +60,10 @@ public final class ObjectParser extends JsonParser implements Serializable
     public Object toObject(Class<?> cls)
     {
         Object obj = newInstance(cls);
-        if (obj == null)
+        if (obj == null || !lexer.isObj())
             return null;
-
+                
         Map<String, Field> filedMap = getMapFieldDeep(cls);
-
         Field key = null;
         Object value = null;
         int scope = lexer.scope();
@@ -78,8 +77,9 @@ public final class ObjectParser extends JsonParser implements Serializable
                 continue;// 冒号或者逗号跳过
 
             if (key != null)
-            {// TODO:后续半段泛型类
-                Class<?> type = key.getType();
+            {
+                Class<?> type = key.getType();//TODO 这里要获取泛型参数
+                
                 value = lexer.getParser(type).toObject(type);//
                 setValue(obj, key, value);
                 key = null;
@@ -106,6 +106,8 @@ public final class ObjectParser extends JsonParser implements Serializable
 
         try
         {
+            if (value != null && value instanceof String && JsonLexer.NULL.equals(value))
+                value = null;
             key.set(obj, value);
         }
         catch (Exception e)

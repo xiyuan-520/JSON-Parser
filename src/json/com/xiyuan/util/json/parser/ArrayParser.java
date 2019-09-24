@@ -153,10 +153,7 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr(JsonLexer lexer, Class<?> cls, JsonParser parser)
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
             return Array.newInstance(cls, 0);
 
         PageArr page = new PageArr(cls, (int) (capacity_multiple * defult_capacity));
@@ -166,7 +163,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             lexer.naxtToken();
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
             page.add(parser.toObject(cls));
         }
@@ -182,11 +179,8 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr_Int()
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
-            return new int[0];
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
+            return new Integer[0];
 
         int length = 0;
         int scope = lexer.scope();
@@ -198,7 +192,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
 
             if (length == temp.length)
@@ -229,11 +223,8 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr_Boolean()
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
-            return new int[0];
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
+            return new Boolean[0];
 
         int length = 0;
         int scope = lexer.scope();
@@ -245,7 +236,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
 
             if (length == temp.length)
@@ -276,11 +267,8 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr_byte()
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
-            return new int[0];
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
+            return new byte[0];
 
         int length = 0;
         int scope = lexer.scope();
@@ -292,7 +280,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
 
             if (length == temp.length)
@@ -323,11 +311,8 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr_char()
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
-            return new int[0];
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
+            return new char[0];
 
         int length = 0;
         int scope = lexer.scope();
@@ -339,7 +324,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
 
             if (length == temp.length)
@@ -370,11 +355,8 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr_short()
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
-            return new int[0];
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
+            return new short[0];
 
         int length = 0;
         int scope = lexer.scope();
@@ -386,7 +368,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
 
             if (length == temp.length)
@@ -417,11 +399,8 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr_double()
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
-            return new int[0];
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
+            return new double[0];
 
         int length = 0;
         int scope = lexer.scope();
@@ -433,7 +412,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
 
             if (length == temp.length)
@@ -464,11 +443,8 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr_long()
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
-            return new int[0];
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
+            return new long[0];
 
         int length = 0;
         int scope = lexer.scope();
@@ -480,7 +456,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
 
             if (length == temp.length)
@@ -511,11 +487,8 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr_float()
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
-            return new int[0];
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
+            return new float[0];
 
         int length = 0;
         int scope = lexer.scope();
@@ -527,7 +500,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
 
             if (length == temp.length)
@@ -558,11 +531,8 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr_boolean()
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
-            return new int[0];
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
+            return new boolean[0];
 
         int length = 0;
         int scope = lexer.scope();
@@ -574,7 +544,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
 
             if (length == temp.length)
@@ -605,11 +575,8 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr_Byte()
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
-            return new int[0];
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
+            return new Byte[0];
 
         int length = 0;
         int scope = lexer.scope();
@@ -621,7 +588,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
 
             if (length == temp.length)
@@ -652,11 +619,8 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr_Char()
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
-            return new int[0];
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
+            return new Character[0];
 
         int length = 0;
         int scope = lexer.scope();
@@ -668,7 +632,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
 
             if (length == temp.length)
@@ -699,11 +663,8 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr_Double()
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
-            return new int[0];
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
+            return new Double[0];
 
         int length = 0;
         int scope = lexer.scope();
@@ -715,7 +676,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
 
             if (length == temp.length)
@@ -746,11 +707,8 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr_Float()
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
-            return new int[0];
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
+            return new Float[0];
 
         int length = 0;
         int scope = lexer.scope();
@@ -762,7 +720,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
 
             if (length == temp.length)
@@ -793,10 +751,7 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr_int()
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
             return new int[0];
 
         int length = 0;
@@ -809,7 +764,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
 
             if (length == temp.length)
@@ -840,11 +795,8 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr_Long()
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
-            return new int[0];
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
+            return new Long[0];
 
         int length = 0;
         int scope = lexer.scope();
@@ -856,7 +808,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
 
             if (length == temp.length)
@@ -887,11 +839,8 @@ public final class ArrayParser extends JsonParser implements Serializable
      */
     private Object fromArr_Short()
     {
-        if (lexer.isEOF())
-            return null;
-
-        if (!lexer.isArr())// 非 数组开始符 [
-            return new int[0];
+        if (lexer.isEOF() && !lexer.isArr())// 非 数组开始符 [或者文档结束
+            return new Short[0];
 
         int length = 0;
         int scope = lexer.scope();
@@ -903,7 +852,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
-            if (lexer.tokenType() == JsonLexer.T_COMMA)
+            if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
 
             if (length == temp.length)

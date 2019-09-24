@@ -55,6 +55,8 @@ public final class ListParser extends JsonParser
         else if (cls == Set.class || cls == HashSet.class)
             list = new HashSet<Object>(arr == null ? 0 : arr.length);
         
+        if (arr == null)
+            return list;
         for (int i = 0; i < arr.length; i++)
             list.add(arr[i]);
         
