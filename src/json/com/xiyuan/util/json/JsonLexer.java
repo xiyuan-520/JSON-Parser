@@ -1044,7 +1044,6 @@ public class JsonLexer
         {
         
         // 八大基本类型+封装类+String
-        
             case BOOL_CLS_HASH:// = 64711720;//boolean.class.getName().hashCode();
             case BOOL_OBJ_CLS_HASH:// = 344809556;//Boolean.class.getName().hashCode();
             case BYTE_CLS_HASH:// = 3039496;//byte.class.getName().hashCode();
