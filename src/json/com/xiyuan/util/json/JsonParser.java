@@ -25,6 +25,7 @@ public abstract class JsonParser implements Serializable
     public static final String DATETIME_REG = "^((([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29))\\s(([0-1][0-9]|[2][0-3]):([0-5][0-9]):([0-5][0-9]))$";
     
     protected JsonLexer lexer;
+    
     public JsonParser(JsonLexer lexer)
     {
         this.lexer = lexer;
@@ -37,7 +38,7 @@ public abstract class JsonParser implements Serializable
      * @return JSON字符串
      */
     public abstract String toString(Object obj);
-
+    
     /**
      * 解析JSON字符串成对象
      * @param <T>
@@ -47,7 +48,7 @@ public abstract class JsonParser implements Serializable
      * @return 返回对象
      */
     public abstract Object toObject(Class<?> cls);
-
+    
     /***********************************************/
     // 以下提供子类调用方法
     /***********************************************/
@@ -61,77 +62,79 @@ public abstract class JsonParser implements Serializable
     {
         if (obj == null || !obj.getClass().isArray())
             throw new IllegalArgumentException("传入的参数不是数组类型");
-
-        if (obj.getClass() == int[].class)
+        switch (obj.getClass().getName().hashCode())
         {
-            int[] os = (int[]) obj;
-            Integer[] arr = new Integer[os.length];
-            for (int i = 0; i < os.length; i++)
-                arr[i] = os[i];
-            return arr;
-        }
-        else if (obj.getClass() == long[].class)
-        {
-            long[] os = (long[]) obj;
-            Long[] arr = new Long[os.length];
-            for (int i = 0; i < os.length; i++)
-                arr[i] = os[i];
-            return arr;
-        }
-        else if (obj.getClass() == boolean[].class)
-        {
-            boolean[] os = (boolean[]) obj;
-            Boolean[] arr = new Boolean[os.length];
-            for (int i = 0; i < os.length; i++)
-                arr[i] = os[i];
-            return arr;
-        }
-        else if (obj.getClass() == byte[].class)
-        {
-            byte[] os = (byte[]) obj;
-            Byte[] arr = new Byte[os.length];
-            for (int i = 0; i < os.length; i++)
-                arr[i] = os[i];
-            return arr;
-        }
-        else if (obj.getClass() == char[].class)
-        {
-            char[] os = (char[]) obj;
-            Character[] arr = new Character[os.length];
-            for (int i = 0; i < os.length; i++)
-                arr[i] = os[i];
-            return arr;
-        }
-        else if (obj.getClass() == short[].class)
-        {
-            short[] os = (short[]) obj;
-            Short[] arr = new Short[os.length];
-            for (int i = 0; i < os.length; i++)
-                arr[i] = os[i];
-            return arr;
-        }
-        else if (obj.getClass() == float[].class)
-        {
-            float[] os = (float[]) obj;
-            Float[] arr = new Float[os.length];
-            for (int i = 0; i < os.length; i++)
-                arr[i] = os[i];
-            return arr;
-        }
-        else if (obj.getClass() == double[].class)
-        {
-            double[] os = (double[]) obj;
-            Double[] arr = new Double[os.length];
-            for (int i = 0; i < os.length; i++)
-                arr[i] = os[i];
-            return arr;
-        }
-        else
-        {
-            return (Object[]) obj;
+            case JsonLexer.BOOL_ARR_CLS_HASH:
+            {
+                boolean[] os = (boolean[]) obj;
+                Boolean[] arr = new Boolean[os.length];
+                for (int i = 0; i < os.length; i++)
+                    arr[i] = os[i];
+                return arr;
+            }
+            case JsonLexer.BYTE_ARR_CLS_HASH:
+            {
+                byte[] os = (byte[]) obj;
+                Byte[] arr = new Byte[os.length];
+                for (int i = 0; i < os.length; i++)
+                    arr[i] = os[i];
+                return arr;
+            }
+            case JsonLexer.CHAR_ARR_CLS_HASH:
+            {
+                char[] os = (char[]) obj;
+                Character[] arr = new Character[os.length];
+                for (int i = 0; i < os.length; i++)
+                    arr[i] = os[i];
+                return arr;
+            }
+            case JsonLexer.SHORT_ARR_CLS_HASH:
+            {
+                short[] os = (short[]) obj;
+                Short[] arr = new Short[os.length];
+                for (int i = 0; i < os.length; i++)
+                    arr[i] = os[i];
+                return arr;
+            }
+            case JsonLexer.INT_ARR_CLS_HASH:
+            {
+                int[] os = (int[]) obj;
+                Integer[] arr = new Integer[os.length];
+                for (int i = 0; i < os.length; i++)
+                    arr[i] = os[i];
+                
+                os = null;
+                return arr;
+            }
+            case JsonLexer.LONG_ARR_CLS_HASH:
+            {
+                long[] os = (long[]) obj;
+                Long[] arr = new Long[os.length];
+                for (int i = 0; i < os.length; i++)
+                    arr[i] = os[i];
+                return arr;
+            }
+            case JsonLexer.FLOAT_ARR_CLS_HASH:
+            {
+                float[] os = (float[]) obj;
+                Float[] arr = new Float[os.length];
+                for (int i = 0; i < os.length; i++)
+                    arr[i] = os[i];
+                return arr;
+            }
+            case JsonLexer.DOUBLE_ARR_CLS_HASH:
+            {
+                double[] os = (double[]) obj;
+                Double[] arr = new Double[os.length];
+                for (int i = 0; i < os.length; i++)
+                    arr[i] = os[i];
+                return arr;
+            }
+            default:
+                return (Object[]) obj;
         }
     }
-
+    
     /**
      * 是否8种基本类型对象数组，支持byte/short/int/long/float/double/boolean/char
      * 
@@ -144,27 +147,23 @@ public abstract class JsonParser implements Serializable
     {
         if (clazz == null)
             return false;
-
-        if (clazz == int[].class)
-            return true;
-        else if (clazz == long[].class)
-            return true;
-        else if (clazz == boolean[].class)
-            return true;
-        else if (clazz == byte[].class)
-            return true;
-        else if (clazz == char[].class)
-            return true;
-        else if (clazz == short[].class)
-            return true;
-        else if (clazz == float[].class)
-            return true;
-        else if (clazz == double[].class)
-            return true;
-        else
-            return false;
+        
+        switch (clazz.getName().hashCode())
+        {
+            case JsonLexer.BOOL_ARR_CLS_HASH:
+            case JsonLexer.BYTE_ARR_CLS_HASH:
+            case JsonLexer.CHAR_ARR_CLS_HASH:
+            case JsonLexer.SHORT_ARR_CLS_HASH:
+            case JsonLexer.INT_ARR_CLS_HASH:
+            case JsonLexer.LONG_ARR_CLS_HASH:
+            case JsonLexer.FLOAT_ARR_CLS_HASH:
+            case JsonLexer.DOUBLE_ARR_CLS_HASH:
+                return true;
+            default:
+                return false;
+        }
     }
-
+    
     /**
      * 是否8种基本类型对象封装类数组，支持byte/short/int/long/float/double/boolean/char
      * 
@@ -177,27 +176,24 @@ public abstract class JsonParser implements Serializable
     {
         if (clazz == null)
             return false;
-
-        if (clazz == Integer[].class)
-            return true;
-        else if (clazz == Long[].class)
-            return true;
-        else if (clazz == Boolean[].class)
-            return true;
-        else if (clazz == Byte[].class)
-            return true;
-        else if (clazz == Character[].class)
-            return true;
-        else if (clazz == Short[].class)
-            return true;
-        else if (clazz == Float[].class)
-            return true;
-        else if (clazz == Double[].class)
-            return true;
-        else
-            return false;
+        
+        switch (clazz.getName().hashCode())
+        {
+            case JsonLexer.BOOL_OBJ_ARR_CLS_HASH:
+            case JsonLexer.BYTE_OBJ_ARR_CLS_HASH:
+            case JsonLexer.CHAR_OBJ_ARR_CLS_HASH:
+            case JsonLexer.SHORT_OBJ_ARR_CLS_HASH:
+            case JsonLexer.INT_OBJ_ARR_CLS_HASH:
+            case JsonLexer.LONG_OBJ_ARR_CLS_HASH:
+            case JsonLexer.FLOAT_OBJ_ARR_CLS_HASH:
+            case JsonLexer.DOUBLE_OBJ_ARR_CLS_HASH:
+                return true;
+            default:
+                return false;
+        }
+        
     }
-
+    
     /**
      * String到java.sql.Date的转换 标准格式:yyyy-MM-dd
      * 
@@ -208,7 +204,7 @@ public abstract class JsonParser implements Serializable
     {
         return java.sql.Date.valueOf(date);
     }
-
+    
     /**
      * 转换String 到 Time,格式:"HH:mm:ss"
      * 
@@ -219,7 +215,7 @@ public abstract class JsonParser implements Serializable
     {
         return Time.valueOf(time);
     }
-
+    
     /**
      * 转换String 到 Timestamp,格式:"yyyy-MM-dd HH:mm:ss"
      * 
@@ -230,7 +226,7 @@ public abstract class JsonParser implements Serializable
     {
         return Timestamp.valueOf(datetime);
     }
-
+    
     /**
      * 字符串转为日历,字符串符合标准格式:yyyy-MM-dd HH:mm:ss
      * 
@@ -241,30 +237,22 @@ public abstract class JsonParser implements Serializable
     {
         if (datetime == null)
             return null;
-
         
         if (!Pattern.matches(DATETIME_REG, datetime))
             throw new IllegalArgumentException("传入参数格式不正确");
-
-        int year = Integer.parseInt(datetime.substring(0, 4));
-        int month = Integer.parseInt(datetime.substring(5, 7));
-        int day = Integer.parseInt(datetime.substring(8, 10));
-        int hour = Integer.parseInt(datetime.substring(11, 13));
-        int minute = Integer.parseInt(datetime.substring(14, 16));
-        int second = Integer.parseInt(datetime.substring(17));
-
+        
         Calendar c = Calendar.getInstance();
-        c.set(Calendar.YEAR, year);
-        c.set(Calendar.MONTH, month - 1);// 月份的起始值为0而不是1
-        c.set(Calendar.DATE, day);
-        c.set(Calendar.HOUR_OF_DAY, hour);
-        c.set(Calendar.MINUTE, minute);
-        c.set(Calendar.SECOND, second);
+        c.set(Calendar.YEAR, Integer.parseInt(datetime.substring(0, 4)));
+        c.set(Calendar.MONTH, Integer.parseInt(datetime.substring(5, 7)) - 1);// 月份的起始值为0而不是1
+        c.set(Calendar.DATE, Integer.parseInt(datetime.substring(8, 10)));
+        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(datetime.substring(11, 13)));
+        c.set(Calendar.MINUTE, Integer.parseInt(datetime.substring(14, 16)));
+        c.set(Calendar.SECOND, Integer.parseInt(datetime.substring(17)));
         c.set(Calendar.MILLISECOND, 0);
-
+        
         return c;
     }
-
+    
     /**
      * 字符串转为时间,字符串符合标准格式yyyy-MM-dd HH:mm:ss
      * 
@@ -275,7 +263,7 @@ public abstract class JsonParser implements Serializable
     {
         return toCalendar(datetime).getTime();
     }
-
+    
     /**
      * 生成标准日期，格式为yyyy-MM-dd
      * 
@@ -286,7 +274,7 @@ public abstract class JsonParser implements Serializable
     {
         return new SimpleDateFormat("yyyy-MM-dd").format(date);
     }
-
+    
     /**
      * 根据输入的时间,生成时间格式 HH:mm:ss
      * 
@@ -297,7 +285,7 @@ public abstract class JsonParser implements Serializable
     {
         return new SimpleDateFormat("HH:mm:ss").format(date);
     }
-
+    
     /**
      * 生成标准格式的字符串 格式为yyyy-MM-dd HH:mm:ss
      * 
@@ -308,7 +296,7 @@ public abstract class JsonParser implements Serializable
     {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
     }
-
+    
     /**
      * 日历转标准时间字符串
      * 
@@ -319,11 +307,11 @@ public abstract class JsonParser implements Serializable
     {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime());
     }
-
+    
     /*****************************************************************/
     // 以下是类相关操作
     /*****************************************************************/
-
+    
     /**
      * 获取类中指定的属性列表，支持深度查找父类的字段列表(父类的循递归查找),静态和临时两种属性不拷贝
      * 
@@ -338,10 +326,10 @@ public abstract class JsonParser implements Serializable
             int mod = field.getModifiers();
             if (Modifier.isStatic(mod) || Modifier.isTransient(mod) || "this$0".equals(field.getName()))
                 continue;// 静态和临时两种属性不拷贝，内部类指向外部类的引用不拷贝
-
+                
             fieldList.add(field);
         }
-
+        
         Class<?> superSrcClass = clazz.getSuperclass();
         if (superSrcClass != null && superSrcClass != Object.class)
         {
@@ -364,10 +352,10 @@ public abstract class JsonParser implements Serializable
             int mod = field.getModifiers();
             if (Modifier.isStatic(mod) || Modifier.isTransient(mod) || "this$0".equals(field.getName()))
                 continue;// 静态和临时两种属性不拷贝，内部类指向外部类的引用不拷贝
-            
+                
             map.put(field.getName(), field);
         }
-
+        
         Class<?> superSrcClass = clazz.getSuperclass();
         if (superSrcClass != null && superSrcClass != Object.class)
         {
@@ -376,7 +364,7 @@ public abstract class JsonParser implements Serializable
         
         return map;
     }
-
+    
     /**
      * 初始化实例，忽略异常，异常时返回null
      * 

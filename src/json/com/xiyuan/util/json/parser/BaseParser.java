@@ -42,42 +42,46 @@ public final class BaseParser extends JsonParser implements Serializable
     @Override
     public Object toObject(Class<?> cls)
     {
-        if (cls == boolean.class)
-            return booleanValue(lexer);
-        else if (cls == Boolean.class)
-            return Boolean.valueOf(booleanValue(lexer));
-        else if (cls == byte.class)
-            return byteValue(lexer);
-        else if (cls == Byte.class)
-            return Byte.valueOf(byteValue(lexer));
-        else if (cls == char.class)
-            return charValue(lexer);
-        else if (cls == Character.class)
-            return Character.valueOf(charValue(lexer));
-        else if (cls == short.class)
-            return shortValue(lexer);
-        else if (cls == Short.class)
-            return Short.valueOf(shortValue(lexer));
-        else if (cls == int.class)
-            return intValue(lexer);
-        else if (cls == Integer.class)
-            return Integer.valueOf(intValue(lexer));
-        else if (cls == long.class)
-            return longValue(lexer);
-        else if (cls == Long.class)
-            return Long.valueOf(longValue(lexer));
-        else if (cls == float.class)
-            return floatValue(lexer);
-        else if (cls == Float.class)
-            return Float.valueOf(floatValue(lexer));
-        else if (cls == double.class)
-            return doubleValue(lexer);
-        else if (cls == Double.class)
-            return Double.valueOf(doubleValue(lexer));
-        else if (cls == String.class)
-            return stringValue(lexer);
         
-        return null;
+        switch (cls.getName().hashCode())
+        {
+            case JsonLexer.BOOL_CLS_HASH:
+                return booleanValue(lexer);
+            case JsonLexer.BYTE_CLS_HASH:
+                return byteValue(lexer);
+            case JsonLexer.CHAR_CLS_HASH:
+                return charValue(lexer);
+            case JsonLexer.SHORT_CLS_HASH:
+                return shortValue(lexer);
+            case JsonLexer.INT_CLS_HASH:
+                return intValue(lexer);
+            case JsonLexer.LONG_CLS_HASH:
+                return longValue(lexer);
+            case JsonLexer.FLOAT_CLS_HASH:
+                return floatValue(lexer);
+            case JsonLexer.DOUBLE_CLS_HASH:
+                return doubleValue(lexer);
+            case JsonLexer.BOOL_OBJ_CLS_HASH:
+                return booleanValue(lexer) ? Boolean.TRUE : Boolean.FALSE;
+            case JsonLexer.BYTE_OBJ_CLS_HASH:
+                return Byte.valueOf(byteValue(lexer));
+            case JsonLexer.CHAR_OBJ_CLS_HASH:
+                return Character.valueOf(charValue(lexer));
+            case JsonLexer.SHORT_OBJ_CLS_HASH:
+                return Short.valueOf(shortValue(lexer));
+            case JsonLexer.INT_OBJ_CLS_HASH:
+                return Integer.valueOf(intValue(lexer));
+            case JsonLexer.LONG_OBJ_CLS_HASH:
+                return Long.valueOf(longValue(lexer));
+            case JsonLexer.FLOAT_OBJ_CLS_HASH:
+                return Float.valueOf(floatValue(lexer));
+            case JsonLexer.DOUBLE_OBJ_CLS_HASH:
+                return Double.valueOf(doubleValue(lexer));
+            case JsonLexer.STRING_CLS_HASH:
+                return stringValue(lexer);
+            default:
+                return null;
+        }
     }
     
     public static boolean booleanValue(JsonLexer lexer)

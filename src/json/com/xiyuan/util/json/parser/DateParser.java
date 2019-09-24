@@ -30,33 +30,21 @@ public final class DateParser extends JsonParser implements Serializable
         if (obj == null)
             return null;
         
-        if (obj instanceof java.sql.Date)
+        switch (obj.getClass().getName().hashCode())
         {
-            java.sql.Date date = (java.sql.Date) obj;
-            return JsonLexer.DB_QUOTE + toDateString(date) + JsonLexer.DB_QUOTE;
+            case JsonLexer.SQL_DATE_CLS_HASH:
+                return JsonLexer.DB_QUOTE + toDateString((java.sql.Date) obj) + JsonLexer.DB_QUOTE;
+            case JsonLexer.SQL_TIME_CLS_HASH:
+                return JsonLexer.DB_QUOTE + toTimeString((java.sql.Time) obj) + JsonLexer.DB_QUOTE;
+            case JsonLexer.SQL_TIMESTAMP_CLS_HASH:
+                return JsonLexer.DB_QUOTE + toDateTimeString((java.sql.Timestamp) obj) + JsonLexer.DB_QUOTE;
+            case JsonLexer.DATE_CLS_HASH:
+                return JsonLexer.DB_QUOTE + toDateTimeString((Date) obj) + JsonLexer.DB_QUOTE;
+            case JsonLexer.CALENDAR_CLS_HASH:
+                return JsonLexer.DB_QUOTE + toDateTimeString((Calendar) obj) + JsonLexer.DB_QUOTE;
+            default:
+                return null;
         }
-        else if (obj instanceof java.sql.Time)
-        {
-            java.sql.Time time = (java.sql.Time) obj;
-            return JsonLexer.DB_QUOTE + toTimeString(time) + JsonLexer.DB_QUOTE;
-        }
-        else if (obj instanceof java.sql.Timestamp)
-        {
-            java.sql.Timestamp time = (java.sql.Timestamp) obj;
-            return JsonLexer.DB_QUOTE + toDateTimeString(time) + JsonLexer.DB_QUOTE;
-        }
-        else if (obj instanceof Date)
-        {
-            Date date = (Date) obj;
-            return JsonLexer.DB_QUOTE + toDateTimeString(date) + JsonLexer.DB_QUOTE;
-        }
-        else if (obj instanceof Calendar)
-        {
-            Calendar calendar = (Calendar) obj;
-            return JsonLexer.DB_QUOTE + toDateTimeString(calendar) + JsonLexer.DB_QUOTE;
-        }
-        
-        return null;
     }
     
     @Override
@@ -66,17 +54,21 @@ public final class DateParser extends JsonParser implements Serializable
 //            return null;
         
         String value = JsonLexer.removeStartEndQuotation(lexer.value());
-        if (cls == java.sql.Date.class)
-            return toDate(value);
-        else if (cls == java.sql.Time.class)
-            return toTime(value);
-        else if (cls == java.sql.Timestamp.class)
-            return toTimestamp(value);
-        else if (cls == Date.class)
-            return toDate(value);
-        else if (cls == Calendar.class)
-            return toCalendar(value);
-        return null;
+        switch (cls.getName().hashCode())
+        {
+            case JsonLexer.SQL_DATE_CLS_HASH:
+                return toDate(value);
+            case JsonLexer.SQL_TIME_CLS_HASH:
+                return toTime(value);
+            case JsonLexer.SQL_TIMESTAMP_CLS_HASH:
+                return  toTimestamp(value);
+            case JsonLexer.DATE_CLS_HASH:
+                return toDate(value);
+            case JsonLexer.CALENDAR_CLS_HASH:
+                return  toCalendar(value);
+            default:
+                return null;
+        }
     }
     
 }

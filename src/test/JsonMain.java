@@ -1,8 +1,7 @@
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.zhiqim.kernel.constants.CodeConstants;
 import org.zhiqim.kernel.constants.TypeConstants;
@@ -11,12 +10,9 @@ import org.zhiqim.kernel.util.Files;
 import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.xiyuan.util.json.JsonLexer;
 import com.xiyuan.util.json.Jsons;
-import com.xiyuan.util.json.Token;
 
 import frame.model.OrdOrder;
-import frame.model.Person;
 
 public class JsonMain implements TypeConstants, CodeConstants
 {
@@ -27,7 +23,6 @@ public class JsonMain implements TypeConstants, CodeConstants
         String jsonPath = "./json/" + listSize + ".json";
         long l1 = System.currentTimeMillis();
         long l2 = l1;
-        @SuppressWarnings("unused")
         String jsonString = "{\"oid\":1802241101547130,\"tids\":\"119037997603325752\",\"status\":\"7\",\"shopNick\":\"th办公旗舰店\",\"buyerNick\":\"梦醒天神人\",\"prdTypeId\":1,\"productId\":1159,\"productText\":\"名片 | 铜版纸覆膜 | 90x54mm | 双面 | 2百张 | 1款1模\",\"policyIds\":\"\",\"amount\":1400,\"draftType\":0,\"invoiceType\":0,\"invoiceNotes\":\"\",\"invoiceItin\":\"\",\"industryId\":0,\"isOnlyDesign\":false,\"isUrgent\":false,\"printWidth\":0,\"printHeight\":0,\"printKs\":1,\"printMs\":1,\"printSpecial\":\"\",\"creater\":\"蛋蛋\",\"createTime\":\"2018-02-24 11:01:54\",\"modifyTime\":\"2018-02-24 14:07:50\",\"userText\":\"\",\"userMobile\":\"\",\"userQq\":\"\",\"receiverName\":\"黄浩\",\"receiverMobile\":\"13157172203\",\"receiverState\":\"浙江省\",\"receiverCity\":\"杭州市\",\"receiverDistrict\":\"滨江区\",\"receiverAddress\":\"长河街道春晓路529号 江南星座1栋一单元502\",\"supplierId\":6805,\"supplierOid\":\"10476998\",\"supplierOidStatus\":\"b\",\"supplierTime\":\"2018-02-24 14:04:03\",\"isSendSelfAddr\":false,\"csCount\":0,\"orderSrc\":0,\"orderSrcOid\":0,\"expressCode\":\"ZTO\",\"isSelfPickup\":false,\"isSfTopay\":false,\"unpackingNum\":0,\"productCostPriceJson\":\"{\\\"costPriceDate\\\":\\\"2018-02-01\\\",\\\"productId\\\":1159,\\\"prdPrice\\\":1400,\\\"prdCostPrice\\\":600,\\\"costPriceStatus\\\":0,\\\"costPriceModifyTime\\\":\\\"2018-02-01 14:14:36\\\"}\",\"ordShipHours\":24,\"ordShipTime\":\"2018-02-25 11:01:54\"}";
         l1 = System.currentTimeMillis();
         String json = new String(Files.read(new File(jsonPath), 1800 * MiB));
@@ -60,11 +55,13 @@ public class JsonMain implements TypeConstants, CodeConstants
         // System.out.println(json.length());
         // System.out.println(ls.size()+2);
         // // System.out.println(Integer.MAX_VALUE);
-        
+        jsonString.equals(null);
     }
     
     public static void testOther()
     {
+        
+       
         String aaa = "f";
         String result = null;
         long t1 = System.nanoTime();

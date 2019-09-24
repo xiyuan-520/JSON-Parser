@@ -51,6 +51,7 @@ public final class MapParser extends JsonParser implements Serializable
     {// TODO 以后 获取cls 具体类型构造map 集构造类型，目前只放入 String
     
         Map<String, String> map = null;
+        
         if (cls == Map.class || cls == HashMap.class)
             map = new HashMap<String, String>();
         else if (cls == ConcurrentMap.class || cls == ConcurrentHashMap.class)
