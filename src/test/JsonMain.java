@@ -179,7 +179,7 @@ public class JsonMain implements TypeConstants, CodeConstants
         System.out.println("自己代码 共生成 " + (orders != null ? orders.size() : a) + "条数据，共耗时：" + (l2 - l1) + " 毫秒");
         for (int i = 0; i < orders.size(); i++)
         {
-            if (i > 0)
+            if (i > 10)
                 break;
             
             System.out.println(orders.get(i));
