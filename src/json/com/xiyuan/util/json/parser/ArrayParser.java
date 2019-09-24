@@ -16,7 +16,7 @@ import com.xiyuan.util.json.JsonParser;
 public final class ArrayParser extends JsonParser implements Serializable
 {
     private static final long serialVersionUID = 1L;
-    private static final int defult_capacity = 200;// 初始化大小
+    private static final int defult_capacity = 10;// 初始化大小
     private static final double capacity_multiple = 2.5;// 1.5增长倍数
     public ArrayParser(JsonLexer lexer)
     {
