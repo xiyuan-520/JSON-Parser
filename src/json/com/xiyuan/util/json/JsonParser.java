@@ -8,7 +8,9 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -20,7 +22,7 @@ public abstract class JsonParser implements Serializable
 {
     private static final long serialVersionUID = 1L;
     public static final long JS_MAX_LONG_VALUE = (long) Math.pow(2, 53);// 2^53//9007199254740992
-    
+    public static final String DATETIME_REG = "^((([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29))\\s(([0-1][0-9]|[2][0-3]):([0-5][0-9]):([0-5][0-9]))$";
     
     protected JsonLexer lexer;
     public JsonParser(JsonLexer lexer)
@@ -240,8 +242,8 @@ public abstract class JsonParser implements Serializable
         if (datetime == null)
             return null;
 
-        String reg = "^((([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29))\\s(([0-1][0-9]|[2][0-3]):([0-5][0-9]):([0-5][0-9]))$";
-        if (!Pattern.matches(reg, datetime))
+        
+        if (!Pattern.matches(DATETIME_REG, datetime))
             throw new IllegalArgumentException("传入参数格式不正确");
 
         int year = Integer.parseInt(datetime.substring(0, 4));
@@ -345,6 +347,34 @@ public abstract class JsonParser implements Serializable
         {
             getFieldListDeep(superSrcClass, fieldList);
         }
+    }
+    
+    /**
+     * 获取类中指定的属性HashMap，支持深度查找父类的字段列表(父类的循递归查找),静态和临时两种属性不拷贝
+     * 
+     * @param clazz 类
+     * @param fieldList 用于存储的字段列表
+     * @return 
+     */
+    protected Map<String, Field> getMapFieldDeep(Class<?> clazz, HashMap<String, Field> map)
+    {
+        Field[] fieldArr = clazz.getDeclaredFields();
+        for (Field field : fieldArr)
+        {
+            int mod = field.getModifiers();
+            if (Modifier.isStatic(mod) || Modifier.isTransient(mod) || "this$0".equals(field.getName()))
+                continue;// 静态和临时两种属性不拷贝，内部类指向外部类的引用不拷贝
+            
+            map.put(field.getName(), field);
+        }
+
+        Class<?> superSrcClass = clazz.getSuperclass();
+        if (superSrcClass != null && superSrcClass != Object.class)
+        {
+            getMapFieldDeep(superSrcClass, map);
+        }
+        
+        return map;
     }
 
     /**

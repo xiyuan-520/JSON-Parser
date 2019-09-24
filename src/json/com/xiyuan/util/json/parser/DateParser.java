@@ -6,8 +6,6 @@ import java.util.Date;
 
 import com.xiyuan.util.json.JsonLexer;
 import com.xiyuan.util.json.JsonParser;
-import com.xiyuan.util.json.Jsons;
-import com.xiyuan.util.json.Token;
 
 /**
  * 日期解析器：
@@ -35,27 +33,27 @@ public final class DateParser extends JsonParser implements Serializable
         if (obj instanceof java.sql.Date)
         {
             java.sql.Date date = (java.sql.Date) obj;
-            return lexer.DB_QUOTE + toDateString(date) + lexer.DB_QUOTE;
+            return JsonLexer.DB_QUOTE + toDateString(date) + JsonLexer.DB_QUOTE;
         }
         else if (obj instanceof java.sql.Time)
         {
             java.sql.Time time = (java.sql.Time) obj;
-            return lexer.DB_QUOTE + toTimeString(time) + lexer.DB_QUOTE;
+            return JsonLexer.DB_QUOTE + toTimeString(time) + JsonLexer.DB_QUOTE;
         }
         else if (obj instanceof java.sql.Timestamp)
         {
             java.sql.Timestamp time = (java.sql.Timestamp) obj;
-            return lexer.DB_QUOTE + toDateTimeString(time) + lexer.DB_QUOTE;
+            return JsonLexer.DB_QUOTE + toDateTimeString(time) + JsonLexer.DB_QUOTE;
         }
         else if (obj instanceof Date)
         {
             Date date = (Date) obj;
-            return lexer.DB_QUOTE + toDateTimeString(date) + lexer.DB_QUOTE;
+            return JsonLexer.DB_QUOTE + toDateTimeString(date) + JsonLexer.DB_QUOTE;
         }
         else if (obj instanceof Calendar)
         {
             Calendar calendar = (Calendar) obj;
-            return lexer.DB_QUOTE + toDateTimeString(calendar) + lexer.DB_QUOTE;
+            return JsonLexer.DB_QUOTE + toDateTimeString(calendar) + JsonLexer.DB_QUOTE;
         }
         
         return null;
@@ -64,20 +62,20 @@ public final class DateParser extends JsonParser implements Serializable
     @Override
     public Object toObject(Class<?> cls)
     {
-//        if (token == null || token.type() != Token.STRING)
+//        if (!lexer.isString())
 //            return null;
-//        
-//        String value = lexer.removeStartEndQuotation(token.toString(json));
-//        if (cls == java.sql.Date.class)
-//            return toDate(value);
-//        else if (cls == java.sql.Time.class)
-//            return toTime(value);
-//        else if (cls == java.sql.Timestamp.class)
-//            return toTimestamp(value);
-//        else if (cls == Date.class)
-//            return toDate(value);
-//        else if (cls == Calendar.class)
-//            return toCalendar(value);
+        
+        String value = JsonLexer.removeStartEndQuotation(lexer.value());
+        if (cls == java.sql.Date.class)
+            return toDate(value);
+        else if (cls == java.sql.Time.class)
+            return toTime(value);
+        else if (cls == java.sql.Timestamp.class)
+            return toTimestamp(value);
+        else if (cls == Date.class)
+            return toDate(value);
+        else if (cls == Calendar.class)
+            return toCalendar(value);
         return null;
     }
     

@@ -1201,7 +1201,27 @@ public class JsonLexer
     {
         return tokenType() == JsonLexer.T_BRACE_R;
     }
-
+    
+    /**判断当前token是否为string型*/
+    public boolean isString()
+    {
+        return this.tokenType() == T_STRING;
+    }
+    
+    /**判断当前token是否为逗号型*/
+    public boolean isComma()
+    {
+        return this.tokenType() == T_COMMA;
+    }
+    
+    
+    /**判断当前token是否为冒号型*/
+    public boolean isColon()
+    {
+        return this.tokenType() == T_COLON;
+    }
+    
+    
     /**
      * json字符串截取
      * @param pos 开始索引

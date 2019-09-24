@@ -3,17 +3,8 @@ package com.xiyuan.util.json;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
-
-import com.xiyuan.util.json.parser.ArrayParser;
-import com.xiyuan.util.json.parser.BaseParser;
-import com.xiyuan.util.json.parser.DateParser;
-import com.xiyuan.util.json.parser.ListParser;
-import com.xiyuan.util.json.parser.MapParser;
-import com.xiyuan.util.json.parser.ObjectParser;
 
 /***
  * JSON 主程序，对象转换成JSON和JSON转换成对象
@@ -328,7 +319,10 @@ public final class Jsons implements Serializable
             return null;
 
         JsonLexer lexer = new JsonLexer(json);
-        return (T) lexer.getParser(clazz).toObject(clazz);
+        lexer.naxtToken();
+        T t = (T) lexer.getParser(clazz).toObject(clazz);
+        lexer = null;
+        return t;
     }
 
     /**
@@ -341,18 +335,30 @@ public final class Jsons implements Serializable
     @SuppressWarnings("unchecked")
     public static <T> List<T> toList(String json, Class<T> resultClass)
     {
+        boolean isList = false;
         JsonLexer lexer = new JsonLexer(json);
         while (lexer.hasNext())
         {
             if (lexer.naxtToken().tokenType() == JsonLexer.T_BRACKET_L)
+            {
+                isList = true;
                 break;
+            }
         }
+        
+        if (!isList)
+            return new ArrayList<T>(0);
         
         if (JsonLexer.isPrimitiveBase(resultClass))//如果是基本类型 则使用基本类型的包装类
             resultClass = JsonLexer.getPrimitiveBase(resultClass);
         //先转成数组再转list
         T[] arr = (T[]) lexer.ArrayParser().toObject(Array.newInstance(resultClass, 0).getClass());
-        return new ArrayList<>(0);
+        List<T> ls = new ArrayList<T>(arr.length);
+        for (int i = 0; i < arr.length; i++)
+            ls.add(arr[i]);
+        
+        lexer = null;
+        return ls;
     }
 
     /**

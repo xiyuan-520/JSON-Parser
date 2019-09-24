@@ -10,8 +10,6 @@ import java.util.Set;
 
 import com.xiyuan.util.json.JsonLexer;
 import com.xiyuan.util.json.JsonParser;
-import com.xiyuan.util.json.Jsons;
-import com.xiyuan.util.json.Token;
 
 public final class ListParser extends JsonParser
 {
@@ -40,20 +38,22 @@ public final class ListParser extends JsonParser
     public Object toObject(Class<?> cls)
     {
         Collection<Object> list = null;
-//        if (cls == Collection.class || cls == List.class || cls == ArrayList.class)
-//            list = new ArrayList<Object>();
-//        else if (cls == LinkedList.class)
-//            list = new LinkedList<Object>();
-//        else if (cls == Set.class || cls == HashSet.class)
-//            list = new HashSet<Object>();
-//        
-//        if (list == null)// 其他不支持，直接返回null;
-//            return list;
-//        
-//        if (token == null || token.type() != Token.BRACKET_L)
-//            return list;
-//        for (Token t : token.getElements(Token.COMMA))
-//            list.add(t.toString(json));// TODO 以后 获取list 具体类型构造对象，目前只放入 String
+        if (cls == Collection.class || cls == List.class || cls == ArrayList.class)
+            list = new ArrayList<Object>();
+        else if (cls == LinkedList.class)
+            list = new LinkedList<Object>();
+        else if (cls == Set.class || cls == HashSet.class)
+            list = new HashSet<Object>();
+        
+        if (list == null)// 其他不支持，直接返回null;
+            return list;
+        
+        if (!lexer.isArr())
+            return list;
+        
+        String[] arr = (String[]) lexer.ArrayParser().toObject(String[].class);// TODO 以后根据具体类型判断
+        for (int i = 0; i < arr.length; i++)
+            list.add(arr[i]);
         
         return list;
     }

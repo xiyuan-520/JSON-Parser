@@ -110,7 +110,7 @@ public final class ArrayParser extends JsonParser implements Serializable
         while (lexer.hasNext())
         {
             lexer.naxtToken();
-            if (lexer.scope() < scope)
+            if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
 
             if (lexer.tokenType() == JsonLexer.T_COMMA)

@@ -13,6 +13,7 @@ import com.xiyuan.util.json.JsonParser;
 public final class BaseParser extends JsonParser implements Serializable
 {
     private static final long serialVersionUID = 1L;
+    
     public BaseParser(JsonLexer lexer)
     {
         super(lexer);
@@ -38,7 +39,6 @@ public final class BaseParser extends JsonParser implements Serializable
         return String.valueOf(obj);
     }
     
-
     @Override
     public Object toObject(Class<?> cls)
     {
@@ -138,10 +138,10 @@ public final class BaseParser extends JsonParser implements Serializable
             while (lexer.hasNext())
             {
                 lexer.naxtToken();
-                if (lexer.scope() < scope)
+                if (lexer.scope() < scope || lexer.isEOF())
                     break;// 碰到结束符
             }
-            return JsonLexer.removeEscapeChar(JsonLexer.removeStartEndQuotation(lexer.string(pos, lexer.pos()+1)));
+            return JsonLexer.removeEscapeChar(JsonLexer.removeStartEndQuotation(lexer.string(pos, lexer.pos() + 1)));
         }
         else
         {
