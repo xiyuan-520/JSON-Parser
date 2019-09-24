@@ -457,6 +457,37 @@ public class JsonLexer
         else
             return false;
     }
+    
+    /**
+     * 获取八种基本类型的包装类，仅支持byte/short/int/long/float/double/boolean/char
+     * @param <T>
+     * 
+     * @param clazz 类结构
+     * @return =true/=false
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Class<T> getPrimitiveBase(Class<T> clazz)
+    {
+
+        if (clazz == int.class)
+            return (Class<T>) Integer.class;
+        else if (clazz == long.class)
+            return (Class<T>) Long.class;
+        else if (clazz == boolean.class)
+            return (Class<T>) Boolean.class;
+        else if (clazz == byte.class)
+            return (Class<T>) Byte.class;
+        else if (clazz == short.class)
+            return (Class<T>) Short.class;
+        else if (clazz == char.class)
+            return (Class<T>) Character.class;
+        else if (clazz == float.class)
+            return (Class<T>) Float.class;
+        else if (clazz == double.class)
+            return (Class<T>) Double.class;
+        else
+            return clazz;
+    }
 
     /**
      * 判断是否为空

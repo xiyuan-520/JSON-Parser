@@ -347,7 +347,10 @@ public final class Jsons implements Serializable
             if (lexer.naxtToken().tokenType() == JsonLexer.T_BRACKET_L)
                 break;
         }
-        error
+        
+        if (JsonLexer.isPrimitiveBase(resultClass))//如果是基本类型 则使用基本类型的包装类
+            resultClass = JsonLexer.getPrimitiveBase(resultClass);
+        //先转成数组再转list
         T[] arr = (T[]) lexer.ArrayParser().toObject(Array.newInstance(resultClass, 0).getClass());
         return new ArrayList<>(0);
     }
