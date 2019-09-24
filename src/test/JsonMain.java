@@ -23,7 +23,7 @@ public class JsonMain implements TypeConstants, CodeConstants
     
     public static void main(String[] args) throws Exception
     {
-        int listSize = 10000;
+        int listSize = 100000;
         String jsonPath = "./json/" + listSize + ".json";
         long l1 = System.currentTimeMillis();
         long l2 = l1;
@@ -37,11 +37,11 @@ public class JsonMain implements TypeConstants, CodeConstants
 //        testGson(json);//145033459
 //        testFastJson(json);
 //        testZhiqim(json);
-        testMy(json, jsonString);
+//        testMy(json, jsonString);
         // Token root = Token.newToken(Token.BRACE_L, 0);
         // Token next = root.next(Token.STRING, 1);
         //
-        
+        testOther();
         // List<Integer> ls = new LinkedList<Integer>();
         // // List<Token> ls = new LinkedList<Token>();
         
@@ -63,6 +63,99 @@ public class JsonMain implements TypeConstants, CodeConstants
         
     }
     
+    public static void testOther()
+    {
+        String aaa = "f";
+        String result = null;
+        long t1 = System.nanoTime();
+        if("a".equals(aaa)){
+            result = "找到了";
+        } else if ("b".equals(aaa)) {
+            result = "找到了";
+        } else if ("c".equals(aaa)) {
+            result = "找到了";
+        } else if ("d".equals(aaa)) {
+            result = "找到了";
+        } else if ("e".equals(aaa)) {
+            result = "找到了";
+        } else if ("f".equals(aaa)) {
+            result = "找到了";
+        } else if ("g".equals(aaa)) {
+            result = "找到了";
+        } else if ("h".equals(aaa)) {
+            result = "找到了";
+        } else if ("i".equals(aaa)) {
+            result = "找到了";
+        } else if ("j".equals(aaa)) {
+            result = "找到了";
+        } else if ("k".equals(aaa)) {
+            result = "找到了";
+        } else if ("l".equals(aaa)) {
+            result = "找到了";
+        } else if ("m".equals(aaa)) {
+            result = "找到了";
+        } else if ("n".equals(aaa)) {
+            result = "找到了";
+        } else {
+            result = "未找到";
+        }
+        long t2 = System.nanoTime();
+        System.out.println("if :\t" + (t2 - t1));
+        
+        System.out.println(result+":"+aaa);
+        //switch语句测试代码：
+
+        long tt1 = System.nanoTime();
+        switch (aaa) {
+            case "a":
+                result = "找到了";
+                break;
+            case "b":
+                result = "找到了";
+                break;
+            case "c":
+                result = "找到了";
+                break;
+            case "d":
+                result = "找到了";
+                break;
+            case "e":
+                result = "找到了";
+                break;
+            case "f":
+                result = "找到了";
+                break;
+            case "g":
+                result = "找到了";
+                break;
+            case "h":
+                result = "找到了";
+                break;
+            case "i":
+                result = "找到了";
+                break;
+            case "j":
+                result = "找到了";
+                break;
+            case "k":
+                result = "找到了";
+                break;
+            case "l":
+                result = "找到了";
+                break;
+            case "m":
+                result = "找到了";
+                break;
+            case "n":
+                result = "找到了";
+                break;
+            default:
+                result = "未找到";
+                break;
+        }
+        long tt2 = System.nanoTime();
+        System.out.println("case :\t" + (tt2 - tt1));
+    }
     public static Object getArr()
     {
         Boolean[] temp = { true, false };
