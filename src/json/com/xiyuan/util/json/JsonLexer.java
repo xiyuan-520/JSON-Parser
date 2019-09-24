@@ -1044,105 +1044,83 @@ public class JsonLexer
         {
         
         // 八大基本类型+封装类+String
-            case BOOL_CLS_HASH:// = 64711720;//boolean.class.getName().hashCode();
-            case BOOL_OBJ_CLS_HASH:// = 344809556;//Boolean.class.getName().hashCode();
-            case BYTE_CLS_HASH:// = 3039496;//byte.class.getName().hashCode();
-            case BYTE_OBJ_CLS_HASH:// = 398507100;//Byte.class.getName().hashCode();
-            case CHAR_CLS_HASH:// :// = 3052374;// char.class.getName().hashCode();
-            case CHAR_OBJ_CLS_HASH:// = 155276373;//Character.class.getName().hashCode();
-            case SHORT_CLS_HASH:// = 109413500;//short.class.getName().hashCode();
-            case SHORT_OBJ_CLS_HASH:// = -515992664;//Short.class.getName().hashCode();
-            case INT_CLS_HASH:// = 104431;//int.class.getName().hashCode();
-            case INT_OBJ_CLS_HASH:// = -2056817302;//Integer.class.getName().hashCode();
-            case LONG_CLS_HASH:// = 3327612;//long.class.getName().hashCode();
-            case LONG_OBJ_CLS_HASH:// = 398795216;//Long.class.getName().hashCode();
-            case FLOAT_CLS_HASH:// = 97526364;//float.class.getName().hashCode();
-            case FLOAT_OBJ_CLS_HASH:// = -527879800;//Float.class.getName().hashCode();
-            case DOUBLE_CLS_HASH:// = -1325958191;//double.class.getName().hashCode();
-            case DOUBLE_OBJ_CLS_HASH:// = 761287205;//Double.class.getName().hashCode();
-            case STRING_CLS_HASH:// = 1195259493;//String.class.getName().hashCode();
+            case BOOL_CLS_HASH:// 64711720 = boolean.class.getName().hashCode();
+            case BYTE_CLS_HASH:// 3039496 = byte.class.getName().hashCode();
+            case CHAR_CLS_HASH:// 3052374 = char.class.getName().hashCode();
+            case SHORT_CLS_HASH:// 109413500 = short.class.getName().hashCode();
+            case INT_CLS_HASH:// 104431 = int.class.getName().hashCode();
+            case LONG_CLS_HASH:// 3327612 = long.class.getName().hashCode();
+            case FLOAT_CLS_HASH:// 97526364 = float.class.getName().hashCode();
+            case DOUBLE_CLS_HASH:// -1325958191 = double.class.getName().hashCode();
+                
+            case DOUBLE_OBJ_CLS_HASH:// 761287205 = Double.class.getName().hashCode();
+            case FLOAT_OBJ_CLS_HASH:// -527879800 = Float.class.getName().hashCode();
+            case LONG_OBJ_CLS_HASH:// 398795216 = Long.class.getName().hashCode();
+            case INT_OBJ_CLS_HASH:// -2056817302 = Integer.class.getName().hashCode();
+            case SHORT_OBJ_CLS_HASH:// -515992664 = Short.class.getName().hashCode();
+            case CHAR_OBJ_CLS_HASH:// 155276373 = Character.class.getName().hashCode();
+            case BYTE_OBJ_CLS_HASH:// 398507100 = Byte.class.getName().hashCode();
+            case BOOL_OBJ_CLS_HASH:// 344809556 = Boolean.class.getName().hashCode();
+                
+            case STRING_CLS_HASH:// 1195259493 = String.class.getName().hashCode();
                 parser = baseParser;
                 break;
             
             // 八大基本类型+封装类+String 的数组
-            case DOUBLE_ARR_CLS_HASH:// =
-                                     // 2889;//double[].class.getName().hashCode();
-            case DOUBLE_OBJ_ARR_CLS_HASH:// =
-                                         // -175516795;//Double[].class.getName().hashCode();
-            case FLOAT_ARR_CLS_HASH:// = 2891;//float[].class.getName().hashCode();
-            case FLOAT_OBJ_ARR_CLS_HASH:// =
-                                        // 48646404;//Float[].class.getName().hashCode();
-            case LONG_ARR_CLS_HASH:// = 2895;//long[].class.getName().hashCode();
-            case LONG_OBJ_ARR_CLS_HASH:// =
-                                       // -2071011078;//Long[].class.getName().hashCode();
-            case INT_ARR_CLS_HASH:// = 2894;//int[].class.getName().hashCode();
-            case INT_OBJ_ARR_CLS_HASH:// =
-                                      // -1935445726;//Integer[].class.getName().hashCode();
-            case SHORT_ARR_CLS_HASH:// = 2904;//short[].class.getName().hashCode();
-            case SHORT_OBJ_ARR_CLS_HASH:// =
-                                        // 417147620;//Short[].class.getName().hashCode();
-            case CHAR_ARR_CLS_HASH:// = 2888;//char[].class.getName().hashCode();
-            case CHAR_OBJ_ARR_CLS_HASH:// =
-                                       // -1378128041;//Character[].class.getName().hashCode();
-            case BYTE_ARR_CLS_HASH:// = 2887;//byte[].class.getName().hashCode();
-            case BYTE_OBJ_ARR_CLS_HASH:// =
-                                       // -2079942674;//Byte[].class.getName().hashCode();
-            case BOOL_ARR_CLS_HASH:// = 2911;//boolean[].class.getName().hashCode();
-            case BOOL_OBJ_ARR_CLS_HASH:// =
-                                       // -499457160;//Boolean[].class.getName().hashCode();
-            case STRING_ARR_CLS_HASH:// =
-                                     // 392722245;//String[].class.getName().hashCode();
-            case OBJECT_ARR_CLS_HASH:// = 614832599;//
-                                     // Object[].class.getName().hashCode();
+            case BOOL_ARR_CLS_HASH:// 2911; boolean[].class.getName().hashCode();
+            case BYTE_ARR_CLS_HASH:// 2887; byte[].class.getName().hashCode();
+            case CHAR_ARR_CLS_HASH:// 2888; char[].class.getName().hashCode();
+            case SHORT_ARR_CLS_HASH:// 2904; short[].class.getName().hashCode();
+            case INT_ARR_CLS_HASH:// 2894; int[].class.getName().hashCode();
+            case LONG_ARR_CLS_HASH:// 2895; long[].class.getName().hashCode();
+            case FLOAT_ARR_CLS_HASH:// 2891; float[].class.getName().hashCode();
+            case DOUBLE_ARR_CLS_HASH:// 2889; double[].class.getName().hashCode();
+                
+            case BOOL_OBJ_ARR_CLS_HASH:// -499457160; Boolean[].class.getName().hashCode();
+            case BYTE_OBJ_ARR_CLS_HASH:// -2079942674; Byte[].class.getName().hashCode();
+            case CHAR_OBJ_ARR_CLS_HASH:// -1378128041; Character[].class.getName().hashCode();
+            case SHORT_OBJ_ARR_CLS_HASH:// 417147620; Short[].class.getName().hashCode();
+            case INT_OBJ_ARR_CLS_HASH:// -1935445726; Integer[].class.getName().hashCode();
+            case LONG_OBJ_ARR_CLS_HASH:// -2071011078; Long[].class.getName().hashCode();
+            case FLOAT_OBJ_ARR_CLS_HASH:// 48646404; Float[].class.getName().hashCode();
+            case DOUBLE_OBJ_ARR_CLS_HASH:// -175516795; Double[].class.getName().hashCode();
+                
+            case STRING_ARR_CLS_HASH:// 392722245; String[].class.getName().hashCode();
+            case OBJECT_ARR_CLS_HASH:// 614832599; Object[].class.getName().hashCode();
                 parser = arrayParser;
                 break;
             
             // 哈希表
-            case MAP_CLS_HASH:// = -1383349348;// Map.class.getName().hashCode();
-            case HASHMAP_CLS_HASH:// = -1402722386;//
-                                  // HashMap.class.getName().hashCode();
-            case CONCURRENTMAP_CLS_HASH:// =-1419705938;//
-                                        // ConcurrentMap.class.getName().hashCode();
-            case CONCURRENTHASHMAP_CLS_HASH:// = 577244352;//
-                                            // ConcurrentHashMap.class.getName().hashCode();
-            case HASHTABLE_CLS_HASH:// = 639525312;//
-                                    // Hashtable.class.getName().hashCode();
-            case LINKEDHASHMAP_CLS_HASH:// = 1258621781;//
-                                        // LinkedHashMap.class.getName().hashCode();
-            case TREEMAP_CLS_HASH:// = 1131064094;//
-                                  // TreeMap.class.getName().hashCode();
+            case MAP_CLS_HASH:// -1383349348; Map.class.getName().hashCode();
+            case HASHMAP_CLS_HASH:// -1402722386; HashMap.class.getName().hashCode();
+            case CONCURRENTMAP_CLS_HASH:// =-1419705938; ConcurrentMap.class.getName().hashCode();
+            case CONCURRENTHASHMAP_CLS_HASH:// 577244352; ConcurrentHashMap.class.getName().hashCode();
+            case HASHTABLE_CLS_HASH:// 639525312; Hashtable.class.getName().hashCode();
+            case LINKEDHASHMAP_CLS_HASH:// 1258621781; LinkedHashMap.class.getName().hashCode();
+            case TREEMAP_CLS_HASH:// 1131064094; TreeMap.class.getName().hashCode();
                 parser = mapParser;
                 break;
             
             // 链表
-            case LIST_CLS_HASH:// = 65821278;// List.class.getName().hashCode();
-            case ARRAYLIST_CLS_HASH:// = -1114099497;//
-                                    // ArrayList.class.getName().hashCode();
-            case LINKEDLIST_CLS_HASH:// = -1899270121;//
-                                     // LinkedList.class.getName().hashCode();
-            case SET_CLS_HASH:// =-1383343454;// Set.class.getName().hashCode();
-            case HASHSET_CLS_HASH:// =-1402716492;//
-                                  // HashSet.class.getName().hashCode();
+            case LIST_CLS_HASH:// 65821278; List.class.getName().hashCode();
+            case ARRAYLIST_CLS_HASH:// -1114099497; ArrayList.class.getName().hashCode();
+            case LINKEDLIST_CLS_HASH:// -1899270121; LinkedList.class.getName().hashCode();
+            case SET_CLS_HASH:// =-1383343454; Set.class.getName().hashCode();
+            case HASHSET_CLS_HASH:// =-1402716492; HashSet.class.getName().hashCode();
                 parser = listParser;
                 break;
             
             // 时间
-            case CALENDAR_CLS_HASH:// = -861027074;//
-                                   // java.util.Calendar.class.getName().hashCode();
-            case DATE_CLS_HASH:// = 65575278;//
-                               // java.util.Date.class.getName().hashCode();
-            case SQL_DATE_CLS_HASH:// = 1087757882;//
-                                   // java.sql.Date.class.getName().hashCode();
-            case SQL_TIME_CLS_HASH:// = 1088242009;//
-                                   // java.sql.Time.class.getName().hashCode();
-            case SQL_TIMESTAMP_CLS_HASH:// = 1252880906;//
-                                        // java.sql.Timestamp.class.getName().hashCode();
+            case CALENDAR_CLS_HASH:// -861027074; java.util.Calendar.class.getName().hashCode();
+            case DATE_CLS_HASH:// 65575278; java.util.Date.class.getName().hashCode();
+            case SQL_DATE_CLS_HASH:// 1087757882; java.sql.Date.class.getName().hashCode();
+            case SQL_TIME_CLS_HASH:// 1088242009; java.sql.Time.class.getName().hashCode();
+            case SQL_TIMESTAMP_CLS_HASH:// 1252880906; java.sql.Timestamp.class.getName().hashCode();
                 parser = dateParser;
                 break;
             
             // 通用 object
-            case OBJECT_CLS_HASH:// = 1063877011;//
-                                 // Object.class.getName().hashCode();
+            case OBJECT_CLS_HASH:// 1063877011; Object.class.getName().hashCode();
                 parser = objParser;
                 break;
         }
