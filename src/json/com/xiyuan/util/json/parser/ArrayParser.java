@@ -112,6 +112,7 @@ public final class ArrayParser extends JsonParser implements Serializable
         if (!lexer.isArr())// 非 数组开始符 [
             return Array.newInstance(cls, 0);
         
+        long l1 = System.currentTimeMillis();
         int poolSize = defult_capacity;
         int length = 0;
         int scope = lexer.scope();
@@ -145,7 +146,7 @@ public final class ArrayParser extends JsonParser implements Serializable
             System.arraycopy(temp, 0, obj, 0, length);
             temp = null;
         }
-        
+        System.out.println("fromAr耗时："+(System.currentTimeMillis()-l1));
         return obj;
     }
     

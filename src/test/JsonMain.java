@@ -32,7 +32,7 @@ public class JsonMain implements TypeConstants, CodeConstants
 //        testGson(json);//145033459
 //        testFastJson(json);
 //        testZhiqim(json);
-//        testMy(json, jsonString);
+        testMy(json, jsonString);
         // Token root = Token.newToken(Token.BRACE_L, 0);
         // Token next = root.next(Token.STRING, 1);
         //
