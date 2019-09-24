@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,7 +26,10 @@ public abstract class JsonParser implements Serializable
     public static final String DATETIME_REG = "^((([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29))\\s(([0-1][0-9]|[2][0-3]):([0-5][0-9]):([0-5][0-9]))$";
     
     protected JsonLexer lexer;
-    
+    /**用于保存临时的对象字段列表,用于toObject*/
+    private Map<Class<?>, Map<String, Field>> fieldMap = new HashMap<Class<?>, Map<String,Field>>();
+    /**用于保存临时的对象字段列表,用于toString*/
+    private Map<Class<?>, List<Field>> fieldList = new HashMap<Class<?>,List<Field>>();
     public JsonParser(JsonLexer lexer)
     {
         this.lexer = lexer;
@@ -318,7 +322,19 @@ public abstract class JsonParser implements Serializable
      * @param clazz 类
      * @param fieldList 用于存储的字段列表
      */
-    protected void getFieldListDeep(Class<?> clazz, List<Field> fieldList)
+    protected List<Field> getFieldListDeep(Class<?> clazz)
+    {
+        List<Field> ls = fieldList.get(clazz);
+        if (ls == null)
+        {
+            ls = new ArrayList<Field>();
+            getFieldListDeep(clazz, ls);
+            fieldList.put(clazz, ls);
+        }
+        
+        return ls;
+    }
+    private void getFieldListDeep(Class<?> clazz, List<Field> fieldList)
     {
         Field[] fieldArr = clazz.getDeclaredFields();
         for (Field field : fieldArr)
@@ -344,26 +360,20 @@ public abstract class JsonParser implements Serializable
      * @param fieldList 用于存储的字段列表
      * @return 
      */
-    protected Map<String, Field> getMapFieldDeep(Class<?> clazz, HashMap<String, Field> map)
+    
+    protected Map<String, Field> getMapFieldDeep(Class<?> clazz)
     {
-        Field[] fieldArr = clazz.getDeclaredFields();
-        for (Field field : fieldArr)
+        Map<String, Field> map = fieldMap.get(clazz);
+        if (map == null)
         {
-            int mod = field.getModifiers();
-            if (Modifier.isStatic(mod) || Modifier.isTransient(mod) || "this$0".equals(field.getName()))
-                continue;// 静态和临时两种属性不拷贝，内部类指向外部类的引用不拷贝
-                
-            map.put(field.getName(), field);
+            map = new HashMap<String, Field>();
+            fieldMap.put(clazz, map);
+            for (Field field : getFieldListDeep(clazz))
+                map.put(field.getName(), field);
         }
-        
-        Class<?> superSrcClass = clazz.getSuperclass();
-        if (superSrcClass != null && superSrcClass != Object.class)
-        {
-            getMapFieldDeep(superSrcClass, map);
-        }
-        
         return map;
     }
+    
     
     /**
      * 初始化实例，忽略异常，异常时返回null

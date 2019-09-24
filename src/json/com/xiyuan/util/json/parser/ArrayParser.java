@@ -18,7 +18,7 @@ import com.xiyuan.util.json.JsonParser;
 public final class ArrayParser extends JsonParser implements Serializable
 {
     private static final long serialVersionUID = 1L;
-    private static final int defult_capacity = 10;// 初始化大小
+    private static final int defult_capacity = 500;// 初始化大小数组大小
     private static final double capacity_multiple = 2.5;// 1.5增长倍数
     
     public ArrayParser(JsonLexer lexer)
@@ -161,12 +161,8 @@ public final class ArrayParser extends JsonParser implements Serializable
         
         
         long l1 = System.currentTimeMillis();
-        PageArr page = new PageArr(cls, 1000);
-        int poolSize = defult_capacity;
-        int length = 0;
+        PageArr page = new PageArr(cls, (int) (capacity_multiple*defult_capacity));
         int scope = lexer.scope();
-        Object[] arr = null;
-        Object[] temp = (Object[]) Array.newInstance(cls, poolSize);
         while (lexer.hasNext())
         {
             lexer.naxtToken();
@@ -175,26 +171,11 @@ public final class ArrayParser extends JsonParser implements Serializable
                 
             if (lexer.tokenType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
-//                
-//            if (length == poolSize)
-//            {
-//                poolSize = (int) (poolSize * capacity_multiple);
-//                arr = (Object[]) Array.newInstance(cls, poolSize);
-//                System.arraycopy(temp, 0, arr, 0, length);
-//                temp = arr;
-//                arr = null;
-//            }
 //            
             page.add(parser.toObject(cls));
 //            temp[length++] = value;
         }
-        
-        arr = (Object[]) Array.newInstance(cls, length);
-        if (length > 0)
-        {
-            System.arraycopy(temp, 0, arr, 0, length);
-            temp = null;
-        }
+       
         System.out.println("fromAr耗时：" + (System.currentTimeMillis() - l1));
         return page.toArr();
     }

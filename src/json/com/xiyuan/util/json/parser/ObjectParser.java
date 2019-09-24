@@ -18,21 +18,20 @@ import com.xiyuan.util.json.JsonParser;
 public final class ObjectParser extends JsonParser implements Serializable
 {
     private static final long serialVersionUID = 1L;
-    
+
     public ObjectParser(JsonLexer lexer)
     {
         super(lexer);
     }
-    
+
     public String toString(Object obj)
     {
         if (obj == null)
             return null;
-        
+
         StringBuilder sb = new StringBuilder().append(JsonLexer.BRACE_L);
         Class<?> cls = obj.getClass();
-        List<Field> fieldList = new ArrayList<Field>();
-        getFieldListDeep(cls, fieldList);
+        List<Field> fieldList = getFieldListDeep(cls);
         for (Field field : fieldList)
         {
             // TODO 以后使用注解获字段取别名，Annotations.getFieldName(field);
@@ -42,32 +41,32 @@ public final class ObjectParser extends JsonParser implements Serializable
             {
                 if (!field.isAccessible())
                     field.setAccessible(true);
-                
+
                 value = field.get(obj);
             }
             catch (Exception e)
             {}
-            
+
             sb.append(JsonLexer.DB_QUOTE).append(name).append(JsonLexer.DB_QUOTE).append(JsonLexer.COLON)
-                    .append(value == null ? JsonLexer.NULL : lexer.getParser(value.getClass()).toString(value)).append(JsonLexer.COMMA);
+                .append(value == null ? JsonLexer.NULL : lexer.getParser(value.getClass()).toString(value)).append(JsonLexer.COMMA);
         }
-        
+
         if (sb.length() > 1)
             sb.setLength(sb.length() - 1);
-        
+
         sb.append(JsonLexer.BRACE_R);
         return sb.toString();
     }
-    
+
     @Override
     public Object toObject(Class<?> cls)
     {
         Object obj = newInstance(cls);
         if (obj == null)
             return null;
-        
-        Map<String, Field> filedMap = getMapFieldDeep(cls, new HashMap<String, Field>());
-        
+
+        Map<String, Field> filedMap = getMapFieldDeep(cls);
+
         Field key = null;
         Object value = null;
         int scope = lexer.scope();
@@ -76,10 +75,10 @@ public final class ObjectParser extends JsonParser implements Serializable
             lexer.naxtToken();
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
-                
+
             if (lexer.isColon() || lexer.isComma())
                 continue;// 冒号或者逗号跳过
-                
+
             if (key != null)
             {// TODO:后续半段泛型类
                 Class<?> type = key.getType();
@@ -90,23 +89,23 @@ public final class ObjectParser extends JsonParser implements Serializable
             }
             else
                 key = filedMap.get(JsonLexer.removeStartEndQuotation(lexer.value()));
-            
+
             value = null;
             continue;
         }
-        
+
         if (key != null)
             setValue(obj, key, null);
-        
+
         key = null;
         return obj;
     }
-    
+
     private void setValue(Object obj, Field key, Object value)
     {
         if (!key.isAccessible())
             key.setAccessible(true);
-        
+
         try
         {
             key.set(obj, value);
