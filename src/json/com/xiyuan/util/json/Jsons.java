@@ -1,6 +1,7 @@
 package com.xiyuan.util.json;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -340,8 +341,15 @@ public final class Jsons implements Serializable
     @SuppressWarnings("unchecked")
     public static <T> List<T> toList(String json, Class<T> resultClass)
     {
-        JsonLexer lexer = new JsonLexer(json);// DOTO
-        return (List<T>) lexer.getParser(resultClass).toObject(resultClass);
+        JsonLexer lexer = new JsonLexer(json);
+        while (lexer.hasNext())
+        {
+            if (lexer.naxtToken().tokenType() == JsonLexer.T_BRACKET_L)
+                break;
+        }
+        error
+        T[] arr = (T[]) lexer.ArrayParser().toObject(Array.newInstance(resultClass, 0).getClass());
+        return new ArrayList<>(0);
     }
 
     /**

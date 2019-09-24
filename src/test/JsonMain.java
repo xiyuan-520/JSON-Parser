@@ -108,19 +108,19 @@ public class JsonMain implements TypeConstants, CodeConstants
 //        json += "{dd:{sddd:1354},\"id\":1,\"name\":\"a\",\"age\":18,\"sex\":\"0\"}";
 //        json += ",";
 //        json += "{\"id\":2,\"name\":\"b\",\"age\":19,\"sex\":\"1\"}";
-        json += "{\"id\":2}";
-        json += "]},:{}}";
+//        json += "{\"id\":2}";
+        json += "]";
         
-//        json = "[1,g,3,1,c3]";
+        json = "[1,6,3,1,85]";
 //        
 //        json = "[[ss,d]]";
 //        System.out.println(json);
         JsonLexer lexer = new JsonLexer(json);
-//        Object[] str = (String[]) lexer.getParser(String[].class).toObject(lexer, String[].class);
-//        for (Object object : str)
-//        {
-//            System.out.println(object);
-//        }
+        List<Integer> ls = Jsons.toList(json, int.class);
+        for (Object object : ls)
+        {
+            System.out.println(object);
+        }
 //        System.out.println("sss:" +str);
         System.out.println("===============");
         lexer = new JsonLexer(json);
