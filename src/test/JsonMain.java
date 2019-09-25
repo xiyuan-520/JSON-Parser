@@ -1,14 +1,20 @@
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.zhiqim.kernel.constants.CodeConstants;
 import org.zhiqim.kernel.constants.TypeConstants;
+import org.zhiqim.kernel.util.Asserts;
 import org.zhiqim.kernel.util.Files;
+import org.zhiqim.kernel.util.Streams;
 
 import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
@@ -18,29 +24,83 @@ import com.xiyuan.util.json.Jsons;
 
 import frame.model.OrdOrder;
 
-public class JsonMain implements TypeConstants, CodeConstants
+public class JsonMain
 {
-    
+    public static byte[] read(File file, int max)
+    {
+        if (file == null || !file.isFile() || !file.canRead())
+            return null;
+        
+        try(FileInputStream input = new FileInputStream(file))
+        {
+            
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int len = 0;long count = 0;
+            while ((len = input.read(buffer)) != -1)
+            {
+                output.write(buffer, 0, len);
+                count += len;
+            }
+            return output.toByteArray();
+        }
+        catch(IOException e)
+        {
+            return null;
+        }
+    }
     public static void main(String[] args) throws Exception
     {
+        System.out.println("args = "+Arrays.toString(args));
         int listSize = 10000;
+        if (args != null && args.length > 0 && Pattern.matches("^\\d+$", args[0]))
+            listSize = Integer.parseInt(args[0]);
         String jsonPath = "./json/" + listSize + ".json";
+        File jsonFile = new File(jsonPath);
+        if (!jsonFile.exists())
+            throw new Exception("json文件不存在："+jsonPath);
+        
         long l1 = System.currentTimeMillis();
         long l2 = l1;
         String jsonString = "{\"oid\":1802241101547130,\"tids\":\"119037997603325752\",\"status\":\"7\",\"shopNick\":\"th办公旗舰店\",\"buyerNick\":\"梦醒天神人\",\"prdTypeId\":1,\"productId\":1159,\"productText\":\"名片 | 铜版纸覆膜 | 90x54mm | 双面 | 2百张 | 1款1模\",\"policyIds\":\"\",\"amount\":1400,\"draftType\":0,\"invoiceType\":0,\"invoiceNotes\":\"\",\"invoiceItin\":\"\",\"industryId\":0,\"isOnlyDesign\":false,\"isUrgent\":false,\"printWidth\":0,\"printHeight\":0,\"printKs\":1,\"printMs\":1,\"printSpecial\":\"\",\"creater\":\"蛋蛋\",\"createTime\":\"2018-02-24 11:01:54\",\"modifyTime\":\"2018-02-24 14:07:50\",\"userText\":\"\",\"userMobile\":\"\",\"userQq\":\"\",\"receiverName\":\"黄浩\",\"receiverMobile\":\"13157172203\",\"receiverState\":\"浙江省\",\"receiverCity\":\"杭州市\",\"receiverDistrict\":\"滨江区\",\"receiverAddress\":\"长河街道春晓路529号 江南星座1栋一单元502\",\"supplierId\":6805,\"supplierOid\":\"10476998\",\"supplierOidStatus\":\"b\",\"supplierTime\":\"2018-02-24 14:04:03\",\"isSendSelfAddr\":false,\"csCount\":0,\"orderSrc\":0,\"orderSrcOid\":0,\"expressCode\":\"ZTO\",\"isSelfPickup\":false,\"isSfTopay\":false,\"unpackingNum\":0,\"productCostPriceJson\":\"{\\\"costPriceDate\\\":\\\"2018-02-01\\\",\\\"productId\\\":1159,\\\"prdPrice\\\":1400,\\\"prdCostPrice\\\":600,\\\"costPriceStatus\\\":0,\\\"costPriceModifyTime\\\":\\\"2018-02-01 14:14:36\\\"}\",\"ordShipHours\":24,\"ordShipTime\":\"2018-02-25 11:01:54\"}";
         l1 = System.currentTimeMillis();
-        String json = new String(Files.read(new File(jsonPath), 1800 * MiB));
+        String json = new String(read(new File(jsonPath), 1800 * 1048576), "UTF-8");
         l2 = System.currentTimeMillis();
         System.out.println("文件加载完成，共耗时：" + (l2 - l1) + " 毫秒，length:" + json.length());
+       
+        int op = 0;
+        if (args != null && args.length > 1 && Pattern.matches("^\\d+$", args[1]))
+            op = Integer.parseInt(args[1]);
+        System.out.println("测试option："+op);
         
+//        op = 0;
+        switch (op)
+        {
+            case 1:
+                testGson(json);//145033459
+                break;
+            case 2:
+                testFastJson(json);
+                break;
+            case 3:
+                testZhiqim(json);
+                break;
+                
+            case 6:
+                testOther();
+                break;
+            default:
+                testMy(json, jsonString, args.length == 0);
+                break;
+        }
 //        testGson(json);//145033459
 //        testFastJson(json);
 //        testZhiqim(json);
-        testMy(json, jsonString);
+//        testMy(json, jsonString);
         // Token root = Token.newToken(Token.BRACE_L, 0);
         // Token next = root.next(Token.STRING, 1);
         //
-        testOther();
+        
         // List<Integer> ls = new LinkedList<Integer>();
         // // List<Token> ls = new LinkedList<Token>();
         
@@ -165,7 +225,7 @@ public class JsonMain implements TypeConstants, CodeConstants
         return arr;
     }
     
-    public static void testMy(String json, String jsonString)
+    public static void testMy(String json, String jsonString, boolean console)
     {
         long l1 = 0, l2 = 0;
         List<OrdOrder> orders = new ArrayList<OrdOrder>();
@@ -183,9 +243,10 @@ public class JsonMain implements TypeConstants, CodeConstants
         System.out.println("自己代码 共生成 " + (orders != null ? orders.size() : a) + "条数据，共耗时：" + (l2 - l1) + " 毫秒");
         for (int i = 0; i < orders.size(); i++)
         {
-            if (i > 5)
+            if (i > 1)
                 break;
             
+            if (console)
             System.out.println(Jsons.toString(orders.get(i)));
         }
         System.out.println("===========================================================================");
