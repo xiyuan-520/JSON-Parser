@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /***
- * JSON 主程序，对象转换成JSON和JSON转换成对象
- * 
+ * JSON 主程序，对象转换成JSON和JSON转换成对象<br>
+ * 本json工具不做任何编码转换，如需切换编码则需要手动将json字符串进行编码
  * @version v1.0.0 @author lgz 2019年8月31日 新建与整理
  */
 public final class Jsons implements Serializable
@@ -121,13 +121,11 @@ public final class Jsons implements Serializable
         if (arr == null)
             return new ArrayList<T>(0);
 
-        long l1 = System.currentTimeMillis();
         List<T> ls = new ArrayList<T>(arr.length);
         for (int i = 0; i < arr.length; i++)
             ls.add(arr[i]);
 
         lexer = null;
-        System.out.println("toList耗时：" + (System.currentTimeMillis() - l1));
         return ls;
     }
 

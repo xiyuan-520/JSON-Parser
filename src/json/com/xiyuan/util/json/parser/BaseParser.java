@@ -92,44 +92,38 @@ public final class BaseParser extends JsonParser implements Serializable
     
     public static byte byteValue(JsonLexer lexer)
     {
-        String value = JsonLexer.removeStartEndQuotation(lexer.value());
-        return Byte.parseByte((lexer.prevIsColon() && lexer.ch() == JsonLexer.COMMA) ? String.valueOf(JsonLexer.COMMA) : value);
+        return Byte.parseByte((lexer.prevIsColon() && lexer.ch() == JsonLexer.COMMA) ? JsonLexer.COMMA_S : JsonLexer.removeStartEndQuotation(lexer.value()));
     }
     
     public static char charValue(JsonLexer lexer)
     {
         String value = JsonLexer.removeStartEndQuotation(lexer.value());
-        return value == null ? (char) 0 : (((lexer.prevIsColon() && !lexer.hasValue()) ? (char) 0 : value.charAt(0)));
+        return value == null ? (char) 0 : (((lexer.prevIsColon() && lexer.novalue()) ? (char) 0 : JsonLexer.removeStartEndQuotation(lexer.value()).charAt(0)));
     }
     
     public static short shortValue(JsonLexer lexer)
     {
-        String value = JsonLexer.removeStartEndQuotation(lexer.value());
-        return Short.parseShort((lexer.prevIsColon() && !lexer.hasValue()) ? String.valueOf(JsonLexer.COMMA) : value);
+        return Short.parseShort((lexer.prevIsColon() && lexer.novalue()) ? JsonLexer.COMMA_S : JsonLexer.removeStartEndQuotation(lexer.value()));
     }
     
     public static int intValue(JsonLexer lexer)
     {
-        String value = JsonLexer.removeStartEndQuotation(lexer.value());
-        return Integer.parseInt((lexer.prevIsColon() && !lexer.hasValue()) ? String.valueOf(JsonLexer.COMMA) : value);
+        return Integer.parseInt((lexer.prevIsColon() && lexer.novalue()) ? JsonLexer.COMMA_S : JsonLexer.removeStartEndQuotation(lexer.value()));
     }
     
     public static long longValue(JsonLexer lexer)
     {
-        String value = JsonLexer.removeStartEndQuotation(lexer.value());
-        return Long.parseLong((lexer.prevIsColon() && !lexer.hasValue()) ? String.valueOf(JsonLexer.COMMA) : value);
+        return Long.parseLong((lexer.prevIsColon() && lexer.novalue()) ? JsonLexer.COMMA_S : JsonLexer.removeStartEndQuotation(lexer.value()));
     }
     
     public static float floatValue(JsonLexer lexer)
     {
-        String value = JsonLexer.removeStartEndQuotation(lexer.value());
-        return Float.parseFloat((lexer.prevIsColon() && !lexer.hasValue()) ? String.valueOf(JsonLexer.COMMA) : value);
+        return Float.parseFloat((lexer.prevIsColon() && lexer.novalue()) ? JsonLexer.COMMA_S : JsonLexer.removeStartEndQuotation(lexer.value()));
     }
     
     public static double doubleValue(JsonLexer lexer)
     {
-        String value = JsonLexer.removeStartEndQuotation((lexer.value() == null) ? null : lexer.value());
-        return Double.parseDouble((lexer.prevIsColon() && !lexer.hasValue()) ? String.valueOf(JsonLexer.COMMA) : value);
+        return Double.parseDouble((lexer.prevIsColon() && lexer.novalue()) ? JsonLexer.COMMA_S : JsonLexer.removeStartEndQuotation((lexer.value() == null) ? null : lexer.value()));
     }
     
     public static String stringValue(JsonLexer lexer)
@@ -137,8 +131,8 @@ public final class BaseParser extends JsonParser implements Serializable
         // 去掉前后可能的引号
         if (lexer.curType() == JsonLexer.T_BRACE_L || lexer.curType() == JsonLexer.T_BRACKET_L)
         {// 对象行
-            int scope = lexer.scope();
             int pos = lexer.pos();
+            int scope = lexer.scope();
             while (lexer.hasNext())
             {
                 lexer.naxtToken();

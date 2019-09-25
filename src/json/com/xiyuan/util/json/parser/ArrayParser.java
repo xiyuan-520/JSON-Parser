@@ -11,7 +11,7 @@ import com.xiyuan.util.json.JsonParser;
 /***
  * 数组解析器,8种基本类型数组、字符串数组和对象数组
  * 
- * @DOTO 此类有重复代码 考虑到性能问题
+ * @DOTO 为了避免频繁调用lexer.getParser(clz)损耗性能,此类有重复代码
  * @DOTO 子类后续添加 java.util.concurrent.atomic 包的类型
  * @version v1.0.0 @author lgz 2019-8-28 新建与整理
  */
@@ -97,6 +97,10 @@ public final class ArrayParser extends JsonParser implements Serializable
         }
     }
 
+    /***
+     *  数据分页对象 避免 内存频繁拷贝
+     * @version v1.0.0 @author lgz 2019-9-25 新建与整理
+     */
     private class PageArr
     {
         Class<?> cls = null;
