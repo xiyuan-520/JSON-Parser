@@ -24,12 +24,13 @@ public abstract class JsonParser implements Serializable
     private static final long serialVersionUID = 1L;
     public static final long JS_MAX_LONG_VALUE = (long) Math.pow(2, 53);// 2^53//9007199254740992
     public static final String DATETIME_REG = "^((([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29))\\s(([0-1][0-9]|[2][0-3]):([0-5][0-9]):([0-5][0-9]))$";
+    private static final int defaultCount = 120;//默认初始化空间大小
+    /**用于保存临时的对象字段列表,用于toObject*/
+    private static final Map<Class<?>, Map<String, Field>> fieldMap = new HashMap<Class<?>, Map<String, Field>>(defaultCount);//初始化defaultCount个类空间
+    /**用于保存临时的对象字段列表,用于toString*/
+    private static final Map<Class<?>, List<Field>> fieldList = new HashMap<Class<?>, List<Field>>(defaultCount);//初始化defaultCount个类空间
     
     protected JsonLexer lexer;
-    /**用于保存临时的对象字段列表,用于toObject*/
-    private Map<Class<?>, Map<String, Field>> fieldMap = new HashMap<Class<?>, Map<String,Field>>();
-    /**用于保存临时的对象字段列表,用于toString*/
-    private Map<Class<?>, List<Field>> fieldList = new HashMap<Class<?>,List<Field>>();
     public JsonParser(JsonLexer lexer)
     {
         this.lexer = lexer;
@@ -322,22 +323,22 @@ public abstract class JsonParser implements Serializable
      * @param clazz 类
      * @param fieldList 用于存储的字段列表
      */
-    protected List<Field> getFieldListDeep(Class<?> clazz)
+    public List<Field> getFieldListDeep(Class<?> clazz)
     {
         List<Field> ls = fieldList.get(clazz);
         if (ls == null)
         {
-            ls = new ArrayList<Field>();
+            ls = new ArrayList<Field>(defaultCount);//初始化 defaultCount个字段空间
             getFieldListDeep(clazz, ls);
             fieldList.put(clazz, ls);
         }
         
         return ls;
     }
-    private void getFieldListDeep(Class<?> clazz, List<Field> fieldList)
+    
+    public void getFieldListDeep(Class<?> clazz, List<Field> fieldList)
     {
-        Field[] fieldArr = clazz.getDeclaredFields();
-        for (Field field : fieldArr)
+        for (Field field : clazz.getDeclaredFields())
         {
             int mod = field.getModifiers();
             if (Modifier.isStatic(mod) || Modifier.isTransient(mod) || "this$0".equals(field.getName()))
@@ -361,19 +362,18 @@ public abstract class JsonParser implements Serializable
      * @return 
      */
     
-    protected Map<String, Field> getMapFieldDeep(Class<?> clazz)
+    public Map<String, Field> getFieldMapDeep(Class<?> clazz)
     {
         Map<String, Field> map = fieldMap.get(clazz);
         if (map == null)
         {
-            map = new HashMap<String, Field>();
+            map = new HashMap<String, Field>(defaultCount);//初始化 defaultCount个字段空间
             fieldMap.put(clazz, map);
             for (Field field : getFieldListDeep(clazz))
                 map.put(field.getName(), field);
         }
         return map;
     }
-    
     
     /**
      * 初始化实例，忽略异常，异常时返回null

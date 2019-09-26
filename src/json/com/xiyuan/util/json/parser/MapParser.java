@@ -29,7 +29,7 @@ public final class MapParser extends JsonParser implements Serializable
             return JsonLexer.EMPTY_OBJ;
         
         Map<?, ?> map = (Map<?, ?>) obj;
-        StringBuilder strb = new StringBuilder().append(JsonLexer.BRACE_L);
+        StringBuilder strb = new StringBuilder(map.size()*500).append(JsonLexer.BRACE_L);
         for (Entry<?, ?> entry : map.entrySet())
         {
             Object o = entry.getKey();

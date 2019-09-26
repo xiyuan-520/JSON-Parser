@@ -3,11 +3,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import org.zhiqim.kernel.constants.CodeConstants;
@@ -20,7 +24,9 @@ import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.xiyuan.util.json.JsonLexer;
+import com.xiyuan.util.json.JsonParser;
 import com.xiyuan.util.json.Jsons;
+import com.xiyuan.util.json.parser.ObjectParser;
 
 import frame.model.OrdOrder;
 
@@ -31,34 +37,32 @@ public class JsonMain
         if (file == null || !file.isFile() || !file.canRead())
             return null;
         
-        try(FileInputStream input = new FileInputStream(file))
+        try (FileInputStream input = new FileInputStream(file))
         {
             
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
-            int len = 0;long count = 0;
+            int len = 0;
             while ((len = input.read(buffer)) != -1)
-            {
                 output.write(buffer, 0, len);
-                count += len;
-            }
             return output.toByteArray();
         }
-        catch(IOException e)
+        catch (IOException e)
         {
             return null;
         }
     }
+    
     public static void main(String[] args) throws Exception
     {
-        System.out.println("args = "+Arrays.toString(args));
+        System.out.println("args = " + Arrays.toString(args));
         int listSize = 10000;
         if (args != null && args.length > 0 && Pattern.matches("^\\d+$", args[0]))
             listSize = Integer.parseInt(args[0]);
         String jsonPath = "./json/" + listSize + ".json";
         File jsonFile = new File(jsonPath);
         if (!jsonFile.exists())
-            throw new Exception("json文件不存在："+jsonPath);
+            throw new Exception("json文件不存在：" + jsonPath);
         
         long l1 = System.currentTimeMillis();
         long l2 = l1;
@@ -67,17 +71,16 @@ public class JsonMain
         String json = new String(read(new File(jsonPath), 1800 * 1048576), "UTF-8");
         l2 = System.currentTimeMillis();
         System.out.println("文件加载完成，共耗时：" + (l2 - l1) + " 毫秒，length:" + json.length());
-       
+        
         int op = 0;
         if (args != null && args.length > 1 && Pattern.matches("^\\d+$", args[1]))
             op = Integer.parseInt(args[1]);
-        System.out.println("测试option："+op);
+        System.out.println("测试option：" + op);
         
-//        op = 0;
         switch (op)
         {
             case 1:
-                testGson(json);//145033459
+                testGson(json);// 145033459
                 break;
             case 2:
                 testFastJson(json);
@@ -85,7 +88,7 @@ public class JsonMain
             case 3:
                 testZhiqim(json);
                 break;
-                
+            
             case 6:
                 testOther();
                 break;
@@ -93,10 +96,10 @@ public class JsonMain
                 testMy(json, jsonString, args.length == 0);
                 break;
         }
-//        testGson(json);//145033459
-//        testFastJson(json);
-//        testZhiqim(json);
-//        testMy(json, jsonString);
+        // testGson(json);//145033459
+        // testFastJson(json);
+        // testZhiqim(json);
+        // testMy(json, jsonString);
         // Token root = Token.newToken(Token.BRACE_L, 0);
         // Token next = root.next(Token.STRING, 1);
         //
@@ -124,99 +127,36 @@ public class JsonMain
     
     public static void testOther()
     {
+        long l1 = 0, l2 = 0;
+        int count = 10000;
+        JsonParser parser = new ObjectParser(null);
+        l1 = System.nanoTime();
+        for (int i = 0; i < count; i++)
+            parser.getFieldMapDeep(OrdOrder.class);
+        l2 = System.nanoTime();
+        System.out.println("hashMap:\t"+(l2-l1)*1.0/1000000);
         
-       
-        String aaa = "f";
-        String result = null;
-        long t1 = System.nanoTime();
-        if("a".equals(aaa)){
-            result = "找到了";
-        } else if ("b".equals(aaa)) {
-            result = "找到了";
-        } else if ("c".equals(aaa)) {
-            result = "找到了";
-        } else if ("d".equals(aaa)) {
-            result = "找到了";
-        } else if ("e".equals(aaa)) {
-            result = "找到了";
-        } else if ("f".equals(aaa)) {
-            result = "找到了";
-        } else if ("g".equals(aaa)) {
-            result = "找到了";
-        } else if ("h".equals(aaa)) {
-            result = "找到了";
-        } else if ("i".equals(aaa)) {
-            result = "找到了";
-        } else if ("j".equals(aaa)) {
-            result = "找到了";
-        } else if ("k".equals(aaa)) {
-            result = "找到了";
-        } else if ("l".equals(aaa)) {
-            result = "找到了";
-        } else if ("m".equals(aaa)) {
-            result = "找到了";
-        } else if ("n".equals(aaa)) {
-            result = "找到了";
-        } else {
-            result = "未找到";
-        }
-        long t2 = System.nanoTime();
-        System.out.println("if :\t" + (t2 - t1));
+        l1 = System.nanoTime();
+        for (int i = 0; i < count; i++)
+            parser.getFieldMapDeep(OrdOrder.class);
+        l2 = System.nanoTime();
+        System.out.println("currentMap:\t"+(l2-l1)*1.0/1000000);
         
-        System.out.println(result+":"+aaa);
-        //switch语句测试代码：
-
-        long tt1 = System.nanoTime();
-        switch (aaa) {
-            case "a":
-                result = "找到了";
-                break;
-            case "b":
-                result = "找到了";
-                break;
-            case "c":
-                result = "找到了";
-                break;
-            case "d":
-                result = "找到了";
-                break;
-            case "e":
-                result = "找到了";
-                break;
-            case "f":
-                result = "找到了";
-                break;
-            case "g":
-                result = "找到了";
-                break;
-            case "h":
-                result = "找到了";
-                break;
-            case "i":
-                result = "找到了";
-                break;
-            case "j":
-                result = "找到了";
-                break;
-            case "k":
-                result = "找到了";
-                break;
-            case "l":
-                result = "找到了";
-                break;
-            case "m":
-                result = "找到了";
-                break;
-            case "n":
-                result = "找到了";
-                break;
-            default:
-                result = "未找到";
-                break;
-        }
-        long tt2 = System.nanoTime();
-        System.out.println("case :\t" + (tt2 - tt1));
+        System.out.println("==============================");
+        parser = new ObjectParser(null);
+        l1 = System.nanoTime();
+        for (int i = 0; i < count; i++)
+            parser.getFieldMapDeep(OrdOrder.class);
+        l2 = System.nanoTime();
+        System.out.println("hashMap:\t"+(l2-l1)*1.0/1000000);
+        
+        l1 = System.nanoTime();
+        for (int i = 0; i < count; i++)
+            parser.getFieldMapDeep(OrdOrder.class);
+        l2 = System.nanoTime();
+        System.out.println("currentMap:\t"+(l2-l1)*1.0/1000000);
     }
+    
     public static Object getArr()
     {
         Boolean[] temp = { true, false };
@@ -227,60 +167,58 @@ public class JsonMain
     
     public static void testMy(String json, String jsonString, boolean console)
     {
-        long l1 = 0, l2 = 0;
+        double l1 = 0, l2 = 0;
         List<OrdOrder> orders = new ArrayList<OrdOrder>();
         System.out.println("===========================================================================");
-        long a = 0;
+        long a = 0; 
         l1 = System.currentTimeMillis();
-        // json =
-         
-         orders = Jsons.toList(json, OrdOrder.class);
+        orders = Jsons.toList(json, OrdOrder.class);
         // orders = Jsons.toList2(json, OrdOrder.class);
         // pool = Jsons.getTokens(json);
         // Token[]ss = token.getElements();
         // token = Jsons.getTokens(json, "oid");
         l2 = System.currentTimeMillis();
-        System.out.println("自己代码 共生成 " + (orders != null ? orders.size() : a) + "条数据，共耗时：" + (l2 - l1) + " 毫秒");
+        System.out.println("自己代码 共生成 " + (orders != null ? orders.size() : a) + "条数据，共耗时：" + (l2 - l1)/1000 + " 秒");
         for (int i = 0; i < orders.size(); i++)
         {
             if (i > 1)
                 break;
             
             if (console)
-            System.out.println(Jsons.toString(orders.get(i)));
+                System.out.println(Jsons.toString(orders.get(i)));
         }
         System.out.println("===========================================================================");
         jsonString = "{\"order\":{\"sssss\":[11,22], \"oid\":1968980653310,\"tids\":\"616970113173646062,616956865634646062\",\"status\":\"9\",\"shopNick\":\"th办公旗舰店\",\"buyerNick\":\"chao817817\",\"prdTypeId\":1,\"productId\":1160,\"productText\":\"名片 | 铜版纸覆膜 | 90x54mm | 双面 | 5百张 | 2款1模包设计\",\"policyIds\":null,\"amount\":5000,\"draftType\":2,\"invoiceType\":0,\"invoiceNotes\":\"\",\"invoiceItin\":\"\",\"industryId\":6932,\"thumbnail\":null,\"isOnlyDesign\":false,\"isUrgent\":false,\"printWidth\":0,\"printHeight\":0,\"printKs\":2,\"printMs\":1,\"printOrderNum\":null,\"printSpecial\":\"\",\"creater\":\"朵喵\",\"createTime\":\"2019-09-10 11:15:40\",\"modifyTime\":\"2019-09-11 17:06:21\",\"userText\":\"\",\"userNotice\":null,\"userMobile\":\"17688070465\",\"userQq\":\"\",\"userWx\":\"\",\"receiverName\":\"蔡泽超\",\"receiverMobile\":\"17688070465\",\"receiverState\":\"广东省\",\"receiverCity\":\"汕尾市\",\"receiverDistrict\":\"海丰县\",\"receiverAddress\":\"公平镇集贤四巷十八号\",\"supplierId\":1908061252058471,\"supplierOid\":null,\"supplierOidStatus\":null,\"supplierTime\":\"2019-09-10 15:50:28\",\"canceler\":null,\"cancelTime\":null,\"cancelNote\":null,\"isSendSelfAddr\":true,\"csCount\":0,\"orderSrc\":0,\"orderSrcOid\":0,\"expressCode\":\"HTKY\",\"ordPost\":1,\"isSelfPickup\":false,\"isSfTopay\":false,\"isMergeOrder\":false,\"isModifyAddrSend\":false,\"unpackingNum\":0,\"sendWaitSureNote\":null,\"productCostPriceJson\":\"{\\\"costDate\\\":\\\"2019-08-06\\\",\\\"supplierId\\\":1908061252058471,\\\"productId\\\":1160,\\\"costPrice\\\":0}\",\"policyCostPriceJsons\":null,\"cancelLation\":null,\"ordShipHours\":24,\"ordShipTime\":\"2019-09-11 11:15:40\",\"userTextReplace\":null,\"consignmentOid\":1968980653310,\"sendRemindType\":0,\"orgId\":1806051109012492,\"orgReceiveTime\":\"2019-09-10 11:18:13\",\"orderFlag\":0,\"ordDesignPlatformFlag\":2,\"designId\":1968980653310,\"designRetrunTime\":null,\"designRetrunCount\":0,\"servicesMessage\":\"\"}}";
         
-//        Object obj = Jsons.getObject(json, "order", OrdOrder.class);
-//        System.out.println(Jsons.toString(obj));
-//        if (obj != null)
-//        {
-//            System.out.println(obj.getClass().getName());
-//        }
-//        int[] arr = Jsons.getObject(jsonString, "sssss", int[].class);
-//        System.out.println(Arrays.toString(arr));
-//        
-//        OrdOrder[]arr1 = Jsons.toObject(json, OrdOrder[].class);
-//        System.out.println(arr1[0]);
+        // Object obj = Jsons.getObject(json, "order", OrdOrder.class);
+        // System.out.println(Jsons.toString(obj));
+        // if (obj != null)
+        // {
+        // System.out.println(obj.getClass().getName());
+        // }
+        // int[] arr = Jsons.getObject(jsonString, "sssss", int[].class);
+        // System.out.println(Arrays.toString(arr));
+        //
+        // OrdOrder[]arr1 = Jsons.toObject(json, OrdOrder[].class);
+        // System.out.println(arr1[0]);
         
-//        // json = "";
-//        
-//        Person p = new Person();
-//        p.setAge(18);
-//        p.setId(1);
-//        p.setName("a");
-//        p.setSex("0");
-//        System.out.println(Jsons.toString(p));
-//        System.out.println("============================================================");
-//        
+        // // json = "";
+        //
+        // Person p = new Person();
+        // p.setAge(18);
+        // p.setId(1);
+        // p.setName("a");
+        // p.setSex("0");
+        // System.out.println(Jsons.toString(p));
+        // System.out.println("============================================================");
+        //
         json = "";
-//        json = "[";
+        // json = "[";
         json += "{ddd:{\"id\":155},\"name\":s,\"age\":18,\"sex\":\"0\"}";
-//        json += ",";
-//        json += "{\"id\":2,\"name\":\"b\",\"age\":19,\"sex\":\"1\"}";
-//        // json += "{\"id\":2}";
-//        json += "]";
+        // json += ",";
+        // json += "{\"id\":2,\"name\":\"b\",\"age\":19,\"sex\":\"1\"}";
+        // // json += "{\"id\":2}";
+        // json += "]";
         
         // json = "[1,6,3,1,85]";
         //
@@ -291,34 +229,34 @@ public class JsonMain
         System.out.println("===============");
         System.out.println(JsonLexer.trim("       "));
         JsonLexer lexer = new JsonLexer(json);
-//        while (lexer.hasNext())
-//        {
-//            String value = lexer.naxtToken().value();
-//            System.out.println(lexer.scope() + "\t" + lexer.curType() + "\t" + value);
-//        }
-//        
-//        List<Person> peList = Jsons.toList(json, Person.class);
-//        for (Person person : peList)
-//        {
-//            System.out.println(person);
-//        }
-//        
+        // while (lexer.hasNext())
+        // {
+        // String value = lexer.naxtToken().value();
+        // System.out.println(lexer.scope() + "\t" + lexer.curType() + "\t" + value);
+        // }
+        //
+        // List<Person> peList = Jsons.toList(json, Person.class);
+        // for (Person person : peList)
+        // {
+        // System.out.println(person);
+        // }
+        //
     }
     
     public static void testFastJson(String json)
     {
-        long l1 = 0, l2 = 0;
+        double l1 = 0, l2 = 0;
         List<OrdOrder> orders = new ArrayList<OrdOrder>();
         System.out.println("===========================================================================");
         l1 = System.currentTimeMillis();
         orders = JSON.parseArray(json, OrdOrder.class);
         l2 = System.currentTimeMillis();
-        System.out.println("马云代码 共生成 " + (orders == null ? 0 : orders.size()) + "条数据，共耗时：" + (l2 - l1) + " 毫秒");
+        System.out.println("马云代码 共生成 " + (orders == null ? 0 : orders.size()) + "条数据，共耗时：" + (l2 - l1)/1000 + " 秒");
     }
     
     public static void testGson(String json)
     {
-        long l1 = 0, l2 = 0;
+        double l1 = 0, l2 = 0;
         List<OrdOrder> orders = new ArrayList<OrdOrder>();
         System.out.println("===========================================================================");
         l1 = System.currentTimeMillis();
@@ -327,17 +265,17 @@ public class JsonMain
         {
         }.getType());
         l2 = System.currentTimeMillis();
-        System.out.println("谷歌代码 共生成 " + (orders.size()) + "条数据，共耗时：" + (l2 - l1) + " 毫秒");
+        System.out.println("谷歌代码 共生成 " + (orders.size()) + "条数据，共耗时：" + (l2 - l1)/1000 + " 秒");
     }
     
     public static void testZhiqim(String json)
     {
-        long l1 = 0, l2 = 0;
+        double l1 = 0, l2 = 0;
         List<OrdOrder> orders = new ArrayList<OrdOrder>();
         System.out.println("===========================================================================");
         l1 = System.currentTimeMillis();
         orders = org.zhiqim.kernel.json.Jsons.toList(json, OrdOrder.class);
         l2 = System.currentTimeMillis();
-        System.out.println("公司代码 共生成 " + (orders.size()) + "条数据，共耗时：" + (l2 - l1) + " 毫秒");
+        System.out.println("公司代码 共生成 " + (orders.size()) + "条数据，共耗时：" + (l2 - l1)/1000 + " 秒");
     }
 }

@@ -17,9 +17,21 @@
 package com.xiyuan.util.json;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import com.xiyuan.util.json.parser.ArrayParser;
 import com.xiyuan.util.json.parser.BaseParser;
@@ -639,7 +651,7 @@ public final class JsonLexer
         if (str == null)
             return null;
         
-        StringBuilder strb = new StringBuilder();
+        StringBuilder strb = new StringBuilder(str.length());
         boolean isEscape = false;// 是否前一字符是转义字符
         for (int i = 0; i < str.length(); i++)
         {
@@ -711,7 +723,7 @@ public final class JsonLexer
     
     /***
      * 去除JSON键和值的前后成对引号
-     * 
+     * 注意：字符串首尾不能 有空格
      * @param str 原字符串
      * @return 去除成对引号之后的字符串
      */
@@ -719,19 +731,17 @@ public final class JsonLexer
     {
         if (str == null)
             return null;
-        
-        if (str.length() >= 2 && str.startsWith(DB_QUOTE_S) && str.endsWith(DB_QUOTE_S))
-        {// 有双引号删除退出
-            str = str.substring(1, str.length() - 1);
-            return str;
-        }
+        int end = str.length() - 1;
+        if (str.length() >= 2 && str.charAt(0) == DB_QUOTE && str.charAt(end) == DB_QUOTE)
+            return str.substring(1, end);// 有双引号删除退出
         
         // 没有双引号则判断单引号
-        if (str.length() >= 2 && str.startsWith(QUOTE_S) && str.endsWith(QUOTE_S))
-            str = str.substring(1, str.length() - 1);
+        if (str.length() >= 2 && str.charAt(0) == QUOTE && str.charAt(end) == QUOTE)
+            return str.substring(1, end);// 有双引号删除退出
         
         return str;
     }
+    
     
     /***********************************************************************/
     // 以下是类的定义及对象的调用方法
@@ -767,6 +777,79 @@ public final class JsonLexer
         this.mapParser = new MapParser(this);
         this.dateParser = new DateParser(this);
         this.objParser = new ObjectParser(this);
+        initParserMap();
+    }
+    
+    private HashMap<Class<?>, JsonParser> parserMap = new HashMap<Class<?>, JsonParser>(200);
+    
+    private void initParserMap()
+    {
+        
+        // 八大基本类型+封装类+String
+        parserMap.put(boolean.class, baseParser);
+        parserMap.put(byte.class, baseParser);
+        parserMap.put(char.class, baseParser);
+        parserMap.put(short.class, baseParser);
+        parserMap.put(int.class, baseParser);
+        parserMap.put(long.class, baseParser);
+        parserMap.put(float.class, baseParser);
+        parserMap.put(double.class, baseParser);
+        parserMap.put(Boolean.class, baseParser);
+        parserMap.put(Byte.class, baseParser);
+        parserMap.put(Character.class, baseParser);
+        parserMap.put(Short.class, baseParser);
+        parserMap.put(Integer.class, baseParser);
+        parserMap.put(Long.class, baseParser);
+        parserMap.put(Float.class, baseParser);
+        parserMap.put(Double.class, baseParser);
+        parserMap.put(String.class, baseParser);
+        
+        parserMap.put(boolean[].class, arrayParser);
+        parserMap.put(byte[].class, arrayParser);
+        parserMap.put(char[].class, arrayParser);
+        parserMap.put(short[].class, arrayParser);
+        parserMap.put(int[].class, arrayParser);
+        parserMap.put(long[].class, arrayParser);
+        parserMap.put(float[].class, arrayParser);
+        parserMap.put(double[].class, arrayParser);
+        parserMap.put(Boolean[].class, arrayParser);
+        parserMap.put(Byte[].class, arrayParser);
+        parserMap.put(Character[].class, arrayParser);
+        parserMap.put(Short[].class, arrayParser);
+        parserMap.put(Integer[].class, arrayParser);
+        parserMap.put(Long[].class, arrayParser);
+        parserMap.put(Float[].class, arrayParser);
+        parserMap.put(Double[].class, arrayParser);
+        parserMap.put(String[].class, arrayParser);
+        parserMap.put(Object[].class, arrayParser);
+        
+        // 哈希表
+        parserMap.put(Map.class, mapParser);
+        parserMap.put(HashMap.class, mapParser);
+        parserMap.put(ConcurrentMap.class, mapParser);
+        parserMap.put(ConcurrentHashMap.class, mapParser);
+        parserMap.put(Hashtable.class, mapParser);
+        parserMap.put(LinkedHashMap.class, mapParser);
+        parserMap.put(TreeMap.class, mapParser);
+        
+        // 链表
+        parserMap.put(Collection.class, listParser);
+        parserMap.put(List.class, listParser);
+        parserMap.put(ArrayList.class, listParser);
+        parserMap.put(LinkedList.class, listParser);
+        parserMap.put(Set.class, listParser);
+        parserMap.put(HashSet.class, listParser);
+        parserMap.put(TreeSet.class, listParser);
+        
+        // 时间
+        parserMap.put(Calendar.class, dateParser);
+        parserMap.put(Date.class, dateParser);
+        parserMap.put(java.sql.Date.class, dateParser);
+        parserMap.put(java.sql.Time.class, dateParser);
+        parserMap.put(java.sql.Timestamp.class, dateParser);
+        
+        // 通用 object
+        parserMap.put(Object.class, objParser);
     }
     
     public JsonParser BaseParser()
@@ -1073,6 +1156,10 @@ public final class JsonLexer
     public JsonParser getParser(Class<?> clazz)
     {
         JsonParser parser = null;
+        parser = parserMap.get(clazz);
+        if (parser != null)
+            return parser;
+        
         switch (clazz.getName().hashCode())
         {
         
@@ -1148,7 +1235,7 @@ public final class JsonLexer
             case DATE_CLS_HASH:// 65575278; java.util.Date.class.getName().hashCode();
             case SQL_DATE_CLS_HASH:// 1087757882; java.sql.Date.class.getName().hashCode();
             case SQL_TIME_CLS_HASH:// 1088242009; java.sql.Time.class.getName().hashCode();
-            case SQL_TIMESTAMP_CLS_HASH:// 1252880906;  java.sql.Timestamp.class.getName().hashCode();
+            case SQL_TIMESTAMP_CLS_HASH:// 1252880906; java.sql.Timestamp.class.getName().hashCode();
                 parser = dateParser;
                 break;
             
@@ -1168,6 +1255,8 @@ public final class JsonLexer
                 parser = arrayParser;
             else
                 parser = objParser;
+            
+            parserMap.put(clazz, listParser);
         }
         
         return parser;

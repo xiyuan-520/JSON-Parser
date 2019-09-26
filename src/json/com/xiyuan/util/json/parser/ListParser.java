@@ -27,7 +27,7 @@ public final class ListParser extends JsonParser
         if (obj == null || !(obj instanceof Collection) || (list = (Collection<?>) obj).isEmpty())
             return JsonLexer.EMPTY_ARR;
         
-        StringBuilder strb = new StringBuilder().append(JsonLexer.BRACKET_L);
+        StringBuilder strb = new StringBuilder(list.size()*500).append(JsonLexer.BRACKET_L);
         for (Object o : list)
             strb.append(o == null ? JsonLexer.NULL : lexer.getParser(o.getClass()).toString(o)).append(JsonLexer.COMMA);
         strb.setLength(strb.length() - 1);
