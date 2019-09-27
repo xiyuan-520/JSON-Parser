@@ -62,7 +62,7 @@ public final class ArrayParser extends JsonParser implements Serializable
         
         public Object[] toArr()
         {
-            if (ls.size() == 0)
+            if (total == 0)
                 return (Object[]) Array.newInstance(cls, 0);
             
             Object[] target = (Object[]) Array.newInstance(cls, total);

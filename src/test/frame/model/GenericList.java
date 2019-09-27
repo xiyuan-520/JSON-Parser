@@ -15,8 +15,7 @@ package frame.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class A
+public class GenericList
 {
-    private List<String> a1;
-    private ArrayList<String> a2;
+    private List<OrdOrder> list;
 }

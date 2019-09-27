@@ -16,6 +16,10 @@
  */
 package com.xiyuan.util.json;
 
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -496,7 +500,7 @@ public final class JsonLexer
             case BYTE_CLS_HASH:// = 3039496;//byte.class.getName().hashCode();
                 cls = (Class<T>) Byte.class;
                 break;
-            case CHAR_CLS_HASH:// :// = 3052374;// char.class.getName().hashCode();
+            case CHAR_CLS_HASH:// = 3052374;// char.class.getName().hashCode();
                 cls = (Class<T>) Character.class;
                 break;
             case SHORT_CLS_HASH:// = 109413500;//short.class.getName().hashCode();
@@ -511,8 +515,7 @@ public final class JsonLexer
             case FLOAT_CLS_HASH:// = 97526364;//float.class.getName().hashCode();
                 cls = (Class<T>) Float.class;
                 break;
-            case DOUBLE_CLS_HASH:// =
-                                 // -1325958191;//double.class.getName().hashCode();
+            case DOUBLE_CLS_HASH:// = -1325958191;//double.class.getName().hashCode();
                 cls = (Class<T>) Double.class;
                 break;
             default:
@@ -734,14 +737,51 @@ public final class JsonLexer
         int end = str.length() - 1;
         if (str.length() >= 2 && str.charAt(0) == DB_QUOTE && str.charAt(end) == DB_QUOTE)
             return str.substring(1, end);// 有双引号删除退出
-        
+            
         // 没有双引号则判断单引号
         if (str.length() >= 2 && str.charAt(0) == QUOTE && str.charAt(end) == QUOTE)
             return str.substring(1, end);// 有双引号删除退出
-        
+            
         return str;
     }
+    /*******************************************/
+    // 以下两个静态方法是 获取静态泛型具体类型的方法
+    /*******************************************/
     
+    /**
+     * 获取泛型类型具体类型的方法
+     * @param type      字段类
+     * @param i         泛型索引位置
+     */
+    @SuppressWarnings("rawtypes")
+    public static Class getClass(Type type, int i)
+    {
+        if (type instanceof ParameterizedType)
+            return getGenericClass((ParameterizedType) type, i);
+        else if (type instanceof TypeVariable)
+            return (Class) getClass(((TypeVariable) type).getBounds()[0], 0);
+        else
+            return (Class) type;
+    }
+    
+    /**
+     * 获取泛型类型具体类型的方法
+     * @param parameterizedType      字段类
+     * @param i                      泛型索引位置
+     */
+    @SuppressWarnings("rawtypes")
+    public static Class<?> getGenericClass(ParameterizedType parameterizedType, int i)
+    {
+        Object genericClass = parameterizedType.getActualTypeArguments()[i];
+        if (genericClass instanceof ParameterizedType)
+            return (Class) ((ParameterizedType) genericClass).getRawType();
+        else if (genericClass instanceof GenericArrayType)
+            return (Class) ((GenericArrayType) genericClass).getGenericComponentType();
+        else if (genericClass instanceof TypeVariable)
+            return (Class) getClass(((TypeVariable) genericClass).getBounds()[0], 0);
+        else
+            return (Class) genericClass;
+    }
     
     /***********************************************************************/
     // 以下是类的定义及对象的调用方法

@@ -49,24 +49,28 @@ public final class MapParser extends JsonParser implements Serializable
     @Override
     public Object toObject(Class<?> cls)
     {// TODO 以后 获取cls 具体类型构造map 集构造类型，目前只放入 String
+        return  toObject(cls, String.class, String.class);
+    }
     
-        Map<String, String> map = null;
-        if (cls == Map.class || cls == HashMap.class)
-            map = new HashMap<String, String>();
-        else if (cls == ConcurrentMap.class || cls == ConcurrentHashMap.class)
-            map = new ConcurrentHashMap<String, String>();
-        else if (cls == Hashtable.class)
-            map = new Hashtable<String, String>();
-        else if (cls == LinkedHashMap.class)
-            map = new LinkedHashMap<String, String>();
-        else if (cls == TreeMap.class)
-            map = new TreeMap<String, String>();
+    /***
+     * 解析成map
+     * @param mapClass          map类型
+     * @param keyClass          key的类型
+     * @param valueClass        value的类型
+     * @return
+     */
+    public Object toObject(Class<?> mapClass, Class<?> keyClass, Class<?> valueClass)
+    {// TODO 以后 获取cls 具体类型构造map 集构造类型，目前只放入 String
+    
+        if (isSupportClass(mapClass))
+            return null;
         
+        Map<Object, Object> map = newMap(mapClass, 0);
         if (map == null || !lexer.isObj())
             return map;// 不支持的类型或者不是 对象
             
-        String key = null;
-        String temp = null;
+        Object key = null;
+        Object value = null;
         int scope = lexer.scope();
         while (lexer.hasNext())
         {
@@ -76,27 +80,24 @@ public final class MapParser extends JsonParser implements Serializable
                 
             if (lexer.isColon() || lexer.isComma())
                 continue;// 冒号或者逗号跳过
-                
-            if (lexer.isObj() || lexer.isArr())
-                temp = (String) lexer.BaseParser().toObject(String.class);
             
-            temp = temp != null ? temp : lexer.value();
             if (key != null)
             {
-                if (JsonLexer.NULL.equals(temp))
+                value = lexer.getParser(valueClass).toObject(valueClass);
+                if (value == null || JsonLexer.NULL.equals(value))
                 {
                     if (!(map instanceof ConcurrentHashMap))
-                        map.put(key, JsonLexer.removeStartEndQuotation(temp));// 必须不是 ConcurrentHashMap 的子类 因为ConcurrentHashMap不允许put null值
+                        map.put(key, value);// 必须不是 ConcurrentHashMap 的子类 因为ConcurrentHashMap不允许put null值
                 }
                 else
-                    map.put(key, JsonLexer.removeStartEndQuotation(temp));
+                    map.put(key, value);
                 
                 key = null;
             }
             else
-                key = JsonLexer.removeStartEndQuotation(temp);
+                key = lexer.getParser(keyClass).toObject(keyClass);
             
-            temp = null;
+            value = null;
             continue;
         }
         
@@ -104,5 +105,39 @@ public final class MapParser extends JsonParser implements Serializable
             map.put(key, null);
         key = null;
         return map;
+    }
+    
+    public Map<Object, Object> newMap(Class<?> mapClass, int capcity)
+    {
+        Map<Object, Object> map = null;
+        if (mapClass == Map.class || mapClass == HashMap.class)
+            map = new HashMap<Object, Object>(capcity);
+        else if (mapClass == ConcurrentMap.class || mapClass == ConcurrentHashMap.class)
+            map = new ConcurrentHashMap<Object, Object>(capcity);
+        else if (mapClass == Hashtable.class)
+            map = new Hashtable<Object, Object>(capcity);
+        else if (mapClass == LinkedHashMap.class)
+            map = new LinkedHashMap<Object, Object>(capcity);
+        else if (mapClass == TreeMap.class)
+            map = new TreeMap<Object, Object>();
+        return map;
+    }
+    
+    
+    /**
+     *  判断支持的集合类型
+     */
+    private boolean isSupportClass(Class<?> cls)
+    {
+        if (cls == Map.class 
+                || cls == HashMap.class 
+                || cls == ConcurrentMap.class 
+                || cls == ConcurrentHashMap.class 
+                || cls == Hashtable.class 
+                || cls == LinkedHashMap.class 
+                || cls == TreeMap.class)
+            return true;
+        
+        return false;
     }
 }
