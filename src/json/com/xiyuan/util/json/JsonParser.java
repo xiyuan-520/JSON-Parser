@@ -318,8 +318,8 @@ public abstract class JsonParser implements Serializable
     /*****************************************************************/
     
     /**
-     * 获取类中指定的属性列表，支持深度查找父类的字段列表(父类的循递归查找),静态和临时两种属性不拷贝
-     * 
+     * 获取类中指定的属性列表，支持深度查找父类的字段列表(父类的循递归查找),不包括静态和临时两种属性
+     * 注：字段已经设置为可访问
      * @param clazz 类
      * @param fieldList 用于存储的字段列表
      */
@@ -336,6 +336,12 @@ public abstract class JsonParser implements Serializable
         return ls;
     }
     
+    /**
+     * 获取类中指定的属性列表，支持深度查找父类的字段列表(父类的循递归查找),不包括静态和临时两种属性
+     * 注：字段已经设置为可访问
+     * @param clazz
+     * @param fieldList
+     */
     public void getFieldListDeep(Class<?> clazz, List<Field> fieldList)
     {
         for (Field field : clazz.getDeclaredFields())
@@ -343,7 +349,10 @@ public abstract class JsonParser implements Serializable
             int mod = field.getModifiers();
             if (Modifier.isStatic(mod) || Modifier.isTransient(mod) || "this$0".equals(field.getName()))
                 continue;// 静态和临时两种属性不拷贝，内部类指向外部类的引用不拷贝
-                
+            
+            if (!field.isAccessible())//设置可访问
+                field.setAccessible(true);
+            
             fieldList.add(field);
         }
         

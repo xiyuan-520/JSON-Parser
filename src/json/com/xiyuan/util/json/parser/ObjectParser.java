@@ -37,9 +37,6 @@ public final class ObjectParser extends JsonParser implements Serializable
             String name = field.getName();
             try
             {
-                if (!field.isAccessible())
-                    field.setAccessible(true);
-
                 value = field.get(obj);
             }
             catch (Exception e)
@@ -57,18 +54,33 @@ public final class ObjectParser extends JsonParser implements Serializable
         return sb.toString();
     }
    
+    //以下字段是临时字段
+    private Object obj;
+    private Object value;
+    private Field key;
+    private Class<?> valueType;
+    private Map<String, Field> filedMap;
+    private int scope;
+    private void resetProp()
+    {
+        value = null;
+        key = null;
+        valueType = null;
+        filedMap = null;
+        scope = -1;
+    }
+    
     @Override
     public Object toObject(Class<?> cls)
     {
-        Object obj = null;
+        obj = null;
         obj = newInstance(cls);
         if (obj == null || !lexer.isObj())
             return null;
         
-        Map<String, Field> filedMap = getFieldMapDeep(cls);
-        Field key = null;
-        Class<?> keytype = null;
-        int scope = lexer.scope();
+        resetProp();//重置临时属性
+        filedMap = getFieldMapDeep(cls);
+        scope = lexer.scope();
         while (lexer.hasNext())
         {
             lexer.naxtToken();
@@ -80,8 +92,16 @@ public final class ObjectParser extends JsonParser implements Serializable
 
             if (key != null)
             {
-                keytype = key.getType();//TODO 这里要获取泛型参数
-                setValue(obj, key, lexer.getParser(keytype).toObject(keytype));
+                valueType = key.getType();//TODO 这里要获取泛型参数
+//                JsonParser parser = lexer.getParser(keytype);
+//                if (parser == lexer.ListParser() || parser == lexer.MapParser())
+//                {   
+//                    
+//                }
+                
+                value = lexer.getParser(valueType).toObject(valueType);
+                
+                setValue(obj, key, value);
                 key = null;
             }
             else
@@ -102,9 +122,6 @@ public final class ObjectParser extends JsonParser implements Serializable
         if (obj == null)
             return;
         
-        if (!key.isAccessible())
-            key.setAccessible(true);
-
         try
         {
             if (value != null && value instanceof String && JsonLexer.NULL.equals(value))
