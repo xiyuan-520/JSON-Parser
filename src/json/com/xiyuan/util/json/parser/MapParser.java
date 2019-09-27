@@ -62,26 +62,31 @@ public final class MapParser extends JsonParser implements Serializable
     public Object toObject(Class<?> mapClass, Class<?> keyClass, Class<?> valueClass)
     {// TODO 以后 获取cls 具体类型构造map 集构造类型，目前只放入 String
     
-        if (isSupportClass(mapClass))
-            return null;
+        if (!isSupportClass(mapClass) || !lexer.isObj())
+            return null;// 不支持的类型或者不是 对象
         
-        Map<Object, Object> map = newMap(mapClass, 0);
-        if (map == null || !lexer.isObj())
-            return map;// 不支持的类型或者不是 对象
-            
+        Map<Object, Object> map = newMap(mapClass, 64);
         Object key = null;
         Object value = null;
+        boolean isValue = false;
         int scope = lexer.scope();
         while (lexer.hasNext())
         {
             lexer.naxtToken();
             if (lexer.scope() < scope || lexer.isEOF())
+            {
+                isValue = false;
                 break;// 碰到结束符
+            }
                 
             if (lexer.isColon() || lexer.isComma())
+            {
+                if (lexer.isColon() && key != null)
+                    isValue = true;//已经找到key 当前是冒号，说明下一个token为值
                 continue;// 冒号或者逗号跳过
+            }
             
-            if (key != null)
+            if (key != null && isValue)
             {
                 value = lexer.getParser(valueClass).toObject(valueClass);
                 if (value == null || JsonLexer.NULL.equals(value))
@@ -93,17 +98,19 @@ public final class MapParser extends JsonParser implements Serializable
                     map.put(key, value);
                 
                 key = null;
+                isValue = false;
             }
             else
                 key = lexer.getParser(keyClass).toObject(keyClass);
             
             value = null;
-            continue;
+            isValue = false;
         }
         
-        if (key != null && !(map instanceof ConcurrentHashMap))
+        if (key != null  && !(map instanceof ConcurrentHashMap))
             map.put(key, null);
         key = null;
+        isValue = false;
         return map;
     }
     

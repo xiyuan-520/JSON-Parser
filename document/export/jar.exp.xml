@@ -10,6 +10,6 @@
 		<item value="json" key="jarName"/>
 		<item value="" key="metaInfoPath"/>
 		<item value="" key="projectSourceName"/>
-		<item value="H:/_github/xiyuan-520" key="releasePath"/>
+		<item value="./${project_loc}/document" key="releasePath"/>
 	</section>
 </section>

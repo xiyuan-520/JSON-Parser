@@ -44,7 +44,7 @@ public class JsonMain
     public static void main(String[] args) throws Exception
     {
         System.out.println("args = " + Arrays.toString(args));
-        int listSize = 5;
+        int listSize = 10000;
         if (args != null && args.length > 0 && Pattern.matches("^\\d+$", args[0]))
             listSize = Integer.parseInt(args[0]);
         String jsonPath = "./json/" + listSize + ".json";
@@ -161,7 +161,7 @@ public class JsonMain
         System.out.println("===========================================================================");
         long a = 0; 
         l1 = System.currentTimeMillis();
-//        orders = Jsons.toList(json, OrdOrder.class);
+        orders = Jsons.toList(json, OrdOrder.class);
         // orders = Jsons.toList2(json, OrdOrder.class);
         // pool = Jsons.getTokens(json);
         // Token[]ss = token.getElements();
@@ -178,11 +178,13 @@ public class JsonMain
         String genericJson = "{\"list\":"+json+"}";
 //        GenericList genericList = Jsons.toObject(genericJson, GenericList.class);
         System.out.println("===========================================================================");
-        jsonString = "{\"order\",order:{\"sssss\":[11,22], \"oid\":1968980653310,\"tids\":\"616970113173646062,616956865634646062\",\"status\":\"9\",\"shopNick\":\"th办公旗舰店\",\"buyerNick\":\"chao817817\",\"prdTypeId\":1,\"productId\":1160,\"productText\":\"名片 | 铜版纸覆膜 | 90x54mm | 双面 | 5百张 | 2款1模包设计\",\"policyIds\":null,\"amount\":5000,\"draftType\":2,\"invoiceType\":0,\"invoiceNotes\":\"\",\"invoiceItin\":\"\",\"industryId\":6932,\"thumbnail\":null,\"isOnlyDesign\":false,\"isUrgent\":false,\"printWidth\":0,\"printHeight\":0,\"printKs\":2,\"printMs\":1,\"printOrderNum\":null,\"printSpecial\":\"\",\"creater\":\"朵喵\",\"createTime\":\"2019-09-10 11:15:40\",\"modifyTime\":\"2019-09-11 17:06:21\",\"userText\":\"\",\"userNotice\":null,\"userMobile\":\"17688070465\",\"userQq\":\"\",\"userWx\":\"\",\"receiverName\":\"蔡泽超\",\"receiverMobile\":\"17688070465\",\"receiverState\":\"广东省\",\"receiverCity\":\"汕尾市\",\"receiverDistrict\":\"海丰县\",\"receiverAddress\":\"公平镇集贤四巷十八号\",\"supplierId\":1908061252058471,\"supplierOid\":null,\"supplierOidStatus\":null,\"supplierTime\":\"2019-09-10 15:50:28\",\"canceler\":null,\"cancelTime\":null,\"cancelNote\":null,\"isSendSelfAddr\":true,\"csCount\":0,\"orderSrc\":0,\"orderSrcOid\":0,\"expressCode\":\"HTKY\",\"ordPost\":1,\"isSelfPickup\":false,\"isSfTopay\":false,\"isMergeOrder\":false,\"isModifyAddrSend\":false,\"unpackingNum\":0,\"sendWaitSureNote\":null,\"productCostPriceJson\":\"{\\\"costDate\\\":\\\"2019-08-06\\\",\\\"supplierId\\\":1908061252058471,\\\"productId\\\":1160,\\\"costPrice\\\":0}\",\"policyCostPriceJsons\":null,\"cancelLation\":null,\"ordShipHours\":24,\"ordShipTime\":\"2019-09-11 11:15:40\",\"userTextReplace\":null,\"consignmentOid\":1968980653310,\"sendRemindType\":0,\"orgId\":1806051109012492,\"orgReceiveTime\":\"2019-09-10 11:18:13\",\"orderFlag\":0,\"ordDesignPlatformFlag\":2,\"designId\":1968980653310,\"designRetrunTime\":null,\"designRetrunCount\":0,\"servicesMessage\":\"\"}}";
+//        jsonString = "{\"order\",order:{\"sssss\":[11,22], \"oid\":1968980653310,\"tids\":\"616970113173646062,616956865634646062\",\"status\":\"9\",\"shopNick\":\"th办公旗舰店\",\"buyerNick\":\"chao817817\",\"prdTypeId\":1,\"productId\":1160,\"productText\":\"名片 | 铜版纸覆膜 | 90x54mm | 双面 | 5百张 | 2款1模包设计\",\"policyIds\":null,\"amount\":5000,\"draftType\":2,\"invoiceType\":0,\"invoiceNotes\":\"\",\"invoiceItin\":\"\",\"industryId\":6932,\"thumbnail\":null,\"isOnlyDesign\":false,\"isUrgent\":false,\"printWidth\":0,\"printHeight\":0,\"printKs\":2,\"printMs\":1,\"printOrderNum\":null,\"printSpecial\":\"\",\"creater\":\"朵喵\",\"createTime\":\"2019-09-10 11:15:40\",\"modifyTime\":\"2019-09-11 17:06:21\",\"userText\":\"\",\"userNotice\":null,\"userMobile\":\"17688070465\",\"userQq\":\"\",\"userWx\":\"\",\"receiverName\":\"蔡泽超\",\"receiverMobile\":\"17688070465\",\"receiverState\":\"广东省\",\"receiverCity\":\"汕尾市\",\"receiverDistrict\":\"海丰县\",\"receiverAddress\":\"公平镇集贤四巷十八号\",\"supplierId\":1908061252058471,\"supplierOid\":null,\"supplierOidStatus\":null,\"supplierTime\":\"2019-09-10 15:50:28\",\"canceler\":null,\"cancelTime\":null,\"cancelNote\":null,\"isSendSelfAddr\":true,\"csCount\":0,\"orderSrc\":0,\"orderSrcOid\":0,\"expressCode\":\"HTKY\",\"ordPost\":1,\"isSelfPickup\":false,\"isSfTopay\":false,\"isMergeOrder\":false,\"isModifyAddrSend\":false,\"unpackingNum\":0,\"sendWaitSureNote\":null,\"productCostPriceJson\":\"{\\\"costDate\\\":\\\"2019-08-06\\\",\\\"supplierId\\\":1908061252058471,\\\"productId\\\":1160,\\\"costPrice\\\":0}\",\"policyCostPriceJsons\":null,\"cancelLation\":null,\"ordShipHours\":24,\"ordShipTime\":\"2019-09-11 11:15:40\",\"userTextReplace\":null,\"consignmentOid\":1968980653310,\"sendRemindType\":0,\"orgId\":1806051109012492,\"orgReceiveTime\":\"2019-09-10 11:18:13\",\"orderFlag\":0,\"ordDesignPlatformFlag\":2,\"designId\":1968980653310,\"designRetrunTime\":null,\"designRetrunCount\":0,\"servicesMessage\":\"\"}}";
         
-        genericJson = "{\"map\":"+json+"}";
-        GenericMap genericMap = Jsons.toObject(json, GenericMap.class);
+        genericJson = "{\"map\":"+jsonString+"}";
+        GenericMap genericMap = Jsons.toObject(genericJson, GenericMap.class);
         System.out.println();
+        
+        GenericMap map= new GenericMap();
 //         Object obj = Jsons.getObject(jsonString, "order", OrdOrder.class);
 //         System.out.println(Jsons.toString(obj));
 //         if (obj != null)
