@@ -8,6 +8,8 @@ import java.util.List;
 import com.xiyuan.util.json.JsonLexer;
 import com.xiyuan.util.json.JsonParser;
 
+import frame.model.OrdOrder;
+
 /***
  * 数组解析器,8种基本类型数组、字符串数组和对象数组
  * 
@@ -29,10 +31,10 @@ public final class ArrayParser extends JsonParser implements Serializable
     {
         private Class<?> cls = null;
         private List<Object[]> ls = new ArrayList<Object[]>();
-        private transient int size = 0;// 当前页大小
         private int pageSize = 500;
         private int total = 0;
-        private transient Object[] cur = null;// 当前对象数组
+        private volatile int curSize = 0;// 当前页大小
+        private volatile Object[] cur = null;// 当前对象数组
         
         public ArrPage(Class<?> cls, int pageSize)
         {
@@ -48,16 +50,21 @@ public final class ArrayParser extends JsonParser implements Serializable
                 this.ls.add(cur);// 每页500
                 
             this.cur = (Object[]) Array.newInstance(cls, pageSize);
-            this.size = 0;
+            this.curSize = 0;
         }
         
         public void add(Object value)
         {
-            if (this.size == this.cur.length)
+            if (this.curSize == this.cur.length)
+            {
                 addPage();
+            }
             
-            this.cur[this.size++] = value;
+            this.cur[this.curSize++] = value;
             this.total++;
+            
+            if (value == null)
+                System.out.println(this.total);
         }
         
         public Object[] toArr()
@@ -69,11 +76,11 @@ public final class ArrayParser extends JsonParser implements Serializable
             for (int i = 0; i < ls.size(); i++)
             {
                 Object[] src = ls.get(i);
-                System.arraycopy(src, 0, target, 0, src.length);
+                System.arraycopy(src, 0, target, src.length*i, src.length);
             }
             
-            if (size > 0)
-                System.arraycopy(cur, 0, target, 0, size);
+            if (this.curSize > 0)
+                System.arraycopy(cur, 0, target, ls.size()*pageSize, this.curSize);
             
             return target;
         }
@@ -176,7 +183,12 @@ public final class ArrayParser extends JsonParser implements Serializable
                 break;// 碰到结束符
             if (lexer.curType() == JsonLexer.T_COMMA)
                 continue;// 逗号跳过
+            
             page.add(parser.toObject(cls));
+            
+//            OrdOrder o = orders.get(i);
+//            if (o == null)
+//                System.out.println(i);
         }
         return page.toArr();
     }

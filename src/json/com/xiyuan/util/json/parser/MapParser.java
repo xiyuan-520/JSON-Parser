@@ -63,7 +63,7 @@ public final class MapParser extends JsonParser implements Serializable
      */
     @SuppressWarnings("unchecked")
     public <K, V> Object toObject(Class<?> mapClass, Class<K> keyClass, Class<V> valueClass)
-    {// TODO 以后 获取cls 具体类型构造map 集构造类型，目前只放入 String
+    {
     
         if (!isSupportClass(mapClass) || !lexer.isObj())
             return null;// 不支持的类型或者不是 对象

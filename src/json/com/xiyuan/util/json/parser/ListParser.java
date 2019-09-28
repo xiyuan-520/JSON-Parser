@@ -28,7 +28,7 @@ public final class ListParser extends JsonParser
         if (obj == null || !(obj instanceof Collection) || (list = (Collection<?>) obj).isEmpty())
             return JsonLexer.EMPTY_ARR;
         
-        StringBuilder strb = new StringBuilder(list.size() * 500).append(JsonLexer.BRACKET_L);
+        StringBuilder strb = new StringBuilder(list.size()+list.size() * 500).append(JsonLexer.BRACKET_L);
         for (Object o : list)
             strb.append(o == null ? JsonLexer.NULL : lexer.getParser(o.getClass()).toString(o)).append(JsonLexer.COMMA);
         strb.setLength(strb.length() - 1);
@@ -36,9 +36,11 @@ public final class ListParser extends JsonParser
         return strb.toString();
     }
     
-    @Override
+    /***
+     *TODO 以后 获取cls 具体类型构造list 集构造类型，目前只放入 String
+     */
     public Object toObject(Class<?> cls)
-    {// TODO 以后 获取cls 具体类型构造list 集构造类型，目前只放入 String
+    {
         return toObject(cls, String.class);
     }
     

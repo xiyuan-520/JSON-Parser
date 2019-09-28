@@ -12,9 +12,9 @@
 
 package frame.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+
+import com.xiyuan.util.json.Jsons;
 
 public class GenericMap
 {
@@ -29,5 +29,8 @@ public class GenericMap
     {
         this.map = map;
     }
-    
+    public String toString()
+    {
+        return Jsons.toString(this);
+    }
 }

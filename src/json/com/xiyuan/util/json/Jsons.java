@@ -137,9 +137,9 @@ public final class Jsons implements Serializable
      * 注：当resultClass的字段包含多层泛型是时只会解析一层泛型<br>
      * 举例：field = Map< String, List< Object>>,则解析后为 field= Map< String, String><br>
      * @param json              json字符串
-     * @param mapClass          map类型
-     * @param keyClass          键类型
-     * @param valueClass        值类型
+     * @param mapClass          map的类型，例如：HashMap.class,LinkedHashMap.class等
+     * @param keyClass          键类型，例如：int.class,String.class等
+     * @param valueClass        值类型，例如：int.class,String.class等
      * @return
      */
     @SuppressWarnings("unchecked")
@@ -168,61 +168,26 @@ public final class Jsons implements Serializable
      * 提供泛型，得到Map< String, V> <br>
      * 注：当resultClass的字段包含多层泛型是时只会解析一层泛型<br>
      * 举例：field = Map< String, List< Object>>,则解析后为 field= Map< String, String>
-     * @param <V>
-     * @param <K>
-     * @param json JSON字符串
-     * @param resultClass 泛型
-     * @return List<T>
+     * @param <V>   值的类型
+     * @param mapClass          map的类型，例如：HashMap.class,LinkedHashMap.class等
+     * @param valueClass        值类型，例如：int.class,String.class等
      */
-    @SuppressWarnings("unchecked")
     public static <T, V> Map<String, V> toMapSV(String json, Class<T> mapClass, Class<V> valueClass)
     {
-        boolean isMap = false;
-        JsonLexer lexer = new JsonLexer(json);
-        while (lexer.hasNext())
-        {
-            if (lexer.naxtToken().isObj())
-            {
-                isMap = true;
-                break;
-            }
-            else
-                break;
-        }
-
-        if (!isMap)
-            return ((MapParser) lexer.MapParser()).newMap(mapClass, String.class, valueClass, 0);
-
-        return (Map<String, V>) ((MapParser) lexer.MapParser()).toObject(mapClass, String.class, valueClass);
+        return toMap(json, mapClass, String.class, valueClass);
     }
 
     /***
      * 提供泛型，得到Map< String, String><br>
      * 注：当resultClass的字段包含多层泛型是时只会解析一层泛型<br>
      * 举例：field = Map< String, List< Object>>,则解析后为 field= Map< String, String>
-     * @param json
-     * @param mapClass
+     * @param json          json字符串
+     * @param mapClass      map的类型，例如：HashMap.class,LinkedHashMap.class等
      * @return
      */
-    @SuppressWarnings("unchecked")
     public static <T> Map<String, String> toMapSS(String json, Class<T> mapClass)
     {
-        boolean isMap = false;
-        JsonLexer lexer = new JsonLexer(json);
-        while (lexer.hasNext())
-        {
-            if (lexer.naxtToken().isObj())
-            {
-                isMap = true;
-                break;
-            }
-            else
-                break;
-        }
-        if (!isMap)
-            return ((MapParser) lexer.MapParser()).newMap(mapClass, String.class, String.class, 0);
-
-        return (Map<String, String>) ((MapParser) lexer.MapParser()).toObject(mapClass, String.class, String.class);
+        return toMapSV(json, mapClass, String.class);
     }
 
     /**

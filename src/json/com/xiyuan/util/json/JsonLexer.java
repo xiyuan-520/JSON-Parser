@@ -1296,7 +1296,7 @@ public final class JsonLexer
             else
                 parser = objParser;
             
-            parserMap.put(clazz, listParser);
+            parserMap.put(clazz, parser);
         }
         
         return parser;

@@ -12,10 +12,26 @@
 
 package frame.model;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import com.xiyuan.util.json.Jsons;
 
 public class GenericList
 {
     private List<OrdOrder> list;
+
+    public List<OrdOrder> getList()
+    {
+        return list;
+    }
+
+    public void setList(List<OrdOrder> list)
+    {
+        this.list = list;
+    }
+    
+    public String toString()
+    {
+        return Jsons.toString(this);
+    }
 }
