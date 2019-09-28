@@ -54,18 +54,21 @@ public final class MapParser extends JsonParser implements Serializable
     
     /***
      * 解析成map
+     * @param <K>
+     * @param <V>
      * @param mapClass          map类型
      * @param keyClass          key的类型
      * @param valueClass        value的类型
      * @return
      */
-    public Object toObject(Class<?> mapClass, Class<?> keyClass, Class<?> valueClass)
+    @SuppressWarnings("unchecked")
+    public <K, V> Object toObject(Class<?> mapClass, Class<K> keyClass, Class<V> valueClass)
     {// TODO 以后 获取cls 具体类型构造map 集构造类型，目前只放入 String
     
         if (!isSupportClass(mapClass) || !lexer.isObj())
             return null;// 不支持的类型或者不是 对象
         
-        Map<Object, Object> map = newMap(mapClass, 64);
+        Map<Object, Object> map =  (Map<Object, Object>) newMap(mapClass, keyClass, valueClass, 64);
         Object key = null;
         Object value = null;
         boolean isValue = false;
@@ -107,26 +110,26 @@ public final class MapParser extends JsonParser implements Serializable
             isValue = false;
         }
         
-        if (key != null  && !(map instanceof ConcurrentHashMap))
-            map.put(key, null);
+//        if (key != null  && !(map instanceof ConcurrentHashMap))
+//            map.put(key, null);
         key = null;
         isValue = false;
         return map;
     }
     
-    public Map<Object, Object> newMap(Class<?> mapClass, int capcity)
+    public <K, V> Map<K, V> newMap(Class<?> mapClass,Class<K> k, Class<V> v, int capcity)
     {
-        Map<Object, Object> map = null;
+        Map<K, V> map = null;
         if (mapClass == Map.class || mapClass == HashMap.class)
-            map = new HashMap<Object, Object>(capcity);
+            map = new HashMap<K, V>(capcity);
         else if (mapClass == ConcurrentMap.class || mapClass == ConcurrentHashMap.class)
-            map = new ConcurrentHashMap<Object, Object>(capcity);
+            map = new ConcurrentHashMap<K, V>(capcity);
         else if (mapClass == Hashtable.class)
-            map = new Hashtable<Object, Object>(capcity);
+            map = new Hashtable<K, V>(capcity);
         else if (mapClass == LinkedHashMap.class)
-            map = new LinkedHashMap<Object, Object>(capcity);
+            map = new LinkedHashMap<K, V>(capcity);
         else if (mapClass == TreeMap.class)
-            map = new TreeMap<Object, Object>();
+            map = new TreeMap<K, V>();
         return map;
     }
     

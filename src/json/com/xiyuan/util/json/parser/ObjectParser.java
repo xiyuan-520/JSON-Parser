@@ -55,6 +55,7 @@ public final class ObjectParser extends JsonParser implements Serializable
         return sb.toString();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object toObject(Class<?> cls)
     {
