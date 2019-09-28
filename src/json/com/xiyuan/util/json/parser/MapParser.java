@@ -110,8 +110,6 @@ public final class MapParser extends JsonParser implements Serializable
             isValue = false;
         }
         
-//        if (key != null  && !(map instanceof ConcurrentHashMap))
-//            map.put(key, null);
         key = null;
         isValue = false;
         return map;

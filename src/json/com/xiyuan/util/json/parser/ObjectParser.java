@@ -90,9 +90,9 @@ public final class ObjectParser extends JsonParser implements Serializable
                 valueType = key.getType();
                 JsonParser parser = lexer.getParser(valueType);
                 if (parser == lexer.ListParser())
-                    setValue(obj, key, ((ListParser) lexer.ListParser()).toObject(valueType, JsonLexer.getClass(key.getGenericType(), 0)));
-                else if (parser == lexer.MapParser())
-                    setValue(obj, key, ((MapParser) lexer.MapParser()).toObject(valueType, JsonLexer.getClass(key.getGenericType(), 0), JsonLexer.getClass(key.getGenericType(), 1)));
+                    setValue(obj, key, lexer.ListParser().toObject(valueType, JsonLexer.getClass(key.getGenericType(), 0)));
+                else if (parser == lexer.MapParser())//
+                    setValue(obj, key, lexer.MapParser().toObject(valueType, JsonLexer.getClass(key.getGenericType(), 0), JsonLexer.getClass(key.getGenericType(), 1)));
                 else
                     setValue(obj, key, parser.toObject(valueType));
                 key = null;

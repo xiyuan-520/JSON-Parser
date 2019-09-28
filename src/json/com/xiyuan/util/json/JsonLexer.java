@@ -786,12 +786,12 @@ public final class JsonLexer
     /***********************************************************************/
     // 以下是类的定义及对象的调用方法
     /***********************************************************************/
-    private JsonParser baseParser;
-    private JsonParser arrayParser;
-    private JsonParser listParser;
-    private JsonParser mapParser;
-    private JsonParser dateParser;
-    private JsonParser objParser;
+    private BaseParser baseParser;
+    private ArrayParser arrayParser;
+    private ListParser listParser;
+    private MapParser mapParser;
+    private DateParser dateParser;
+    private ObjectParser objParser;
     
     private int pos = -1;
     private String json = null;
@@ -892,27 +892,27 @@ public final class JsonLexer
         parserMap.put(Object.class, objParser);
     }
     
-    public JsonParser BaseParser()
+    public BaseParser BaseParser()
     {
         return this.baseParser;
     }
     
-    public JsonParser ArrayParser()
+    public ArrayParser ArrayParser()
     {
         return this.arrayParser;
     }
     
-    public JsonParser ListParser()
+    public ListParser ListParser()
     {
         return this.listParser;
     }
     
-    public JsonParser MapParser()
+    public MapParser MapParser()
     {
         return this.mapParser;
     }
     
-    public JsonParser DateParser()
+    public DateParser DateParser()
     {
         return this.dateParser;
     }
