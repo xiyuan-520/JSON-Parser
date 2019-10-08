@@ -7,9 +7,9 @@
 		<item value="false" key="isExportAndZipProject"/>
 		<item value="false" key="isExportJavaSource"/>
 		<item value="false" key="isIncludeJavaFile"/>
-		<item value="json" key="jarName"/>
+		<item value="json_test" key="jarName"/>
 		<item value="" key="metaInfoPath"/>
 		<item value="" key="projectSourceName"/>
-		<item value="./${project_loc}/document" key="releasePath"/>
+		<item value="H:\_github\xiyuan-520/JSON-Parser" key="releasePath"/>
 	</section>
 </section>

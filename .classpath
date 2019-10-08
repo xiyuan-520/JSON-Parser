@@ -6,6 +6,6 @@
 	<classpathentry kind="lib" path="libcompair/fastjson-1.2.2-sources.jar"/>
 	<classpathentry kind="lib" path="libcompair/fastjson-1.2.2.jar" sourcepath="libcompair/fastjson-1.2.2-sources.jar"/>
 	<classpathentry kind="lib" path="libcompair/gson-2.8.5.jar"/>
-	<classpathentry kind="lib" path="libcompair/zhiqim.jar" sourcepath="D:/_gitee/zhiqim/V1.5.0/ZhiqimDK/zhiqim-src.jar"/>
+	<classpathentry kind="lib" path="libcompair/zhiqim.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
