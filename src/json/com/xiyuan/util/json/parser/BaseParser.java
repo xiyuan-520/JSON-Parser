@@ -1,6 +1,9 @@
 package com.xiyuan.util.json.parser;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.xiyuan.util.json.JsonLexer;
 import com.xiyuan.util.json.JsonParser;
@@ -45,39 +48,45 @@ public final class BaseParser extends JsonParser implements Serializable
         
         switch (cls.getName().hashCode())
         {
-            case JsonLexer.BOOL_CLS_HASH:
+            case JsonLexer.CONCURRENT_ATOMIC_ATOMIC_BOOLEAN:
+                return new AtomicBoolean(booleanValue(lexer));
+            case JsonLexer.CONCURRENT_ATOMIC_ATOMIC_INTEGER:
+                return new AtomicInteger(intValue(lexer));
+            case JsonLexer.CONCURRENT_ATOMIC_ATOMIC_LONG:
+                return new AtomicLong(longValue(lexer));
+            case JsonLexer.BOOLEAN:
                 return booleanValue(lexer);
-            case JsonLexer.BYTE_CLS_HASH:
+            case JsonLexer.BYTE:
                 return byteValue(lexer);
-            case JsonLexer.CHAR_CLS_HASH:
+            case JsonLexer.CHAR:
                 return charValue(lexer);
-            case JsonLexer.SHORT_CLS_HASH:
+            case JsonLexer.SHORT:
                 return shortValue(lexer);
-            case JsonLexer.INT_CLS_HASH:
+            case JsonLexer.INT:
                 return intValue(lexer);
-            case JsonLexer.LONG_CLS_HASH:
+            case JsonLexer.LONG:
                 return longValue(lexer);
-            case JsonLexer.FLOAT_CLS_HASH:
+            case JsonLexer.FLOAT:
                 return floatValue(lexer);
-            case JsonLexer.DOUBLE_CLS_HASH:
+            case JsonLexer.DOUBLE:
                 return doubleValue(lexer);
-            case JsonLexer.BOOL_OBJ_CLS_HASH:
+            case JsonLexer.BOOLEAN_O:
                 return booleanValue(lexer) ? Boolean.TRUE : Boolean.FALSE;
-            case JsonLexer.BYTE_OBJ_CLS_HASH:
+            case JsonLexer.BYTE_O:
                 return Byte.valueOf(byteValue(lexer));
-            case JsonLexer.CHAR_OBJ_CLS_HASH:
+            case JsonLexer.CHAR_O:
                 return Character.valueOf(charValue(lexer));
-            case JsonLexer.SHORT_OBJ_CLS_HASH:
+            case JsonLexer.SHORT_O:
                 return Short.valueOf(shortValue(lexer));
-            case JsonLexer.INT_OBJ_CLS_HASH:
+            case JsonLexer.INT_O:
                 return Integer.valueOf(intValue(lexer));
-            case JsonLexer.LONG_OBJ_CLS_HASH:
+            case JsonLexer.LONG_O:
                 return Long.valueOf(longValue(lexer));
-            case JsonLexer.FLOAT_OBJ_CLS_HASH:
+            case JsonLexer.FLOAT_O:
                 return Float.valueOf(floatValue(lexer));
-            case JsonLexer.DOUBLE_OBJ_CLS_HASH:
+            case JsonLexer.DOUBLE_O:
                 return Double.valueOf(doubleValue(lexer));
-            case JsonLexer.STRING_CLS_HASH:
+            case JsonLexer.STRING:
                 return stringValue(lexer);
             default:
                 return null;

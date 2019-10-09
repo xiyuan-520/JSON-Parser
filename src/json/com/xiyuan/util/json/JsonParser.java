@@ -69,7 +69,7 @@ public abstract class JsonParser implements Serializable
             throw new IllegalArgumentException("传入的参数不是数组类型");
         switch (obj.getClass().getName().hashCode())
         {
-            case JsonLexer.BOOL_ARR_CLS_HASH:
+            case JsonLexer.BOOLEAN:
             {
                 boolean[] os = (boolean[]) obj;
                 Boolean[] arr = new Boolean[os.length];
@@ -77,7 +77,7 @@ public abstract class JsonParser implements Serializable
                     arr[i] = os[i];
                 return arr;
             }
-            case JsonLexer.BYTE_ARR_CLS_HASH:
+            case JsonLexer.ARR_BYTE:
             {
                 byte[] os = (byte[]) obj;
                 Byte[] arr = new Byte[os.length];
@@ -85,7 +85,7 @@ public abstract class JsonParser implements Serializable
                     arr[i] = os[i];
                 return arr;
             }
-            case JsonLexer.CHAR_ARR_CLS_HASH:
+            case JsonLexer.ARR_CHAR:
             {
                 char[] os = (char[]) obj;
                 Character[] arr = new Character[os.length];
@@ -93,7 +93,7 @@ public abstract class JsonParser implements Serializable
                     arr[i] = os[i];
                 return arr;
             }
-            case JsonLexer.SHORT_ARR_CLS_HASH:
+            case JsonLexer.ARR_SHORT:
             {
                 short[] os = (short[]) obj;
                 Short[] arr = new Short[os.length];
@@ -101,7 +101,7 @@ public abstract class JsonParser implements Serializable
                     arr[i] = os[i];
                 return arr;
             }
-            case JsonLexer.INT_ARR_CLS_HASH:
+            case JsonLexer.ARR_INT:
             {
                 int[] os = (int[]) obj;
                 Integer[] arr = new Integer[os.length];
@@ -111,7 +111,7 @@ public abstract class JsonParser implements Serializable
                 os = null;
                 return arr;
             }
-            case JsonLexer.LONG_ARR_CLS_HASH:
+            case JsonLexer.ARR_LONG:
             {
                 long[] os = (long[]) obj;
                 Long[] arr = new Long[os.length];
@@ -119,7 +119,7 @@ public abstract class JsonParser implements Serializable
                     arr[i] = os[i];
                 return arr;
             }
-            case JsonLexer.FLOAT_ARR_CLS_HASH:
+            case JsonLexer.ARR_FLOAT:
             {
                 float[] os = (float[]) obj;
                 Float[] arr = new Float[os.length];
@@ -127,7 +127,7 @@ public abstract class JsonParser implements Serializable
                     arr[i] = os[i];
                 return arr;
             }
-            case JsonLexer.DOUBLE_ARR_CLS_HASH:
+            case JsonLexer.ARR_DOUBLE:
             {
                 double[] os = (double[]) obj;
                 Double[] arr = new Double[os.length];
@@ -153,20 +153,7 @@ public abstract class JsonParser implements Serializable
         if (clazz == null)
             return false;
         
-        switch (clazz.getName().hashCode())
-        {
-            case JsonLexer.BOOL_ARR_CLS_HASH:
-            case JsonLexer.BYTE_ARR_CLS_HASH:
-            case JsonLexer.CHAR_ARR_CLS_HASH:
-            case JsonLexer.SHORT_ARR_CLS_HASH:
-            case JsonLexer.INT_ARR_CLS_HASH:
-            case JsonLexer.LONG_ARR_CLS_HASH:
-            case JsonLexer.FLOAT_ARR_CLS_HASH:
-            case JsonLexer.DOUBLE_ARR_CLS_HASH:
-                return true;
-            default:
-                return false;
-        }
+        return clazz.isArray() ? clazz.getComponentType().isPrimitive() : false;
     }
     
     /**
@@ -184,14 +171,14 @@ public abstract class JsonParser implements Serializable
         
         switch (clazz.getName().hashCode())
         {
-            case JsonLexer.BOOL_OBJ_ARR_CLS_HASH:
-            case JsonLexer.BYTE_OBJ_ARR_CLS_HASH:
-            case JsonLexer.CHAR_OBJ_ARR_CLS_HASH:
-            case JsonLexer.SHORT_OBJ_ARR_CLS_HASH:
-            case JsonLexer.INT_OBJ_ARR_CLS_HASH:
-            case JsonLexer.LONG_OBJ_ARR_CLS_HASH:
-            case JsonLexer.FLOAT_OBJ_ARR_CLS_HASH:
-            case JsonLexer.DOUBLE_OBJ_ARR_CLS_HASH:
+            case JsonLexer.ARR_BOOLEAN:
+            case JsonLexer.ARR_BYTE_O:
+            case JsonLexer.ARR_CHAR_O:
+            case JsonLexer.ARR_SHORT_O:
+            case JsonLexer.ARR_INT_O:
+            case JsonLexer.ARR_LONG_O:
+            case JsonLexer.ARR_FLOAT_O:
+            case JsonLexer.ARR_DOUBLE_O:
                 return true;
             default:
                 return false;

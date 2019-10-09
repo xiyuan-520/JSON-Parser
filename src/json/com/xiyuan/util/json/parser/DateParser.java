@@ -32,15 +32,15 @@ public final class DateParser extends JsonParser implements Serializable
         
         switch (obj.getClass().getName().hashCode())
         {
-            case JsonLexer.SQL_DATE_CLS_HASH:
+            case JsonLexer.SQL_DATE:
                 return JsonLexer.DB_QUOTE + toDateString((java.sql.Date) obj) + JsonLexer.DB_QUOTE;
-            case JsonLexer.SQL_TIME_CLS_HASH:
+            case JsonLexer.SQL_TIME:
                 return JsonLexer.DB_QUOTE + toTimeString((java.sql.Time) obj) + JsonLexer.DB_QUOTE;
-            case JsonLexer.SQL_TIMESTAMP_CLS_HASH:
+            case JsonLexer.SQL_TIMESTAMP:
                 return JsonLexer.DB_QUOTE + toDateTimeString((java.sql.Timestamp) obj) + JsonLexer.DB_QUOTE;
-            case JsonLexer.DATE_CLS_HASH:
+            case JsonLexer.DATE:
                 return JsonLexer.DB_QUOTE + toDateTimeString((Date) obj) + JsonLexer.DB_QUOTE;
-            case JsonLexer.CALENDAR_CLS_HASH:
+            case JsonLexer.CALENDAR:
                 return JsonLexer.DB_QUOTE + toDateTimeString((Calendar) obj) + JsonLexer.DB_QUOTE;
             default:
                 return null;
@@ -50,21 +50,18 @@ public final class DateParser extends JsonParser implements Serializable
     @Override
     public Object toObject(Class<?> cls)
     {
-//        if (!lexer.isString())
-//            return null;
-        
         String value = JsonLexer.removeStartEndQuotation(lexer.value());
         switch ((value == null || JsonLexer.NULL.equals(value)) ? -1 : cls.getName().hashCode())
         {
-            case JsonLexer.SQL_DATE_CLS_HASH:
+            case JsonLexer.SQL_DATE:
                 return toDate(value);
-            case JsonLexer.SQL_TIME_CLS_HASH:
+            case JsonLexer.SQL_TIME:
                 return toTime(value);
-            case JsonLexer.SQL_TIMESTAMP_CLS_HASH:
+            case JsonLexer.SQL_TIMESTAMP:
                 return  toTimestamp(value);
-            case JsonLexer.DATE_CLS_HASH:
+            case JsonLexer.DATE:
                 return toDate(value);
-            case JsonLexer.CALENDAR_CLS_HASH:
+            case JsonLexer.CALENDAR:
                 return  toCalendar(value);
             default:
                 return null;

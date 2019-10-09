@@ -28,7 +28,7 @@ public final class ObjectParser extends JsonParser implements Serializable
             return null;
 
         List<Field> fields = getFieldListDeep(obj.getClass());
-        // 假设每个字段为6字符+4个引号+1冒号+4(null)，则str默认length = fields.size()*(6+4+1+4) =
+        // 假设每个字段为6字符+4个引号+1冒号+4(null)，则str默认length = fields.size()*(6+4+1+4)
         // fields.size()*(15)
         StringBuilder sb = new StringBuilder(fields.size() * 15).append(JsonLexer.BRACE_L);
         Object value = null;

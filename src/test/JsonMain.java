@@ -4,8 +4,22 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerArray;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.regex.Pattern;
 
 import com.alibaba.fastjson.JSON;
@@ -83,6 +97,9 @@ public class JsonMain
                 break;
             case 7:
                 testMyGenericJson(json, jsonString, args.length == 0);
+                break;
+            case 8:
+                doBuildType();
                 break;
             default:
                 testMy(json, jsonString, args.length == 0);
@@ -337,5 +354,174 @@ public class JsonMain
         orders = org.zhiqim.kernel.json.Jsons.toList(json, OrdOrder.class);
         l2 = System.currentTimeMillis();
         System.out.println("公司代码 共生成 " + (orders.size()) + "条数据，共耗时：" + (l2 - l1) / 1000 + " 秒");
+    }
+    
+    public static void doBuildType()
+    {
+//        List<Object> ls = new ArrayList<Object>();
+//        ls.add("// 基本类型");
+//        ls.add(boolean.class);
+//        ls.add(byte.class);
+//        ls.add(char.class);
+//        ls.add(short.class);
+//        ls.add(int.class);
+//        ls.add(long.class);
+//        ls.add(float.class);
+//        ls.add(double.class);
+//        
+//        ls.add("// 基本封装类型");
+//        ls.add(Boolean.class);
+//        ls.add(Byte.class);
+//        ls.add(Character.class);
+//        ls.add(Short.class);
+//        ls.add(Integer.class);
+//        ls.add(Long.class);
+//        ls.add(Float.class);
+//        ls.add(Double.class);
+//        
+//        ls.add("// 基本数组类型");
+//        ls.add(boolean[].class);
+//        ls.add(byte[].class);
+//        ls.add(char[].class);
+//        ls.add(short[].class);
+//        ls.add(int[].class);
+//        ls.add(long[].class);
+//        ls.add(float[].class);
+//        ls.add(double[].class);
+//        
+//        ls.add("// 基本封装类型数组");
+//        ls.add(Boolean[].class);
+//        ls.add(Byte[].class);
+//        ls.add(Character[].class);
+//        ls.add(Short[].class);
+//        ls.add(Integer[].class);
+//        ls.add(Long[].class);
+//        ls.add(Float[].class);
+//        ls.add(Double[].class);
+//        
+//        ls.add("// String型&数组");
+//        ls.add(String.class);
+//        ls.add(String[].class);
+//        
+//        ls.add("// 哈希表");
+//        ls.add(Map.class);
+//        ls.add(HashMap.class);
+//        ls.add(ConcurrentMap.class);
+//        ls.add(ConcurrentHashMap.class);
+//        ls.add(Hashtable.class);
+//        ls.add(LinkedHashMap.class);
+//        ls.add(TreeMap.class);
+//        
+//        ls.add("// 链表");
+//        ls.add(List.class);
+//        ls.add(ArrayList.class);
+//        ls.add(LinkedList.class);
+//        ls.add(Set.class);
+//        ls.add(HashSet.class);
+//        
+//        ls.add("// 通用Object型&数组");
+//        ls.add(Object.class);
+//        ls.add(Object[].class);
+//        
+//        ls.add("// 时间");
+//        ls.add(java.util.Calendar.class);
+//        ls.add(java.util.Date.class);
+//        ls.add(java.sql.Time.class);
+//        ls.add(java.sql.Date.class);
+//        ls.add(java.sql.Timestamp.class);
+//        
+//        
+//        ls.add("// java.util.concurrent.atomic");
+//        ls.add(AtomicBoolean.class);
+//        ls.add(AtomicInteger.class);
+//        ls.add(AtomicLong.class);
+//        ls.add(AtomicIntegerArray.class);
+//        ls.add(AtomicLongArray.class);
+//        List<String> lss = new ArrayList<String>();
+//        for (Object obj : ls)
+//        {
+//            if (obj instanceof Class<?>)
+//            {
+//                Class<?> cls = (Class<?>) obj;
+//                int hashCode = cls.getName().hashCode();
+//                String describeName = cls.getName();
+//                String varableName = describeName.replaceAll("java.", "").replaceAll("lang.", "").replaceAll("util.", "").replaceAll("\\.", "_");
+//                if (cls.isArray())
+//                {
+//                    describeName = cls.getComponentType().getName();
+//                    varableName = describeName.replaceAll("java.", "").replaceAll("lang.", "").replaceAll("util.", "").replaceAll("\\.", "_");
+//                }
+//                
+//                StringBuffer sb = new StringBuffer();
+//                for (int i = 0; i < varableName.length(); i++)
+//                {
+//                    char ch = varableName.charAt(i);
+//                    if (i > 0 && (ch >= 'A' && ch <= 'Z') && varableName.charAt(i-1) != '_')
+//                        sb.append('_');
+//                    
+//                    sb.append(ch);
+//                }
+//                
+//                if (cls.isArray())
+//                {
+//                    sb.insert(0, "ARR_");
+//                    if (cls.getComponentType().getName().hashCode() == Boolean.class.getName().hashCode()
+//                            || cls.getComponentType().getName().hashCode() == Byte.class.getName().hashCode()
+//                            || cls.getComponentType().getName().hashCode() == Short.class.getName().hashCode()
+//                            || cls.getComponentType().getName().hashCode() == Long.class.getName().hashCode()
+//                            || cls.getComponentType().getName().hashCode() == Float.class.getName().hashCode()
+//                            || cls.getComponentType().getName().hashCode() == Double.class.getName().hashCode()
+//                            || cls.getComponentType().getName().hashCode() == Character.class.getName().hashCode()
+//                            || cls.getComponentType().getName().hashCode() == Integer.class.getName().hashCode())
+//                    {
+//                        if (cls.getComponentType().getName().hashCode() == Character.class.getName().hashCode()
+//                                || cls.getComponentType().getName().hashCode() == Integer.class.getName().hashCode())
+//                        {
+//                            sb = new StringBuffer(sb.toString().replaceAll("Character", "char"));
+//                            sb = new StringBuffer(sb.toString().replaceAll("Integer", "int"));
+//                        }
+//                        sb.append("_o");
+//                    }
+//                }
+//                else
+//                {
+//                    if (hashCode == Boolean.class.getName().hashCode()
+//                            || hashCode == Byte.class.getName().hashCode()
+//                            || hashCode == Character.class.getName().hashCode()
+//                            || hashCode == Short.class.getName().hashCode()
+//                            || hashCode == Integer.class.getName().hashCode()
+//                            || hashCode == Long.class.getName().hashCode()
+//                            || hashCode == Float.class.getName().hashCode()
+//                            || hashCode == Double.class.getName().hashCode()
+//                            || hashCode== Character.class.getName().hashCode()
+//                            || hashCode == Integer.class.getName().hashCode())
+//                    {
+//                        if (hashCode == Character.class.getName().hashCode()
+//                                || hashCode == Integer.class.getName().hashCode())
+//                        {
+//                            sb = new StringBuffer(sb.toString().replaceAll("Character", "char"));
+//                            sb = new StringBuffer(sb.toString().replaceAll("Integer", "int"));
+//                        }
+//                        sb.append("_o");
+//                    }
+//                }
+//                lss.add("/** " + describeName + ".class.getName().hashCode()<br> = " + hashCode + "; */");
+//                lss.add("public final static int " + sb.toString().toUpperCase() + " = " + hashCode + ";");
+//            }
+//            else
+//            {
+//                lss.add("");
+//                lss.add(obj.toString());
+//            }
+//        }
+//        
+//        for (String string : lss)
+//        {
+//            System.out.println(string);
+//        }
+        
+        String ddd = "5689";
+        AtomicLong arr = Jsons.toObject(ddd, AtomicLong.class);
+        System.out.println(arr);
     }
 }
