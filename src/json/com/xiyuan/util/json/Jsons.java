@@ -30,17 +30,6 @@ public final class Jsons implements Serializable
     }
 
     /***
-     * 去除JSON中的转义字符
-     * 
-     * @param str 原字符串
-     * @return 去除成对引号之后的字符串
-     */
-    public static String removeEscapeChar(String str)
-    {
-        return JsonLexer.removeEscapeChar(str);
-    }
-
-    /***
      * 去除JSON键和值的前后成对引号
      * 
      * @param str 原字符串

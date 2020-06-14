@@ -127,139 +127,313 @@ public final class JsonLexer
     /**************************************************/
     
     // 基本类型
-    /** boolean.class.getName().hashCode()<br> = 64711720; */
+    /**
+     * boolean.class.getName().hashCode()<br>
+     * = 64711720;
+     */
     public final static int BOOLEAN = 64711720;
-    /** byte.class.getName().hashCode()<br> = 3039496; */
+    /**
+     * byte.class.getName().hashCode()<br>
+     * = 3039496;
+     */
     public final static int BYTE = 3039496;
-    /** char.class.getName().hashCode()<br> = 3052374; */
+    /**
+     * char.class.getName().hashCode()<br>
+     * = 3052374;
+     */
     public final static int CHAR = 3052374;
-    /** short.class.getName().hashCode()<br> = 109413500; */
+    /**
+     * short.class.getName().hashCode()<br>
+     * = 109413500;
+     */
     public final static int SHORT = 109413500;
-    /** int.class.getName().hashCode()<br> = 104431; */
+    /**
+     * int.class.getName().hashCode()<br>
+     * = 104431;
+     */
     public final static int INT = 104431;
-    /** long.class.getName().hashCode()<br> = 3327612; */
+    /**
+     * long.class.getName().hashCode()<br>
+     * = 3327612;
+     */
     public final static int LONG = 3327612;
-    /** float.class.getName().hashCode()<br> = 97526364; */
+    /**
+     * float.class.getName().hashCode()<br>
+     * = 97526364;
+     */
     public final static int FLOAT = 97526364;
-    /** double.class.getName().hashCode()<br> = -1325958191; */
+    /**
+     * double.class.getName().hashCode()<br>
+     * = -1325958191;
+     */
     public final static int DOUBLE = -1325958191;
     
     // 基本封装类型
-    /** java.lang.Boolean.class.getName().hashCode()<br> = 344809556; */
+    /**
+     * java.lang.Boolean.class.getName().hashCode()<br>
+     * = 344809556;
+     */
     public final static int BOOLEAN_O = 344809556;
-    /** java.lang.Byte.class.getName().hashCode()<br> = 398507100; */
+    /**
+     * java.lang.Byte.class.getName().hashCode()<br>
+     * = 398507100;
+     */
     public final static int BYTE_O = 398507100;
-    /** java.lang.Character.class.getName().hashCode()<br> = 155276373; */
+    /**
+     * java.lang.Character.class.getName().hashCode()<br>
+     * = 155276373;
+     */
     public final static int CHAR_O = 155276373;
-    /** java.lang.Short.class.getName().hashCode()<br> = -515992664; */
+    /**
+     * java.lang.Short.class.getName().hashCode()<br>
+     * = -515992664;
+     */
     public final static int SHORT_O = -515992664;
-    /** java.lang.Integer.class.getName().hashCode()<br> = -2056817302; */
+    /**
+     * java.lang.Integer.class.getName().hashCode()<br>
+     * = -2056817302;
+     */
     public final static int INT_O = -2056817302;
-    /** java.lang.Long.class.getName().hashCode()<br> = 398795216; */
+    /**
+     * java.lang.Long.class.getName().hashCode()<br>
+     * = 398795216;
+     */
     public final static int LONG_O = 398795216;
-    /** java.lang.Float.class.getName().hashCode()<br> = -527879800; */
+    /**
+     * java.lang.Float.class.getName().hashCode()<br>
+     * = -527879800;
+     */
     public final static int FLOAT_O = -527879800;
-    /** java.lang.Double.class.getName().hashCode()<br> = 761287205; */
+    /**
+     * java.lang.Double.class.getName().hashCode()<br>
+     * = 761287205;
+     */
     public final static int DOUBLE_O = 761287205;
     
     // 基本数组类型
-    /** boolean.class.getName().hashCode()<br> = 2911; */
+    /**
+     * boolean.class.getName().hashCode()<br>
+     * = 2911;
+     */
     public final static int ARR_BOOLEAN = 2911;
-    /** byte.class.getName().hashCode()<br> = 2887; */
+    /**
+     * byte.class.getName().hashCode()<br>
+     * = 2887;
+     */
     public final static int ARR_BYTE = 2887;
-    /** char.class.getName().hashCode()<br> = 2888; */
+    /**
+     * char.class.getName().hashCode()<br>
+     * = 2888;
+     */
     public final static int ARR_CHAR = 2888;
-    /** short.class.getName().hashCode()<br> = 2904; */
+    /**
+     * short.class.getName().hashCode()<br>
+     * = 2904;
+     */
     public final static int ARR_SHORT = 2904;
-    /** int.class.getName().hashCode()<br> = 2894; */
+    /**
+     * int.class.getName().hashCode()<br>
+     * = 2894;
+     */
     public final static int ARR_INT = 2894;
-    /** long.class.getName().hashCode()<br> = 2895; */
+    /**
+     * long.class.getName().hashCode()<br>
+     * = 2895;
+     */
     public final static int ARR_LONG = 2895;
-    /** float.class.getName().hashCode()<br> = 2891; */
+    /**
+     * float.class.getName().hashCode()<br>
+     * = 2891;
+     */
     public final static int ARR_FLOAT = 2891;
-    /** double.class.getName().hashCode()<br> = 2889; */
+    /**
+     * double.class.getName().hashCode()<br>
+     * = 2889;
+     */
     public final static int ARR_DOUBLE = 2889;
     
     // 基本封装类型数组
-    /** java.lang.Boolean.class.getName().hashCode()<br> = -499457160; */
+    /**
+     * java.lang.Boolean.class.getName().hashCode()<br>
+     * = -499457160;
+     */
     public final static int ARR_BOOLEAN_O = -499457160;
-    /** java.lang.Byte.class.getName().hashCode()<br> = -2079942674; */
+    /**
+     * java.lang.Byte.class.getName().hashCode()<br>
+     * = -2079942674;
+     */
     public final static int ARR_BYTE_O = -2079942674;
-    /** java.lang.Character.class.getName().hashCode()<br> = -1378128041; */
+    /**
+     * java.lang.Character.class.getName().hashCode()<br>
+     * = -1378128041;
+     */
     public final static int ARR_CHAR_O = -1378128041;
-    /** java.lang.Short.class.getName().hashCode()<br> = 417147620; */
+    /**
+     * java.lang.Short.class.getName().hashCode()<br>
+     * = 417147620;
+     */
     public final static int ARR_SHORT_O = 417147620;
-    /** java.lang.Integer.class.getName().hashCode()<br> = -1935445726; */
+    /**
+     * java.lang.Integer.class.getName().hashCode()<br>
+     * = -1935445726;
+     */
     public final static int ARR_INT_O = -1935445726;
-    /** java.lang.Long.class.getName().hashCode()<br> = -2071011078; */
+    /**
+     * java.lang.Long.class.getName().hashCode()<br>
+     * = -2071011078;
+     */
     public final static int ARR_LONG_O = -2071011078;
-    /** java.lang.Float.class.getName().hashCode()<br> = 48646404; */
+    /**
+     * java.lang.Float.class.getName().hashCode()<br>
+     * = 48646404;
+     */
     public final static int ARR_FLOAT_O = 48646404;
-    /** java.lang.Double.class.getName().hashCode()<br> = -175516795; */
+    /**
+     * java.lang.Double.class.getName().hashCode()<br>
+     * = -175516795;
+     */
     public final static int ARR_DOUBLE_O = -175516795;
     
     // String型&数组
-    /** java.lang.String.class.getName().hashCode()<br> = 1195259493; */
+    /**
+     * java.lang.String.class.getName().hashCode()<br>
+     * = 1195259493;
+     */
     public final static int STRING = 1195259493;
-    /** java.lang.String.class.getName().hashCode()<br> = 392722245; */
+    /**
+     * java.lang.String.class.getName().hashCode()<br>
+     * = 392722245;
+     */
     public final static int ARR_STRING = 392722245;
     
     // 哈希表
-    /** java.util.Map.class.getName().hashCode()<br> = -1383349348; */
+    /**
+     * java.util.Map.class.getName().hashCode()<br>
+     * = -1383349348;
+     */
     public final static int MAP = -1383349348;
-    /** java.util.HashMap.class.getName().hashCode()<br> = -1402722386; */
+    /**
+     * java.util.HashMap.class.getName().hashCode()<br>
+     * = -1402722386;
+     */
     public final static int HASH_MAP = -1402722386;
-    /** java.util.concurrent.ConcurrentMap.class.getName().hashCode()<br> = -1419705938; */
+    /**
+     * java.util.concurrent.ConcurrentMap.class.getName().hashCode()<br>
+     * = -1419705938;
+     */
     public final static int CONCURRENT_CONCURRENT_MAP = -1419705938;
-    /** java.util.concurrent.ConcurrentHashMap.class.getName().hashCode()<br> = 577244352; */
+    /**
+     * java.util.concurrent.ConcurrentHashMap.class.getName().hashCode()<br>
+     * = 577244352;
+     */
     public final static int CONCURRENT_CONCURRENT_HASH_MAP = 577244352;
-    /** java.util.Hashtable.class.getName().hashCode()<br> = 639525312; */
+    /**
+     * java.util.Hashtable.class.getName().hashCode()<br>
+     * = 639525312;
+     */
     public final static int HASHTABLE = 639525312;
-    /** java.util.LinkedHashMap.class.getName().hashCode()<br> = 1258621781; */
+    /**
+     * java.util.LinkedHashMap.class.getName().hashCode()<br>
+     * = 1258621781;
+     */
     public final static int LINKED_HASH_MAP = 1258621781;
-    /** java.util.TreeMap.class.getName().hashCode()<br> = 1131064094; */
+    /**
+     * java.util.TreeMap.class.getName().hashCode()<br>
+     * = 1131064094;
+     */
     public final static int TREE_MAP = 1131064094;
     
     // 链表
-    /** java.util.List.class.getName().hashCode()<br> = 65821278; */
+    /**
+     * java.util.List.class.getName().hashCode()<br>
+     * = 65821278;
+     */
     public final static int LIST = 65821278;
-    /** java.util.ArrayList.class.getName().hashCode()<br> = -1114099497; */
+    /**
+     * java.util.ArrayList.class.getName().hashCode()<br>
+     * = -1114099497;
+     */
     public final static int ARRAY_LIST = -1114099497;
-    /** java.util.LinkedList.class.getName().hashCode()<br> = -1899270121; */
+    /**
+     * java.util.LinkedList.class.getName().hashCode()<br>
+     * = -1899270121;
+     */
     public final static int LINKED_LIST = -1899270121;
-    /** java.util.Set.class.getName().hashCode()<br> = -1383343454; */
+    /**
+     * java.util.Set.class.getName().hashCode()<br>
+     * = -1383343454;
+     */
     public final static int SET = -1383343454;
-    /** java.util.HashSet.class.getName().hashCode()<br> = -1402716492; */
+    /**
+     * java.util.HashSet.class.getName().hashCode()<br>
+     * = -1402716492;
+     */
     public final static int HASH_SET = -1402716492;
     
     // 通用Object型&数组
-    /** java.lang.Object.class.getName().hashCode()<br> = 1063877011; */
+    /**
+     * java.lang.Object.class.getName().hashCode()<br>
+     * = 1063877011;
+     */
     public final static int OBJECT = 1063877011;
-    /** java.lang.Object.class.getName().hashCode()<br> = 614832599; */
+    /**
+     * java.lang.Object.class.getName().hashCode()<br>
+     * = 614832599;
+     */
     public final static int ARR_OBJECT = 614832599;
     
     // 时间
-    /** java.util.Calendar.class.getName().hashCode()<br> = -861027074; */
+    /**
+     * java.util.Calendar.class.getName().hashCode()<br>
+     * = -861027074;
+     */
     public final static int CALENDAR = -861027074;
-    /** java.util.Date.class.getName().hashCode()<br> = 65575278; */
+    /**
+     * java.util.Date.class.getName().hashCode()<br>
+     * = 65575278;
+     */
     public final static int DATE = 65575278;
-    /** java.sql.Time.class.getName().hashCode()<br> = 1088242009; */
+    /**
+     * java.sql.Time.class.getName().hashCode()<br>
+     * = 1088242009;
+     */
     public final static int SQL_TIME = 1088242009;
-    /** java.sql.Date.class.getName().hashCode()<br> = 1087757882; */
+    /**
+     * java.sql.Date.class.getName().hashCode()<br>
+     * = 1087757882;
+     */
     public final static int SQL_DATE = 1087757882;
-    /** java.sql.Timestamp.class.getName().hashCode()<br> = 1252880906; */
+    /**
+     * java.sql.Timestamp.class.getName().hashCode()<br>
+     * = 1252880906;
+     */
     public final static int SQL_TIMESTAMP = 1252880906;
     
     // java.util.concurrent.atomic
-    /** java.util.concurrent.atomic.AtomicBoolean.class.getName().hashCode()<br> = -1210542319; */
+    /**
+     * java.util.concurrent.atomic.AtomicBoolean.class.getName().hashCode()<br>
+     * = -1210542319;
+     */
     public final static int CONCURRENT_ATOMIC_ATOMIC_BOOLEAN = -1210542319;
-    /** java.util.concurrent.atomic.AtomicInteger.class.getName().hashCode()<br> = 682798119; */
+    /**
+     * java.util.concurrent.atomic.AtomicInteger.class.getName().hashCode()<br>
+     * = 682798119;
+     */
     public final static int CONCURRENT_ATOMIC_ATOMIC_INTEGER = 682798119;
-    /** java.util.concurrent.atomic.AtomicLong.class.getName().hashCode()<br> = -968709069; */
+    /**
+     * java.util.concurrent.atomic.AtomicLong.class.getName().hashCode()<br>
+     * = -968709069;
+     */
     public final static int CONCURRENT_ATOMIC_ATOMIC_LONG = -968709069;
-    /** java.util.concurrent.atomic.AtomicIntegerArray.class.getName().hashCode()<br> = 1047484018; */
+    /**
+     * java.util.concurrent.atomic.AtomicIntegerArray.class.getName().hashCode()<br>
+     * = 1047484018;
+     */
     public final static int CONCURRENT_ATOMIC_ATOMIC_INTEGER_ARRAY = 1047484018;
-    /** java.util.concurrent.atomic.AtomicLongArray.class.getName().hashCode()<br> = -1353089562; */
+    /**
+     * java.util.concurrent.atomic.AtomicLongArray.class.getName().hashCode()<br>
+     * = -1353089562;
+     */
     public final static int CONCURRENT_ATOMIC_ATOMIC_LONG_ARRAY = -1353089562;
     
     /**
@@ -366,8 +540,7 @@ public final class JsonLexer
     }
     
     /**
-     * 判断是否为空
-     * 只判断 s = null 或者 s.length = 0
+     * 判断是否为空 只判断 s = null 或者 s.length = 0
      * @param s
      */
     public static boolean isEmpty(String s)
@@ -377,8 +550,8 @@ public final class JsonLexer
     
     /****
      * 判断是否全部为空白，当s = null 或者 s.length = 0 或者 全部是空白 时返回true
-     * @param s     原字符串
-     * @return      true表示全部是空白
+     * @param s 原字符串
+     * @return true表示全部是空白
      */
     public static boolean isEmptyBlank(String s)
     {
@@ -395,8 +568,8 @@ public final class JsonLexer
     
     /**
      * 去除两边空白
-     * @param s     原字符串
-     * @return      去除空白后的字符串
+     * @param s 原字符串
+     * @return 去除空白后的字符串
      */
     public static String trim(String s)
     {
@@ -482,76 +655,7 @@ public final class JsonLexer
         return strb.toString();
     }
     
-    /***
-     * 去除JSON中的转义字符
-     * 
-     * @param str 原字符串
-     * @return 去除成对引号之后的字符串
-     */
-    public static String removeEscapeChar(String str)
-    {
-        if (str == null)
-            return null;
-        
-        StringBuilder strb = new StringBuilder(str.length());
-        boolean isEscape = false;// 是否前一字符是转义字符
-        for (int i = 0; i < str.length(); i++)
-        {
-            char c = str.charAt(i);
-            if (!isEscape)
-            {// 未转义
-                if (c == '\\')
-                    isEscape = true;// 设为有转义
-                else
-                    strb.append(c);
-            }
-            else
-            {// 有转义
-                switch (c)
-                {
-                    case '\\':
-                        strb.append('\\');
-                        break;
-                    case '\"':
-                        strb.append('\"');
-                        break;
-                    case QUOTE:
-                        strb.append(QUOTE);
-                        break;
-                    case 'b':
-                        strb.append('\b');
-                        break;
-                    case 'f':
-                        strb.append('\f');
-                        break;
-                    case 'n':
-                        strb.append('\n');
-                        break;
-                    case 'r':
-                        strb.append('\r');
-                        break;
-                    case 't':
-                        strb.append('\t');
-                        break;
-                    case '/':
-                        strb.append('/');
-                        break;
-                    default:
-                        strb.append("\\").append(c);
-                        break;// 如果未找到匹配,则返原值
-                }
-                isEscape = false;// 重置转义为结束
-            }
-        }
-        
-        if (isEscape)
-        {// 最后一个字符是\
-            strb.append("\\");
-        }
-        
-        return strb.toString();
-    }
-    
+   
     /**
      * 验证是否为空白
      * 
@@ -564,8 +668,7 @@ public final class JsonLexer
     }
     
     /***
-     * 去除JSON键和值的前后成对引号
-     * 注意：字符串首尾不能 有空格
+     * 去除JSON键和值的前后成对引号 注意：字符串首尾不能 有空格
      * @param str 原字符串
      * @return 去除成对引号之后的字符串
      */
@@ -590,8 +693,8 @@ public final class JsonLexer
     
     /**
      * 获取泛型类型具体类型的方法
-     * @param type      字段类
-     * @param i         泛型索引位置
+     * @param type 字段类
+     * @param i 泛型索引位置
      */
     @SuppressWarnings("rawtypes")
     public static Class getClass(Type type, int i)
@@ -606,8 +709,8 @@ public final class JsonLexer
     
     /**
      * 获取泛型类型具体类型的方法
-     * @param parameterizedType      字段类
-     * @param i                      泛型索引位置
+     * @param parameterizedType 字段类
+     * @param i 泛型索引位置
      */
     @SuppressWarnings("rawtypes")
     public static Class<?> getGenericClass(ParameterizedType parameterizedType, int i)
@@ -732,8 +835,6 @@ public final class JsonLexer
         parserMap.put(java.sql.Time.class, dateParser);
         parserMap.put(java.sql.Timestamp.class, dateParser);
         
-        
-        
         // 通用 object
         parserMap.put(Object.class, objParser);
     }
@@ -830,8 +931,8 @@ public final class JsonLexer
             return naxtToken();// 空白字符开头
             
         // json 数据格式只有两种，1.对象使用{} 括起，2.数组[] 括起。所以非 // {或者[开头的数据
-//        if (pos == 0 && BRACE_L != ch && ch != BRACKET_L)
-//            return naxtToken();
+        // if (pos == 0 && BRACE_L != ch && ch != BRACKET_L)
+        // return naxtToken();
         
         switch (ch)
         {
@@ -934,7 +1035,21 @@ public final class JsonLexer
         getStringTokenLength(pos, scopeType(), curType);
         if (length > 0)
         {
-            this.value = json.substring(pos, pos + length);
+            // String token 两端去空格
+            int s = pos;
+            int end = pos + length - 1;
+            for (; s < end; s++)
+            {
+                if (!isWhitespace(json.charAt(s)))
+                    break;
+            }
+            for (; end > s; end--)
+            {
+                if (!isWhitespace(json.charAt(end)))
+                    break;
+            }
+            
+            this.value = json.substring(s, end + 1);
             pos += (length - 1);
         }
         
@@ -957,7 +1072,7 @@ public final class JsonLexer
         if (scope() < 0)// 当前没有作用域 则视为String字符 一直到json末尾
             return length = json.length() - pos;//
             
-        for (; pos < json.length(); pos++ ,length++)
+        for (; pos < json.length(); pos++, length++)
         {
             ch = json.charAt(pos);
             if (quote == 0)
@@ -995,8 +1110,7 @@ public final class JsonLexer
     }
     
     /**
-     * 是否有值
-     * 注意：这里只有当 上一个token 为冒号&当前为逗号，则当前没值
+     * 是否有值 注意：这里只有当 上一个token 为冒号&当前为逗号，则当前没值
      */
     public boolean novalue()
     {

@@ -139,22 +139,99 @@ public final class BaseParser extends JsonParser implements Serializable
     {
         // 去掉前后可能的引号
         if (lexer.curType() == JsonLexer.T_BRACE_L || lexer.curType() == JsonLexer.T_BRACKET_L)
-        {// 对象行
-            int pos = lexer.pos();
+        {// 对象行 json字符串
+            StringBuilder sb = new StringBuilder(lexer.value());
             int scope = lexer.scope();
             while (lexer.hasNext())
             {
                 lexer.naxtToken();
+                String v = lexer.value();
+                if(lexer.curType() == JsonLexer.T_STRING)
+                {//如果是String 值则需要剔除转义符
+                    v = removeEscapeChar(v, true);
+                }
+                sb.append(v);
                 if (lexer.scope() < scope || lexer.isEOF())
                     break;// 碰到结束符
             }
-            return JsonLexer.removeEscapeChar(JsonLexer.removeStartEndQuotation(lexer.string(pos, lexer.pos() + 1)));
+            
+            return sb.toString();
         }
         else
         {
             // 去除引号&字符串要求删除转义 然后返回
-            return JsonLexer.removeEscapeChar(JsonLexer.removeStartEndQuotation((lexer.value() == null) ? null : lexer.value()));
+            return removeEscapeChar(JsonLexer.removeStartEndQuotation((lexer.value() == null) ? null : lexer.value()), false);
         }
     }
     
+    /***
+     * 去除JSON中的转义字符
+     * 
+     * @param str 原字符串
+     * @return 去除成对引号之后的字符串
+     */
+    public static String removeEscapeChar(String str, boolean isJsonString)
+    {
+        if(isJsonString)
+            return str;
+        
+        if (str == null)
+            return null;
+        
+        StringBuilder strb = new StringBuilder(str.length());
+        boolean isEscape = false;// 是否前一字符是转义字符
+        for (int i = 0; i < str.length(); i++)
+        {
+            char c = str.charAt(i);
+            if (!isEscape)
+            {// 未转义
+                if (c == '\\')
+                    isEscape = true;// 设为有转义
+                else
+                    strb.append(c);
+            }
+            else
+            {// 有转义
+                switch (c)
+                {
+                    case '\\':
+                        strb.append('\\');
+                        break;
+                    case 'b':
+                        strb.append('\b');
+                        break;
+                    case 'f':
+                        strb.append('\f');
+                        break;
+                    case 'n':
+                        strb.append('\n');
+                        break;
+                    case 'r':
+                        strb.append('\r');
+                        break;
+                    case 't':
+                        strb.append('\t');
+                        break;
+                    case '/':
+                    case '\'':
+                    case '\"':
+                    {
+                        strb.append(c);
+                        break;
+                    }
+                    default:
+                        strb.append("\\").append(c);
+                        break;// 如果未找到匹配,则返原值
+                }
+                isEscape = false;// 重置转义为结束
+            }
+        }
+        
+        if (isEscape)
+        {// 最后一个字符是\
+            strb.append("\\");
+        }
+        
+        return strb.toString();
+    }
 }
