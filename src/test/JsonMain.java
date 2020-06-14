@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -194,9 +195,14 @@ public class JsonMain
         json = Streams.getStringUTF8(new FileInputStream("./json/log.txt"));
         String tradeStr = Jsons.getString(json, "trade");
         System.out.println(tradeStr);
+        LinkedHashMap<String, String>  map = (LinkedHashMap<String, String>) Jsons.toMapSV(tradeStr, LinkedHashMap.class, String.class);
+        
+        System.out.println(Jsons.toString(map));
+        System.out.println(map.get("orders"));
         System.out.println(Jsons.getString(json, "title"));
         System.out.println(Jsons.getString(json, "alipay_no"));
         System.out.println(Jsons.getString(json, "pic_path"));
+//        System.out.println(map.get(());
 //        TradeAll trade = Jsons.toObject(tradeStr, TradeAll.class);
 //        Jsons.geta
 //        Order[] orderArrStr = Jsons.getArray(tradeStr, "order", Order.class);

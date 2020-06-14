@@ -37,7 +37,7 @@ public final class MapParser extends JsonParser implements Serializable
             Object value = entry.getValue();
             strb.append(JsonLexer.DB_QUOTE).append(JsonLexer.removeStartEndQuotation(key)).append(JsonLexer.DB_QUOTE);
             strb.append(JsonLexer.COLON);
-            strb.append(value == null ? JsonLexer.NULL : lexer.getParser(o.getClass()).toString(value));
+            strb.append(value == null ? JsonLexer.NULL : lexer.getParser(value.getClass()).toString(value));
             strb.append(JsonLexer.COMMA);
         }
         
