@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
+import com.xiyuan.util.json.JsonException;
 import com.xiyuan.util.json.JsonLexer;
 import com.xiyuan.util.json.JsonParser;
 
@@ -17,9 +18,9 @@ public final class ObjectParser extends JsonParser implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
-    public ObjectParser(JsonLexer lexer)
+    public ObjectParser(JsonLexer lexer, int level)
     {
-        super(lexer);
+        super(lexer, level);
     }
 
     public String toString(Object obj)
@@ -60,9 +61,19 @@ public final class ObjectParser extends JsonParser implements Serializable
     public Object toObject(Class<?> cls)
     {
 
+        if(!lexer.isObj() && level == 1)
+            throw new JsonException("Json数据，必须已 '{' 开头，pos:"+lexer.pos());
+        
         Object obj = null;
-
-        obj = newInstance(cls);
+        try
+        {
+            obj = newInstance(cls);
+        }
+        catch (Exception e)
+        {
+            throw new JsonException(e);
+        }
+      
         if (obj == null || !lexer.isObj())
             return null;
         boolean isValue = false;

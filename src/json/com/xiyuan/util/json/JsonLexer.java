@@ -617,13 +617,13 @@ public final class JsonLexer
                     strb.append("\\\\");
                     break;
                 case DB_QUOTE:
-                    if (quotation == 0 || quotation == DB_QUOTE)
+                    if (quotation == DB_QUOTE)
                         strb.append("\\\"");
                     else
                         strb.append(c);
                     break;
                 case QUOTE:
-                    if (quotation == 0 || quotation == QUOTE)
+                    if (quotation == QUOTE)
                         strb.append("\\\'");
                     else
                         strb.append(c);
@@ -748,18 +748,20 @@ public final class JsonLexer
     private boolean novalue = false;
     private int scopeIndex = -1;
     private char quote = 0;// 字符串开始的引号值
-    private int length = 0;
+//    private int length = 0;//当前token 字符串长度
     
-    public JsonLexer(String input)
+    
+    
+    public JsonLexer(String input, int level)
     {
         this.json = trim(input);
         this.value = null;
-        this.baseParser = new BaseParser(this);
-        this.arrayParser = new ArrayParser(this);
-        this.listParser = new ListParser(this);
-        this.mapParser = new MapParser(this);
-        this.dateParser = new DateParser(this);
-        this.objParser = new ObjectParser(this);
+        this.baseParser = new BaseParser(this, level);
+        this.arrayParser = new ArrayParser(this, level);
+        this.listParser = new ListParser(this, level);
+        this.mapParser = new MapParser(this, level);
+        this.dateParser = new DateParser(this, level);
+        this.objParser = new ObjectParser(this, level);
         initParserMap();
     }
     
@@ -946,8 +948,13 @@ public final class JsonLexer
             }
             case BRACE_R:
             {
+                
+                
                 if (objNum > 0)
                 {
+                    if(scopeType() == T_BRACKET_L && ch == BRACE_R)//判断当前作用域为'[' 但接数符 为'}' 
+                        throw new JsonException("Json 数组字符串不能以 '}' 结尾，pos:"+pos);
+                    
                     objNum--;
                     if (!contextLs.isEmpty() && scopeType() == T_BRACE_L)
                         removeScope();// 设置结束当前context
@@ -971,8 +978,13 @@ public final class JsonLexer
             }
             case BRACKET_R:
             {
+                
+                
                 if (arrNum > 0)
                 {
+                    if(scopeType() == T_BRACE_L && ch == BRACKET_R)//判断当前作用域为'{' 但接数符 为']' 
+                        throw new JsonException("Json 对象字符串不能以 ']' 结尾，pos:"+pos);
+                    
                     arrNum--;
                     if (!contextLs.isEmpty() && scopeType() == T_BRACKET_L)
                         removeScope();// 设置结束当前context
@@ -1032,7 +1044,7 @@ public final class JsonLexer
     
     private int buildStringToken(int pos, int scope, byte prevType)
     {
-        getStringTokenLength(pos, scopeType(), curType);
+        int length = getStringTokenLength(pos, scopeType(), curType);
         if (length > 0)
         {
             // String token 两端去空格
@@ -1067,22 +1079,22 @@ public final class JsonLexer
      */
     private int getStringTokenLength(int pos, byte contextType, byte prevType)
     {
-        length = 0;
-        quote = 0;
+        int length = 0;
+        quote = (char)0;
         if (scope() < 0)// 当前没有作用域 则视为String字符 一直到json末尾
             return length = json.length() - pos;//
             
         for (; pos < json.length(); pos++, length++)
         {
             ch = json.charAt(pos);
-            if (quote == 0)
+            if (quote == (char)0)
             {
                 quote = ch;// 记录开始符
                 continue;
             }
             
             // 查找结束符， 非引号字符串结束的字符
-            if (quote > 0 && quote != DB_QUOTE && quote != QUOTE && (ch == COLON || ch == COMMA || ch == BRACE_R || ch == BRACKET_R))
+            if (quote != 0 && quote != DB_QUOTE && quote != QUOTE && (ch == COLON || ch == COMMA || ch == BRACE_R || ch == BRACKET_R))
             {
                 if (contextType == T_BRACKET_L && ch == COLON)// 如果是数组当前是冒号&所属范围是数组，则当前冒号为值
                     continue;
@@ -1091,7 +1103,11 @@ public final class JsonLexer
                 if (ch == COLON && prevType == JsonLexer.T_COLON)
                     continue;// {a::sss:sdcsdcs, b:wwww} 其中 sss:sdcsdcs 为值
                 else
+                {// 非引号开始 并且有结束负号&作用域不是-1 throw new JsonException("Json[对象字符串]，要求{}开头和结尾");
+                    
                     return length;// 非引号开始 并且有结束负号&作用域不是-1
+                }
+                   
             }
             
             // 查找结束符，引号开头&当前是引号 & 上一个字符不是不是转义符
@@ -1286,16 +1302,11 @@ public final class JsonLexer
     }
     
     /**
-     * json字符串截取
-     * @param pos 开始索引
-     * @param endPos 结束索引
+     * 获取Json数据源
      * @return
      */
-    public String string(int pos, int endPos)
+    public String getSource()
     {
-        if (pos < 0 || json == null || pos > json.length() || endPos < pos)
-            return null;
-        
-        return json.substring(pos, endPos > json.length() ? json.length() : endPos);
+        return json;
     }
 }

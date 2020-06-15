@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import com.xiyuan.util.json.JsonException;
 import com.xiyuan.util.json.JsonLexer;
 import com.xiyuan.util.json.JsonParser;
 
@@ -17,10 +18,9 @@ public final class MapParser extends JsonParser implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
-    public MapParser(JsonLexer lexer)
+    public MapParser(JsonLexer lexer, int level)
     {
-        super(lexer);
-        // TODO Auto-generated constructor stub
+        super(lexer, level);
     }
     
     public String toString(Object obj)
@@ -64,7 +64,9 @@ public final class MapParser extends JsonParser implements Serializable
     @SuppressWarnings("unchecked")
     public <K, V> Object toObject(Class<?> mapClass, Class<K> keyClass, Class<V> valueClass)
     {
-    
+        if(!lexer.isObj() && level == 1)
+            throw new JsonException("Json数据，必须已 '{' 开头，pos:"+lexer.pos());
+        
         if (!isSupportClass(mapClass) || !lexer.isObj())
             return null;// 不支持的类型或者不是 对象
         

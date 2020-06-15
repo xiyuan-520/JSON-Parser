@@ -109,7 +109,8 @@ public class TradeAll
     
     private String consign_time; // 发货时间
     
-    private List<Order> orders = new ArrayList<>();
+    private Order[] orders = new Order[0];
+//    private List<Order> orders = new ArrayList<>();
 
     public long getTid()
     {
@@ -461,14 +462,14 @@ public class TradeAll
         this.consign_time = consign_time;
     }
 
-    public List<Order> getOrders()
-    {
-        return orders;
-    }
-
-    public void setOrders(List<Order> orders)
-    {
-        this.orders = orders;
-    }
+//    public List<Order> getOrders()
+//    {
+//        return orders;
+//    }
+//
+//    public void setOrders(List<Order> orders)
+//    {
+//        this.orders = orders;
+//    }
     
 }

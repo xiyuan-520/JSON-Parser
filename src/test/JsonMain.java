@@ -4,27 +4,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
-import org.zhiqim.kernel.util.Streams;
-
 import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.xiyuan.util.json.JsonParser;
 import com.xiyuan.util.json.Jsons;
-import com.xiyuan.util.json.parser.ObjectParser;
 
 import frame.model.GenericList;
 import frame.model.GenericMap;
 import frame.model.OrdOrder;
-import frame.model.Order;
-import frame.model.TradeAll;
 
 public class JsonMain
 {
@@ -130,34 +122,35 @@ public class JsonMain
     
     public static void testOther()
     {
-        long l1 = 0, l2 = 0;
-        int count = 5;
-        JsonParser parser = new ObjectParser(null);
-        l1 = System.nanoTime();
-        for (int i = 0; i < count; i++)
-            parser.getFieldMapDeep(OrdOrder.class);
-        l2 = System.nanoTime();
-        System.out.println("hashMap:\t" + (l2 - l1) * 1.0 / 1000000);
-        
-        l1 = System.nanoTime();
-        for (int i = 0; i < count; i++)
-            parser.getFieldMapDeep(OrdOrder.class);
-        l2 = System.nanoTime();
-        System.out.println("currentMap:\t" + (l2 - l1) * 1.0 / 1000000);
-        
-        System.out.println("==============================");
-        parser = new ObjectParser(null);
-        l1 = System.nanoTime();
-        for (int i = 0; i < count; i++)
-            parser.getFieldMapDeep(OrdOrder.class);
-        l2 = System.nanoTime();
-        System.out.println("hashMap:\t" + (l2 - l1) * 1.0 / 1000000);
-        
-        l1 = System.nanoTime();
-        for (int i = 0; i < count; i++)
-            parser.getFieldMapDeep(OrdOrder.class);
-        l2 = System.nanoTime();
-        System.out.println("currentMap:\t" + (l2 - l1) * 1.0 / 1000000);
+//        Jsons Jsons = new Jsons(0);
+//        long l1 = 0, l2 = 0;
+//        int count = 5;
+//        JsonParser parser = new ObjectParser(null);
+//        l1 = System.nanoTime();
+//        for (int i = 0; i < count; i++)
+//            parser.getFieldMapDeep(OrdOrder.class);
+//        l2 = System.nanoTime();
+//        System.out.println("hashMap:\t" + (l2 - l1) * 1.0 / 1000000);
+//        
+//        l1 = System.nanoTime();
+//        for (int i = 0; i < count; i++)
+//            parser.getFieldMapDeep(OrdOrder.class);
+//        l2 = System.nanoTime();
+//        System.out.println("currentMap:\t" + (l2 - l1) * 1.0 / 1000000);
+//        
+//        System.out.println("==============================");
+//        parser = new ObjectParser(null);
+//        l1 = System.nanoTime();
+//        for (int i = 0; i < count; i++)
+//            parser.getFieldMapDeep(OrdOrder.class);
+//        l2 = System.nanoTime();
+//        System.out.println("hashMap:\t" + (l2 - l1) * 1.0 / 1000000);
+//        
+//        l1 = System.nanoTime();
+//        for (int i = 0; i < count; i++)
+//            parser.getFieldMapDeep(OrdOrder.class);
+//        l2 = System.nanoTime();
+//        System.out.println("currentMap:\t" + (l2 - l1) * 1.0 / 1000000);
     }
     
     public static Object getArr()
@@ -192,16 +185,15 @@ public class JsonMain
         // if (console)
         // System.out.println(Jsons.toString(orders.get(i)));
         // }
-        json = Streams.getStringUTF8(new FileInputStream("./json/log.txt"));
-        String tradeStr = Jsons.getString(json, "trade");
-        System.out.println(tradeStr);
-        LinkedHashMap<String, String>  map = (LinkedHashMap<String, String>) Jsons.toMapSV(tradeStr, LinkedHashMap.class, String.class);
+        Jsons Jsons = new Jsons(1);
+//        json = Streams.getStringUTF8(new FileInputStream("./json/log.txt"));
+//        String tradeStr = Jsons.getString(json, "trade");
+//        System.out.println(tradeStr);
+//        System.out.println(Jsons.toStringAddOrUpdate(tradeStr, "oid_str", "1026183937603390000"));
+//        System.out.println(Jsons.toStringAddOrUpdate(tradeStr, "you_xiang", true));
         
-        System.out.println(Jsons.toString(map));
-        System.out.println(map.get("orders"));
-        System.out.println(Jsons.getString(json, "title"));
-        System.out.println(Jsons.getString(json, "alipay_no"));
-        System.out.println(Jsons.getString(json, "pic_path"));
+        System.out.println(Jsons.toStringAddOrUpdate("[]", "sss", 222));
+
 //        System.out.println(map.get(());
 //        TradeAll trade = Jsons.toObject(tradeStr, TradeAll.class);
 //        Jsons.geta
@@ -233,6 +225,7 @@ public class JsonMain
     
     public static void testMyGenericJson(String json, String jsonString, boolean console) throws Exception
     {
+        Jsons Jsons = new Jsons(0);
         double l1 = 0, l2 = 0;
         String genericJson = "{\"list\":" + json + "}";
         l1 = System.currentTimeMillis();
@@ -551,6 +544,7 @@ public class JsonMain
         // System.out.println(string);
         // }
         
+        Jsons Jsons = new Jsons(0);
         String ddd = "5689";
         AtomicLong arr = Jsons.toObject(ddd, AtomicLong.class);
         System.out.println(arr);

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.xiyuan.util.json.JsonException;
 import com.xiyuan.util.json.JsonLexer;
 import com.xiyuan.util.json.JsonParser;
 
@@ -16,9 +17,9 @@ public final class ListParser extends JsonParser
 {
     private static final long serialVersionUID = 1L;
     
-    public ListParser(JsonLexer lexer)
+    public ListParser(JsonLexer lexer, int level)
     {
-        super(lexer);
+        super(lexer, level);
     }
     
     @Override
@@ -48,7 +49,9 @@ public final class ListParser extends JsonParser
     {
         if (!isSupportClass(genericClass))
             return null;// 不支持的类型
-            
+        if(!lexer.isArr() && level == 1)
+            throw new JsonException("Json数据，必须已 '[' 开头，pos:" + lexer.pos());
+        
         if (!lexer.isArr())
             return null;
         

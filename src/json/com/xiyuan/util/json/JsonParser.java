@@ -30,10 +30,12 @@ public abstract class JsonParser implements Serializable
     /**用于保存临时的对象字段列表,用于toString*/
     private static final Map<Class<?>, List<Field>> fieldList = new HashMap<Class<?>, List<Field>>(defaultCount);//初始化defaultCount个类空间
     
+    protected int level;//检查日志级别0=忽略异常，1=严格检查，不匹配则抛异常
     protected JsonLexer lexer;
-    public JsonParser(JsonLexer lexer)
+    public JsonParser(JsonLexer lexer, int level)
     {
         this.lexer = lexer;
+        this.level = level;
     }
     
     /**

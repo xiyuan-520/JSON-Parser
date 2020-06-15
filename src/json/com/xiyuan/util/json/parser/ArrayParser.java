@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.concurrent.atomic.AtomicLongArray;
 
+import com.xiyuan.util.json.JsonException;
 import com.xiyuan.util.json.JsonLexer;
 import com.xiyuan.util.json.JsonParser;
 
@@ -85,9 +86,9 @@ public final class ArrayParser extends JsonParser implements Serializable
         }
     }
     
-    public ArrayParser(JsonLexer lexer)
+    public ArrayParser(JsonLexer lexer, int level)
     {
-        super(lexer);
+        super(lexer, level);
     }
     
     public String toString(Object obj)
@@ -120,13 +121,16 @@ public final class ArrayParser extends JsonParser implements Serializable
     @Override
     public Object toObject(Class<?> cls)
     {
+        if (!lexer.isArr() && level == 1)
+            throw new JsonException("Json数据，必须已 '[' 开头，pos:" + lexer.pos());
+        
         switch (cls.getName().hashCode())
         {
             case JsonLexer.CONCURRENT_ATOMIC_ATOMIC_INTEGER_ARRAY:
                 return new AtomicIntegerArray((int[]) fromArr_int());
             case JsonLexer.CONCURRENT_ATOMIC_ATOMIC_LONG_ARRAY:
                 return new AtomicLongArray((long[]) fromArr_long());
-            // 基本类型
+                // 基本类型
             case JsonLexer.ARR_BOOLEAN:
                 return fromArr_boolean();
             case JsonLexer.ARR_BYTE:
@@ -172,7 +176,7 @@ public final class ArrayParser extends JsonParser implements Serializable
      * 
      * @param lexer 分析器
      * @param cls 组件类型
-     * @param parser 组件类型 对饮的解析器
+     * @param parser 组件类型 对应的解析器
      * @return
      */
     private Object fromArr(JsonLexer lexer, Class<?> cls, JsonParser parser)

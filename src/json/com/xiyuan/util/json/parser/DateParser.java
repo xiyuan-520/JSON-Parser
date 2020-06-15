@@ -19,9 +19,9 @@ public final class DateParser extends JsonParser implements Serializable
 {
 
     private static final long serialVersionUID = 1L;
-    public DateParser(JsonLexer lexer)
+    public DateParser(JsonLexer lexer, int level)
     {
-        super(lexer);
+        super(lexer, level);
     }
     
     @Override

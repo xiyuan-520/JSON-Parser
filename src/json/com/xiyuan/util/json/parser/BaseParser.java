@@ -17,9 +17,9 @@ public final class BaseParser extends JsonParser implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
-    public BaseParser(JsonLexer lexer)
+    public BaseParser(JsonLexer lexer, int level)
     {
-        super(lexer);
+        super(lexer, level);
     }
     
     public String toString(Object obj)
