@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
+import org.zhiqim.kernel.util.Streams;
+
 import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -164,6 +166,15 @@ public class JsonMain
     @SuppressWarnings({ "unused" })
     public static void testMy(String json, String jsonString, boolean console) throws Exception
     {
+        int i=0;
+        for(;i<10;i++)
+        {
+            System.out.println(i);
+            if(i == 6)
+                break;
+        }
+        
+        System.out.println("i==="+i);
         // double l1 = 0, l2 = 0;
         // List<OrdOrder> orders = new ArrayList<OrdOrder>();
         // System.out.println("===========================================================================");
@@ -185,14 +196,14 @@ public class JsonMain
         // if (console)
         // System.out.println(Jsons.toString(orders.get(i)));
         // }
-        Jsons Jsons = new Jsons(1);
+//        Jsons Jsons = new Jsons(1);
 //        json = Streams.getStringUTF8(new FileInputStream("./json/log.txt"));
 //        String tradeStr = Jsons.getString(json, "trade");
 //        System.out.println(tradeStr);
-//        System.out.println(Jsons.toStringAddOrUpdate(tradeStr, "oid_str", "1026183937603390000"));
+////        System.out.println(Jsons.toStringAddOrUpdate(tradeStr, "oid_str", "1026183937603390000"));
 //        System.out.println(Jsons.toStringAddOrUpdate(tradeStr, "you_xiang", true));
         
-        System.out.println(Jsons.toStringAddOrUpdate("[]", "sss", 222));
+//        System.out.println(Jsons.toStringAddOrUpdate("[]", "sss", 222));
 
 //        System.out.println(map.get(());
 //        TradeAll trade = Jsons.toObject(tradeStr, TradeAll.class);

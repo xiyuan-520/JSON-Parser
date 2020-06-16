@@ -42,6 +42,8 @@ import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicLongArray;
 
+import javax.swing.JEditorPane;
+
 import com.xiyuan.util.json.parser.ArrayParser;
 import com.xiyuan.util.json.parser.BaseParser;
 import com.xiyuan.util.json.parser.DateParser;
@@ -655,7 +657,6 @@ public final class JsonLexer
         return strb.toString();
     }
     
-   
     /**
      * 验证是否为空白
      * 
@@ -739,18 +740,15 @@ public final class JsonLexer
     private int pos = -1;
     private String json = null;
     private List<Byte> contextLs = new ArrayList<Byte>();// 当前token 所在的作用范围类型
-    private byte curType = T_UNKNOWN;// 当前token 的类型
-    private byte prevType = T_UNKNOWN;// 当前token 的类型
+    private byte curType = T_UNKNOWN;// 当前token 作用域类型
+    private byte prevType = T_UNKNOWN;// 当前上一个token作用域类型
     private char ch;// 循环的当前字符
-    private int objNum = 0;
-    private int arrNum = 0;
     private String value = NULL;
-    private boolean novalue = false;
+    
     private int scopeIndex = -1;
     private char quote = 0;// 字符串开始的引号值
-//    private int length = 0;//当前token 字符串长度
     
-    
+    // private int length = 0;//当前token 字符串长度
     
     public JsonLexer(String input, int level)
     {
@@ -908,7 +906,7 @@ public final class JsonLexer
         return this.prevType;
     }
     
-    private void setType(byte type)
+    private void setCurrentType(byte type)
     {
         this.prevType = this.curType;
         this.curType = type;
@@ -917,13 +915,11 @@ public final class JsonLexer
     public JsonLexer naxtToken()
     {
         this.value = NULL;
-        this.novalue = false;
         if (!hasNext())
         {
-            setType(T_EOF);
+            this.setCurrentType(T_EOF);
             this.scopeIndex = -1;
             this.ch = 0;
-            this.novalue = false;
             return this;
         }
         
@@ -932,119 +928,115 @@ public final class JsonLexer
         if (isWhitespace(ch))
             return naxtToken();// 空白字符开头
             
+        this.setCurrentType(T_UNKNOWN);// 设置当前为空类型,
+        
         // json 数据格式只有两种，1.对象使用{} 括起，2.数组[] 括起。所以非 // {或者[开头的数据
         // if (pos == 0 && BRACE_L != ch && ch != BRACKET_L)
         // return naxtToken();
+        byte contextType = getContextType();
+        
+        if(this.pos != -1 && contextType == T_UNKNOWN)//作用域栈已经全部退出了,
+            throw new JsonException("Json 数据必须包含在'{}'或者'[]'里面，pos:" + pos);
+        
+        if (contextType == T_UNKNOWN && ch != BRACE_L && ch != BRACKET_L)
+            throw new JsonException("Json 数据必须以 '{' 或者 '['开头，pos:" + pos);
+        
+       
         
         switch (ch)
         {
             case BRACE_L:
-            {
-                objNum++;
-                value = String.valueOf(ch);
-                setScope(T_BRACE_L);
-                setType(T_BRACE_L);
+            {// { 开头 上一个token类型必须为,空，‘{’，‘[’,‘,’,‘:’
+            
+                this.value = String.valueOf(ch);
+                this.setContextType(T_BRACE_L);// 设置作用域类型
+                this.setCurrentType(T_BRACE_L);// 设置当前类型
                 break;
             }
             case BRACE_R:
             {
                 
+                if (contextType == T_BRACKET_L)// 判断当前作用域为'[' 但接数符 为'}'
+                    throw new JsonException("Json 数组字符串必须以 ']' 结束，pos:" + pos);
                 
-                if (objNum > 0)
-                {
-                    if(scopeType() == T_BRACKET_L && ch == BRACE_R)//判断当前作用域为'[' 但接数符 为'}' 
-                        throw new JsonException("Json 数组字符串不能以 '}' 结尾，pos:"+pos);
-                    
-                    objNum--;
-                    if (!contextLs.isEmpty() && scopeType() == T_BRACE_L)
-                        removeScope();// 设置结束当前context
-                        
-                    value = String.valueOf(ch);
-                    setType(scopeType());
-                }
-                else
-                    pos = buildStringToken(pos, scopeType(), curType);
-                
+                removeScope();// 设置结束当前context
+                contextType = getContextType();
+                this.value = String.valueOf(ch);
+                setCurrentType(T_BRACE_R);// 设置当前为结束 } 类型
                 break;
             }
             case BRACKET_L:
-            {
-                
-                arrNum++;
+            {// [ 开头 上一个token类型必须为,空，‘{’，‘[’,‘,’,‘:’
+            
                 value = String.valueOf(ch);
-                setScope(T_BRACKET_L);
-                setType(T_BRACKET_L);
+                setContextType(T_BRACKET_L);
+                setCurrentType(T_BRACKET_L);
                 break;
             }
             case BRACKET_R:
             {
                 
+                if (contextType == T_BRACE_L)// 判断当前作用域为'{' 但接数符 为']'
+                    throw new JsonException("Json 数组字符串必须以 '}' 结束，pos:" + pos);
                 
-                if (arrNum > 0)
-                {
-                    if(scopeType() == T_BRACE_L && ch == BRACKET_R)//判断当前作用域为'{' 但接数符 为']' 
-                        throw new JsonException("Json 对象字符串不能以 ']' 结尾，pos:"+pos);
-                    
-                    arrNum--;
-                    if (!contextLs.isEmpty() && scopeType() == T_BRACKET_L)
-                        removeScope();// 设置结束当前context
-                        
-                    value = String.valueOf(ch);
-                    setType(scopeType());
-                }
-                else
-                    pos = buildStringToken(pos, scopeType(), curType);
+                removeScope();// 设置结束当前context
+                contextType = getContextType();
+                value = String.valueOf(ch);
+                setCurrentType(T_BRACE_R);// 设置当前为结束 } 类型
                 
                 break;
             }
             case COMMA:// 上一个token 不能为,
             {// 前面token 必须是 对象结束 或者 数组结束 或者字符串
             
-                if (curType == T_COMMA)
-                {
+                if (prevIsComma())
+                {// 上一个是逗号
                     naxtToken();
                     return this;// 上一个token类型是逗号
                 }
                 
                 // 处理上一个是 冒号 当前为逗号，则当前值为null 列：{dd:,} 被整理 后为 {dd:null,}
-                if (curType == T_COLON)
+                if (prevIsColon())
                 {
-                    setType(T_STRING);
-                    this.novalue = true;// 设置没有值标记
-                    pos--;// 设置当前为值
+                    this.setCurrentType(T_STRING);
+                    this.pos--;// 设置下一个token起点位置为当前位置-1
                 }
                 else
                 {
-                    setType(T_COMMA);
-                    value = String.valueOf(ch);
+                    this.setCurrentType(T_COMMA);// 设置当前为‘，’类型
+                    this.value = String.valueOf(ch);
                 }
                 break;
             }
             case COLON:
             {
                 
-                if (curType == JsonLexer.T_STRING)
-                {// 上一个token是String 则当前是冒号
-                    setType(T_COLON);
-                    value = String.valueOf(ch);
+                if (prevIsString() || prevIsEndArr() || prevIsEndObj())
+                {// 上一个token是String 或者 ]、}， 则当前是冒号,说明这一段数据是已 键值对形式数据，支持数组，对象类型做key
+                    this.setCurrentType(T_COLON);// 设置当前为‘：’类型
+                    this.value = String.valueOf(ch);
                 }
                 else
-                    pos = buildStringToken(pos, scopeType(), curType);
+                {//否则当string值处理
+                    this.setCurrentType(T_STRING);// 设置当前为string类型
+                    this.buildStringToken(contextType);
+                }
                 
                 break;
             }
             default:
             {
-                pos = buildStringToken(pos, scopeType(), curType);
+                this.setCurrentType(T_STRING);// 设置当前为string类型
+                this.buildStringToken(contextType);
                 break;
             }
         }
         return this;
     }
     
-    private int buildStringToken(int pos, int scope, byte prevType)
+    private void buildStringToken(byte contextType)
     {
-        int length = getStringTokenLength(pos, scopeType(), curType);
+        int length = getStringTokenLength(this.pos, contextType);
         if (length > 0)
         {
             // String token 两端去空格
@@ -1062,32 +1054,67 @@ public final class JsonLexer
             }
             
             this.value = json.substring(s, end + 1);
-            pos += (length - 1);
+            this.pos += (length - 1);
         }
-        
-        setType(T_STRING);
-        return pos;
     }
     
     /**
      * 生成从当前位置开始的 一个字符串token
      * 
      * @param pos 读取位置
-     * @param scope token所属范围类型
-     * @param prevToken 上一个token的类型
+     * @param contextType token所属范围类型
      * @return 返回String token 的字符长度
      */
-    private int getStringTokenLength(int pos, byte contextType, byte prevType)
+    private int getStringTokenLength(int pos, byte contextType)
     {
         int length = 0;
-        quote = (char)0;
-        if (scope() < 0)// 当前没有作用域 则视为String字符 一直到json末尾
+        this.quote = (char) 0;
+        if (contextType == T_UNKNOWN)// 当前没有作用域 则视为String字符 一直到json末尾
             return length = json.length() - pos;//
             
-        for (; pos < json.length(); pos++, length++)
+        int start = 0;
+        for (; this.pos < json.length(); this.pos++)
+        {
+            this.ch = json.charAt(pos);
+            if (quote == (char) 0 && JsonLexer.isWhitespace(this.ch))
+                continue;// 字符串未开始,并且为空白
+                
+            if (this.quote == (char) 0)
+            {// 非空白字符开始
+                this.quote = ch;// 记录开始符
+                start = pos;
+                continue;
+            }
+            
+            // 非 单双引号开始 则必须
+            if (quote != DB_QUOTE && quote != QUOTE)
+            {//
+                if(contextType == T_BRACE_L && ch == BRACE_R)
+                {//当前作用域为 { 且碰到 '}'则结束
+                    this.pos--;//当前结束符不记录到string值
+                    break;
+                }
+                
+                
+            }
+            else
+            {//单双引号开始
+                
+            }
+        }
+        
+        int end = pos;
+        this.value = json.substring(start, end);//需要需要去空格
+        
+        if(this.pos < json.length())
+            this.pos--;//设置结束符为当前字符开始
+        
+      
+        
+        for (; pos < json.length(); pos++ ,length++)
         {
             ch = json.charAt(pos);
-            if (quote == (char)0)
+            if (quote == (char) 0)
             {
                 quote = ch;// 记录开始符
                 continue;
@@ -1104,10 +1131,10 @@ public final class JsonLexer
                     continue;// {a::sss:sdcsdcs, b:wwww} 其中 sss:sdcsdcs 为值
                 else
                 {// 非引号开始 并且有结束负号&作用域不是-1 throw new JsonException("Json[对象字符串]，要求{}开头和结尾");
-                    
+                
                     return length;// 非引号开始 并且有结束负号&作用域不是-1
                 }
-                   
+                
             }
             
             // 查找结束符，引号开头&当前是引号 & 上一个字符不是不是转义符
@@ -1125,15 +1152,7 @@ public final class JsonLexer
         return scopeIndex;
     }
     
-    /**
-     * 是否有值 注意：这里只有当 上一个token 为冒号&当前为逗号，则当前没值
-     */
-    public boolean novalue()
-    {
-        return this.novalue;
-    }
-    
-    public byte scopeType()
+    public byte getContextType()
     {
         if (contextLs.isEmpty())
             return T_UNKNOWN;
@@ -1149,7 +1168,7 @@ public final class JsonLexer
     /***
      * 添加context
      */
-    public void setScope(Byte scope)
+    public void setContextType(Byte scope)
     {
         contextLs.add(scope);
         scopeIndex++;
