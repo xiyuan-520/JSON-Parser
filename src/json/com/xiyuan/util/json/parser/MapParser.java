@@ -29,7 +29,7 @@ public final class MapParser extends JsonParser implements Serializable
             return JsonLexer.EMPTY_OBJ;
         
         Map<?, ?> map = (Map<?, ?>) obj;
-        StringBuilder strb = new StringBuilder(map.size()*500).append(JsonLexer.BRACE_L);
+        StringBuilder strb = new StringBuilder(map.size() * 500).append(JsonLexer.BRACE_L);
         for (Entry<?, ?> entry : map.entrySet())
         {
             Object o = entry.getKey();
@@ -49,49 +49,55 @@ public final class MapParser extends JsonParser implements Serializable
     @Override
     public Object toObject(Class<?> cls)
     {// TODO 以后 获取cls 具体类型构造map 集构造类型，目前只放入 String
-        return  toObject(cls, String.class, String.class);
+        return toObject(cls, String.class, String.class);
     }
     
     /***
      * 解析成map
      * @param <K>
      * @param <V>
-     * @param mapClass          map类型
-     * @param keyClass          key的类型
-     * @param valueClass        value的类型
+     * @param mapClass map类型
+     * @param keyClass key的类型
+     * @param valueClass value的类型
      * @return
      */
     @SuppressWarnings("unchecked")
     public <K, V> Object toObject(Class<?> mapClass, Class<K> keyClass, Class<V> valueClass)
     {
-        if(!lexer.isObj() && level == 1)
-            throw new JsonException("Json数据，必须已 '{' 开头，pos:"+lexer.pos());
+        if (!lexer.isObj() && level == 1)
+            throw new JsonException("Json数据，必须已 '{' 开头，pos:" + lexer.pos());
         
         if (!isSupportClass(mapClass) || !lexer.isObj())
             return null;// 不支持的类型或者不是 对象
-        
-        Map<Object, Object> map =  (Map<Object, Object>) newMap(mapClass, keyClass, valueClass, 64);
+            
+        Map<Object, Object> map = (Map<Object, Object>) newMap(mapClass, keyClass, valueClass, 64);
         Object key = null;
         Object value = null;
-        boolean isValue = false;
         int scope = lexer.scope();
         while (lexer.hasNext())
         {
             lexer.naxtToken();
             if (lexer.scope() < scope || lexer.isEOF())
-            {
-                isValue = false;
                 break;// 碰到结束符
-            }
                 
-            if (lexer.isColon() || lexer.isComma())
+            if (lexer.isString() && key == null)
             {
-                if (lexer.isColon() && key != null)
-                    isValue = true;//已经找到key 当前是冒号，说明下一个token为值
+                key = lexer.getParser(keyClass).toObject(keyClass);
+                if (key instanceof String)
+                    key = JsonLexer.removeStartEndQuotation((String) key);
+                continue;
+            }
+            
+            if (key != null && !lexer.prevIsColon())
+                continue;// 找到key值位开始
+                
+            if ((lexer.isColon() || lexer.isComma() && key != null))
+            {// 找到key了但是 当前为 冒号 或者逗号,，视为没找到
+                key = null;
                 continue;// 冒号或者逗号跳过
             }
             
-            if (key != null && isValue)
+            if (key != null && lexer.prevIsColon())
             {
                 value = lexer.getParser(valueClass).toObject(valueClass);
                 if (value == null || JsonLexer.NULL.equals(value))
@@ -100,24 +106,21 @@ public final class MapParser extends JsonParser implements Serializable
                         map.put(key, value);// 必须不是 ConcurrentHashMap 的子类 因为ConcurrentHashMap不允许put null值
                 }
                 else
+                {
+                    if (value instanceof String)
+                        value = JsonLexer.removeStartEndQuotation( JsonLexer.removeEscapeChar((String)value, false));
                     map.put(key, value);
+                }
                 
                 key = null;
-                isValue = false;
             }
-            else
-                key = lexer.getParser(keyClass).toObject(keyClass);
             
-            value = null;
-            isValue = false;
         }
         
-        key = null;
-        isValue = false;
         return map;
     }
     
-    public <K, V> Map<K, V> newMap(Class<?> mapClass,Class<K> k, Class<V> v, int capcity)
+    public <K, V> Map<K, V> newMap(Class<?> mapClass, Class<K> k, Class<V> v, int capcity)
     {
         Map<K, V> map = null;
         if (mapClass == Map.class || mapClass == HashMap.class)
@@ -133,19 +136,13 @@ public final class MapParser extends JsonParser implements Serializable
         return map;
     }
     
-    
     /**
-     *  判断支持的集合类型
+     * 判断支持的集合类型
      */
     private boolean isSupportClass(Class<?> cls)
     {
-        if (cls == Map.class 
-                || cls == HashMap.class 
-                || cls == ConcurrentMap.class 
-                || cls == ConcurrentHashMap.class 
-                || cls == Hashtable.class 
-                || cls == LinkedHashMap.class 
-                || cls == TreeMap.class)
+        if (cls == Map.class || cls == HashMap.class || cls == ConcurrentMap.class || cls == ConcurrentHashMap.class || cls == Hashtable.class || cls == LinkedHashMap.class
+            || cls == TreeMap.class)
             return true;
         
         return false;

@@ -80,6 +80,7 @@ public final class JsonLexer
     /** 结束类型 8 = EOF **/
     public final static byte T_EOF = 8;// 结束
     
+    public final static char _C_0_ = '0';
     /** 左大括号 { */
     public final static char BRACE_L = '{';
     /** 右大括号 } */
@@ -123,7 +124,8 @@ public final class JsonLexer
     public final static String EMPTY_OBJ = "{}";
     /** 空数组 [] */
     public final static String EMPTY_ARR = "[]";
-    
+    public final static String MAX_LONG = "" + Long.MAX_VALUE;
+    public final static String MIN_LONG = "" + Long.MIN_VALUE;
     /**************************************************/
     // 数据类型class的哈希吗
     /**************************************************/
@@ -625,6 +627,7 @@ public final class JsonLexer
                         strb.append(c);
                     break;
                 case QUOTE:
+                    
                     if (quotation == QUOTE)
                         strb.append("\\\'");
                     else
@@ -657,6 +660,76 @@ public final class JsonLexer
         return strb.toString();
     }
     
+    /***
+     * 去除JSON中的转义字符
+     * 
+     * @param str 原字符串
+     * @return 去除成对引号之后的字符串
+     */
+    public static String removeEscapeChar(String str, boolean isJsonString)
+    {
+        if(isJsonString)
+            return str;
+        
+        if (str == null)
+            return null;
+        
+        StringBuilder strb = new StringBuilder(str.length());
+        boolean isEscape = false;// 是否前一字符是转义字符
+        for (int i = 0; i < str.length(); i++)
+        {
+            char c = str.charAt(i);
+            if (!isEscape)
+            {// 未转义
+                if (c == '\\')
+                    isEscape = true;// 设为有转义
+                else
+                    strb.append(c);
+            }
+            else
+            {// 有转义
+                switch (c)
+                {
+                    case '\\':
+                        strb.append('\\');
+                        break;
+                    case 'b':
+                        strb.append('\b');
+                        break;
+                    case 'f':
+                        strb.append('\f');
+                        break;
+                    case 'n':
+                        strb.append('\n');
+                        break;
+                    case 'r':
+                        strb.append('\r');
+                        break;
+                    case 't':
+                        strb.append('\t');
+                        break;
+                    case '/':
+                    case '\'':
+                    case '\"':
+                    {
+                        strb.append(c);
+                        break;
+                    }
+                    default:
+                        strb.append("\\").append(c);
+                        break;// 如果未找到匹配,则返原值
+                }
+                isEscape = false;// 重置转义为结束
+            }
+        }
+        
+        if (isEscape)
+        {// 最后一个字符是\
+            strb.append("\\");
+        }
+        
+        return strb.toString();
+    }
     /**
      * 验证是否为空白
      * 
@@ -928,20 +1001,18 @@ public final class JsonLexer
         if (isWhitespace(ch))
             return naxtToken();// 空白字符开头
             
-        this.setCurrentType(T_UNKNOWN);// 设置当前为空类型,
+        this.setCurrentType(curType());// 设置当前为空类型,
         
         // json 数据格式只有两种，1.对象使用{} 括起，2.数组[] 括起。所以非 // {或者[开头的数据
         // if (pos == 0 && BRACE_L != ch && ch != BRACKET_L)
         // return naxtToken();
         byte contextType = getContextType();
         
-        if(this.pos != -1 && contextType == T_UNKNOWN)//作用域栈已经全部退出了,
+        if (this.pos != -1 && contextType == T_UNKNOWN && ch != BRACE_L && ch != BRACKET_L)// 作用域栈已经全部退出了,
             throw new JsonException("Json 数据必须包含在'{}'或者'[]'里面，pos:" + pos);
         
         if (contextType == T_UNKNOWN && ch != BRACE_L && ch != BRACKET_L)
             throw new JsonException("Json 数据必须以 '{' 或者 '['开头，pos:" + pos);
-        
-       
         
         switch (ch)
         {
@@ -987,7 +1058,7 @@ public final class JsonLexer
                 break;
             }
             case COMMA:// 上一个token 不能为,
-            {// 前面token 必须是 对象结束 或者 数组结束 或者字符串
+            {// ‘,’ 前面token 必须是 对象结束 或者 数组结束 或者字符串
             
                 if (prevIsComma())
                 {// 上一个是逗号
@@ -1017,7 +1088,7 @@ public final class JsonLexer
                     this.value = String.valueOf(ch);
                 }
                 else
-                {//否则当string值处理
+                {// 否则当string值处理
                     this.setCurrentType(T_STRING);// 设置当前为string类型
                     this.buildStringToken(contextType);
                 }
@@ -1034,45 +1105,21 @@ public final class JsonLexer
         return this;
     }
     
-    private void buildStringToken(byte contextType)
-    {
-        int length = getStringTokenLength(this.pos, contextType);
-        if (length > 0)
-        {
-            // String token 两端去空格
-            int s = pos;
-            int end = pos + length - 1;
-            for (; s < end; s++)
-            {
-                if (!isWhitespace(json.charAt(s)))
-                    break;
-            }
-            for (; end > s; end--)
-            {
-                if (!isWhitespace(json.charAt(end)))
-                    break;
-            }
-            
-            this.value = json.substring(s, end + 1);
-            this.pos += (length - 1);
-        }
-    }
-    
     /**
      * 生成从当前位置开始的 一个字符串token
-     * 
-     * @param pos 读取位置
-     * @param contextType token所属范围类型
-     * @return 返回String token 的字符长度
+     * @param contextType
      */
-    private int getStringTokenLength(int pos, byte contextType)
+    private void buildStringToken(byte contextType)
     {
-        int length = 0;
+        int end = 0;
+        int start = 0;
         this.quote = (char) 0;
         if (contextType == T_UNKNOWN)// 当前没有作用域 则视为String字符 一直到json末尾
-            return length = json.length() - pos;//
-            
-        int start = 0;
+        {
+            start = this.pos;
+            this.pos = json.length();
+        }
+        
         for (; this.pos < json.length(); this.pos++)
         {
             this.ch = json.charAt(pos);
@@ -1089,59 +1136,53 @@ public final class JsonLexer
             // 非 单双引号开始 则必须
             if (quote != DB_QUOTE && quote != QUOTE)
             {//
-                if(contextType == T_BRACE_L && ch == BRACE_R)
-                {//当前作用域为 { 且碰到 '}'则结束
-                    this.pos--;//当前结束符不记录到string值
+                // 1. 碰到逗号必须结束
+                if (ch == COMMA || ch == COLON)
+                {
+                    end = pos;// string结束不包含当前字符
+                    this.pos--;// 当前结束符不记录到string值
                     break;
                 }
                 
-                
-            }
-            else
-            {//单双引号开始
-                
-            }
-        }
-        
-        int end = pos;
-        this.value = json.substring(start, end);//需要需要去空格
-        
-        if(this.pos < json.length())
-            this.pos--;//设置结束符为当前字符开始
-        
-      
-        
-        for (; pos < json.length(); pos++ ,length++)
-        {
-            ch = json.charAt(pos);
-            if (quote == (char) 0)
-            {
-                quote = ch;// 记录开始符
-                continue;
-            }
-            
-            // 查找结束符， 非引号字符串结束的字符
-            if (quote != 0 && quote != DB_QUOTE && quote != QUOTE && (ch == COLON || ch == COMMA || ch == BRACE_R || ch == BRACKET_R))
-            {
-                if (contextType == T_BRACKET_L && ch == COLON)// 如果是数组当前是冒号&所属范围是数组，则当前冒号为值
-                    continue;
-                
-                // 当前为冒号上一个token的类型为冒号，则档前为值
-                if (ch == COLON && prevType == JsonLexer.T_COLON)
-                    continue;// {a::sss:sdcsdcs, b:wwww} 其中 sss:sdcsdcs 为值
-                else
-                {// 非引号开始 并且有结束负号&作用域不是-1 throw new JsonException("Json[对象字符串]，要求{}开头和结尾");
-                
-                    return length;// 非引号开始 并且有结束负号&作用域不是-1
+                // 2. 当前作用域为 { 且碰到 '}'则结束
+                if (contextType == T_BRACE_L && ch == BRACE_R)
+                {
+                    end = pos;// string结束不包含当前字符
+                    this.pos--;// 当前结束符不记录到string值
+                    break;
                 }
                 
+                // 3. 当前作用域为 [ 且碰到 ']'则结束
+                if (contextType == T_BRACKET_L && ch == T_BRACKET_R)
+                {// 当前作用域为 [ 且碰到 ']'则结束
+                
+                    end = pos;// string结束不包含当前字符
+                    this.pos--;// 当前结束符不记录到string值
+                    break;
+                }
             }
-            
-            // 查找结束符，引号开头&当前是引号 & 上一个字符不是不是转义符
-            if ((ch == QUOTE || ch == DB_QUOTE) && ch == quote && json.charAt(pos - 1) != '\\')
-                return ++length;// 包含当前字符
+            else
+            {// 单双引号开始
+             // 查找结束符，引号开头&当前是引号 & 上一个字符不是不是转义符
+                if ((ch == QUOTE || ch == DB_QUOTE) && ch == quote && json.charAt(pos - 1) != '\\')
+                {
+                    end = pos+1;
+                    break;
+                }
+            }
         }
-        return length;
+        
+        // 需要需要去空格
+        for (; end > 0; end--)
+        {
+            if (!isWhitespace(json.charAt(end - 1)))
+                break;
+        }
+        if (end == start)
+            return;
+       
+        this.value = json.substring(start, end);
+        
     }
     
     /**

@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -166,15 +167,15 @@ public class JsonMain
     @SuppressWarnings({ "unused" })
     public static void testMy(String json, String jsonString, boolean console) throws Exception
     {
-        int i=0;
-        for(;i<10;i++)
-        {
-            System.out.println(i);
-            if(i == 6)
-                break;
-        }
-        
-        System.out.println("i==="+i);
+//        int i=0;
+//        for(;i<10;i++)
+//        {
+//            System.out.println(i);
+//            if(i == 6)
+//                break;
+//        }
+//        
+//        System.out.println("i==="+i);
         // double l1 = 0, l2 = 0;
         // List<OrdOrder> orders = new ArrayList<OrdOrder>();
         // System.out.println("===========================================================================");
@@ -196,8 +197,8 @@ public class JsonMain
         // if (console)
         // System.out.println(Jsons.toString(orders.get(i)));
         // }
-//        Jsons Jsons = new Jsons(1);
-//        json = Streams.getStringUTF8(new FileInputStream("./json/log.txt"));
+        Jsons Jsons = new Jsons(1);
+        json = Streams.getStringUTF8(new FileInputStream("./json/log.txt"));
 //        String tradeStr = Jsons.getString(json, "trade");
 //        System.out.println(tradeStr);
 ////        System.out.println(Jsons.toStringAddOrUpdate(tradeStr, "oid_str", "1026183937603390000"));
@@ -205,7 +206,10 @@ public class JsonMain
         
 //        System.out.println(Jsons.toStringAddOrUpdate("[]", "sss", 222));
 
-//        System.out.println(map.get(());
+        System.out.println(json);
+//        Map<String, Object> map = Jsons.toMapSV(json, LinkedHashMap.class, Object.class);
+          System.out.println(Jsons.toString(Jsons.toList(json, OrdOrder.class)));
+//        System.out.println(Jsons.toString(map));
 //        TradeAll trade = Jsons.toObject(tradeStr, TradeAll.class);
 //        Jsons.geta
 //        Order[] orderArrStr = Jsons.getArray(tradeStr, "order", Order.class);

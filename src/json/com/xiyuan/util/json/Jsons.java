@@ -121,7 +121,10 @@ public class Jsons implements Serializable
     /**
      * 提供泛型，得到Map< String, V> <br>
      * 注：当resultClass的字段包含多层泛型是时只会解析一层泛型<br>
-     * 举例：field = Map< String, List< Object>>,则解析后为 field= Map< String, String>
+     * 举例：field = Map< String, List< Object>>,则解析后为 field= Map< String, String> <br>
+     * 注意：当V == Object.class 时,不带引号的数据会自动转换基础类型（此方法会影响性能）： <br>
+     * 1）数据为整型时，会根据int取值范围, 自动为 转为 int 或者 long,其他为string型  <br>
+     * 2）数据小数时，都转为 double
      * @param <V>   值的类型
      * @param mapClass          map的类型，例如：HashMap.class,LinkedHashMap.class等
      * @param valueClass        值类型，例如：int.class,String.class等

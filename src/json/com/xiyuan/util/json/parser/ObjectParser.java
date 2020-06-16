@@ -5,6 +5,8 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
+import org.zhiqim.kernel.util.consts.Int;
+
 import com.xiyuan.util.json.JsonException;
 import com.xiyuan.util.json.JsonLexer;
 import com.xiyuan.util.json.JsonParser;
@@ -17,17 +19,17 @@ import com.xiyuan.util.json.JsonParser;
 public final class ObjectParser extends JsonParser implements Serializable
 {
     private static final long serialVersionUID = 1L;
-
+    
     public ObjectParser(JsonLexer lexer, int level)
     {
         super(lexer, level);
     }
-
+    
     public String toString(Object obj)
     {
         if (obj == null)
             return null;
-
+        
         List<Field> fields = getFieldListDeep(obj.getClass());
         // 假设每个字段为6字符+4个引号+1冒号+4(null)，则str默认length = fields.size()*(6+4+1+4)
         // fields.size()*(15)
@@ -43,28 +45,27 @@ public final class ObjectParser extends JsonParser implements Serializable
             }
             catch (Exception e)
             {}
-
+            
             sb.append(JsonLexer.DB_QUOTE).append(name).append(JsonLexer.DB_QUOTE);
             sb.append(JsonLexer.COLON);
             sb.append(value == null ? JsonLexer.NULL : lexer.getParser(value.getClass()).toString(value)).append(JsonLexer.COMMA);
         }
-
+        
         if (sb.length() > 1)
             sb.setLength(sb.length() - 1);
-
+        
         sb.append(JsonLexer.BRACE_R);
         return sb.toString();
     }
-
+    
     @SuppressWarnings("unchecked")
     @Override
     public Object toObject(Class<?> cls)
     {
-
-        if(!lexer.isObj() && level == 1)
-            throw new JsonException("Json数据，必须已 '{' 开头，pos:"+lexer.pos());
-        
         Object obj = null;
+        if (!lexer.isObj() && level == 1)
+            throw new JsonException("Json数据，必须已 '{' 开头，pos:" + lexer.pos());
+        
         try
         {
             obj = newInstance(cls);
@@ -73,7 +74,7 @@ public final class ObjectParser extends JsonParser implements Serializable
         {
             throw new JsonException(e);
         }
-      
+        
         if (obj == null || !lexer.isObj())
             return null;
         boolean isValue = false;
@@ -82,20 +83,20 @@ public final class ObjectParser extends JsonParser implements Serializable
         Map<String, Field> filedMap = getFieldMapDeep(cls);
         int scope = lexer.scope();
         filedMap = getFieldMapDeep(cls);
-
+        
         while (lexer.hasNext())
         {
             lexer.naxtToken();
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
-
+                
             if (lexer.isColon() || lexer.isComma())
             {
                 if (lexer.isColon() && key != null)
-                    isValue = true;//已经找到key 当前是冒号，说明下一个token为值
+                    isValue = true;// 已经找到key 当前是冒号，说明下一个token为值
                 continue;// 冒号或者逗号跳过
             }
-
+            
             if (key != null && isValue)
             {
                 valueType = key.getType();
@@ -113,20 +114,20 @@ public final class ObjectParser extends JsonParser implements Serializable
             
             isValue = false;
         }
-
+        
         if (key != null)
             setValue(obj, key, null);
-
+        
         key = null;
         isValue = false;
         return obj;
     }
-
+    
     private void setValue(Object obj, Field key, Object value)
     {
         if (obj == null)
             return;
-
+        
         try
         {
             if (value != null && value instanceof String && JsonLexer.NULL.equals(value))
