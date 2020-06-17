@@ -2,8 +2,8 @@
 <section name="zhiqim">
 	<section name="ExportJar">
 		<item value="" key="excludeDirs"/>
-		<item value="src/test" key="excludePackages"/>
-		<item value="false" key="isDivided"/>
+		<item value="" key="excludePackages"/>
+		<item value="true" key="isDivided"/>
 		<item value="false" key="isExportAndZipProject"/>
 		<item value="false" key="isExportJavaSource"/>
 		<item value="false" key="isIncludeJavaFile"/>

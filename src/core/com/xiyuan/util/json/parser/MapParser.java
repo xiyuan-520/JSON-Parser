@@ -72,7 +72,7 @@ public final class MapParser extends JsonParser implements Serializable
             
         Map<Object, Object> map = (Map<Object, Object>) newMap(mapClass, keyClass, valueClass, 64);
         Object key = null;
-        Object value = null;
+        
         int scope = lexer.scope();
         while (lexer.hasNext())
         {
@@ -99,22 +99,19 @@ public final class MapParser extends JsonParser implements Serializable
             
             if (key != null && lexer.prevIsColon())
             {
-                value = lexer.getParser(valueClass).toObject(valueClass);
-                if (value == null || JsonLexer.NULL.equals(value))
+                Object value = lexer.getParser(valueClass).toObject(valueClass);
+                if (JsonLexer.NULL.equals(value))
+                    value = null;
+                
+                if (value == null && map instanceof ConcurrentHashMap)
                 {
-                    if (!(map instanceof ConcurrentHashMap))
-                        map.put(key, value);// 必须不是 ConcurrentHashMap 的子类 因为ConcurrentHashMap不允许put null值
-                }
-                else
-                {
-                    if (value instanceof String)
-                        value = JsonLexer.removeStartEndQuotation( JsonLexer.removeEscapeChar((String)value, false));
-                    map.put(key, value);
+                    key = null;
+                    continue;// ConcurrentHashMap 不允许put null值
                 }
                 
+                map.put(key, value);
                 key = null;
             }
-            
         }
         
         return map;
@@ -142,7 +139,7 @@ public final class MapParser extends JsonParser implements Serializable
     private boolean isSupportClass(Class<?> cls)
     {
         if (cls == Map.class || cls == HashMap.class || cls == ConcurrentMap.class || cls == ConcurrentHashMap.class || cls == Hashtable.class || cls == LinkedHashMap.class
-            || cls == TreeMap.class)
+                || cls == TreeMap.class)
             return true;
         
         return false;

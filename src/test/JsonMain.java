@@ -4,13 +4,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
-
-import org.zhiqim.kernel.util.Streams;
 
 import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
@@ -90,7 +87,7 @@ public class JsonMain
                 doBuildType();
                 break;
             default:
-                testMy(json, jsonString, args.length == 0);
+                testMy(json, jsonString, args.length == 0, args.length == 3);
                 break;
         }
         // testGson(json);//145033459
@@ -125,35 +122,35 @@ public class JsonMain
     
     public static void testOther()
     {
-//        Jsons Jsons = new Jsons(0);
-//        long l1 = 0, l2 = 0;
-//        int count = 5;
-//        JsonParser parser = new ObjectParser(null);
-//        l1 = System.nanoTime();
-//        for (int i = 0; i < count; i++)
-//            parser.getFieldMapDeep(OrdOrder.class);
-//        l2 = System.nanoTime();
-//        System.out.println("hashMap:\t" + (l2 - l1) * 1.0 / 1000000);
-//        
-//        l1 = System.nanoTime();
-//        for (int i = 0; i < count; i++)
-//            parser.getFieldMapDeep(OrdOrder.class);
-//        l2 = System.nanoTime();
-//        System.out.println("currentMap:\t" + (l2 - l1) * 1.0 / 1000000);
-//        
-//        System.out.println("==============================");
-//        parser = new ObjectParser(null);
-//        l1 = System.nanoTime();
-//        for (int i = 0; i < count; i++)
-//            parser.getFieldMapDeep(OrdOrder.class);
-//        l2 = System.nanoTime();
-//        System.out.println("hashMap:\t" + (l2 - l1) * 1.0 / 1000000);
-//        
-//        l1 = System.nanoTime();
-//        for (int i = 0; i < count; i++)
-//            parser.getFieldMapDeep(OrdOrder.class);
-//        l2 = System.nanoTime();
-//        System.out.println("currentMap:\t" + (l2 - l1) * 1.0 / 1000000);
+        // Jsons Jsons = new Jsons(0);
+        // long l1 = 0, l2 = 0;
+        // int count = 5;
+        // JsonParser parser = new ObjectParser(null);
+        // l1 = System.nanoTime();
+        // for (int i = 0; i < count; i++)
+        // parser.getFieldMapDeep(OrdOrder.class);
+        // l2 = System.nanoTime();
+        // System.out.println("hashMap:\t" + (l2 - l1) * 1.0 / 1000000);
+        //
+        // l1 = System.nanoTime();
+        // for (int i = 0; i < count; i++)
+        // parser.getFieldMapDeep(OrdOrder.class);
+        // l2 = System.nanoTime();
+        // System.out.println("currentMap:\t" + (l2 - l1) * 1.0 / 1000000);
+        //
+        // System.out.println("==============================");
+        // parser = new ObjectParser(null);
+        // l1 = System.nanoTime();
+        // for (int i = 0; i < count; i++)
+        // parser.getFieldMapDeep(OrdOrder.class);
+        // l2 = System.nanoTime();
+        // System.out.println("hashMap:\t" + (l2 - l1) * 1.0 / 1000000);
+        //
+        // l1 = System.nanoTime();
+        // for (int i = 0; i < count; i++)
+        // parser.getFieldMapDeep(OrdOrder.class);
+        // l2 = System.nanoTime();
+        // System.out.println("currentMap:\t" + (l2 - l1) * 1.0 / 1000000);
     }
     
     public static Object getArr()
@@ -165,77 +162,31 @@ public class JsonMain
     }
     
     @SuppressWarnings({ "unused" })
-    public static void testMy(String json, String jsonString, boolean console) throws Exception
+    public static void testMy(String json, String jsonString, boolean console, boolean flag) throws Exception
     {
-//        int i=0;
-//        for(;i<10;i++)
-//        {
-//            System.out.println(i);
-//            if(i == 6)
-//                break;
-//        }
-//        
-//        System.out.println("i==="+i);
-        // double l1 = 0, l2 = 0;
-        // List<OrdOrder> orders = new ArrayList<OrdOrder>();
-        // System.out.println("===========================================================================");
-        // long a = 0;
-        // l1 = System.currentTimeMillis();
-        // orders = Jsons.toList(json, OrdOrder.class);
-        // l2 = System.currentTimeMillis();
-        // System.out.println("自己代码 共生成 " + (orders != null ? orders.size() : a) + "条数据，共耗时：" + (l2 - l1) / 1000 +
-        // " 秒");
-        // int empty = 0;
-        // int start = 0;
-        // for (int i = 0; i < orders.size(); i++)
-        // {
-        // OrdOrder o = orders.get(i);
-        //
-        // if (i > 1)
-        // break;
-        //
-        // if (console)
-        // System.out.println(Jsons.toString(orders.get(i)));
-        // }
-        Jsons Jsons = new Jsons(1);
-        json = Streams.getStringUTF8(new FileInputStream("./json/log.txt"));
-//        String tradeStr = Jsons.getString(json, "trade");
-//        System.out.println(tradeStr);
-////        System.out.println(Jsons.toStringAddOrUpdate(tradeStr, "oid_str", "1026183937603390000"));
-//        System.out.println(Jsons.toStringAddOrUpdate(tradeStr, "you_xiang", true));
+        Jsons Jsons = new Jsons(flag ? 1 : 0);
+        double l1 = 0, l2 = 0;
+        List<OrdOrder> orders = new ArrayList<OrdOrder>();
+        System.out.println("==========================================================================="+flag);
+        long a = 0;
+        l1 = System.currentTimeMillis();
+        orders = Jsons.toList(json, OrdOrder.class);
+        l2 = System.currentTimeMillis();
+        System.out.println("自己代码 共生成 " + (orders != null ? orders.size() : a) + "条数据，共耗时：" + (l2 - l1) / 1000 + " 秒");
+        int empty = 0;
+        int start = 0;
+        for (int i = 0; i < orders.size(); i++)
+        {
+            OrdOrder o = orders.get(i);
+            
+            if (i > 1)
+                break;
+            
+            if (console)
+                System.out.println(Jsons.toString(orders.get(i)));
+        }
         
-//        System.out.println(Jsons.toStringAddOrUpdate("[]", "sss", 222));
-
-        System.out.println(json);
-//        Map<String, Object> map = Jsons.toMapSV(json, LinkedHashMap.class, Object.class);
-          System.out.println(Jsons.toString(Jsons.toList(json, OrdOrder.class)));
-//        System.out.println(Jsons.toString(map));
-//        TradeAll trade = Jsons.toObject(tradeStr, TradeAll.class);
-//        Jsons.geta
-//        Order[] orderArrStr = Jsons.getArray(tradeStr, "order", Order.class);
-//        System.out.println(Jsons.toString(orderArrStr));
-//        Order[] orderArr = Jsons.toObject(orderArrStr, Order[].class);
-//        List<Order> orders = new ArrayList<Order>();
-//        for (Order order : orderArr)
-//            orders.add(order);
-//        trade.setOrders(orders);
-////        Map<String, String> map = Jsons.toMapSS(responseText, HashMap.class);
-//        System.out.println(responseText);
-//        
-//        Order order = Jsons.toObject(responseText, Order.class);
-//        System.out.println(Jsons.toString(order));
-//      syso  String ordersstr = map.get("orders");
-//        String orderArrStr = Jsons.getArray(ordersstr, "order");
-//        map.remove("orders");
-//        tradeStr = Jsons.toString(map);
-//        
-//        TradeAll trade = Jsons.toObject(tradeStr, TradeAll.class);
-//        
-//        Order[] orderArr = Jsons.toObject(orderArrStr, Order[].class);
-//        List<Order> orders = new ArrayList<Order>();
-//        for (Order order : orderArr)
-//            orders.add(order);
-//        trade.setOrders(orders);
+        // trade.setOrders(orders);
     }
     
     public static void testMyGenericJson(String json, String jsonString, boolean console) throws Exception
@@ -377,7 +328,9 @@ public class JsonMain
         System.out.println("===========================================================================");
         l1 = System.currentTimeMillis();
         Gson gson = new Gson();
-        orders = gson.fromJson(json, new TypeToken<List<OrdOrder>>() {}.getType());
+        orders = gson.fromJson(json, new TypeToken<List<OrdOrder>>()
+        {
+        }.getType());
         l2 = System.currentTimeMillis();
         System.out.println("谷歌代码 共生成 " + (orders.size()) + "条数据，共耗时：" + (l2 - l1) / 1000 + " 秒");
     }

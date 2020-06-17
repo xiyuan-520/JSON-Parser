@@ -5,8 +5,6 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-import org.zhiqim.kernel.util.consts.Int;
-
 import com.xiyuan.util.json.JsonException;
 import com.xiyuan.util.json.JsonLexer;
 import com.xiyuan.util.json.JsonParser;
@@ -77,8 +75,8 @@ public final class ObjectParser extends JsonParser implements Serializable
         
         if (obj == null || !lexer.isObj())
             return null;
-        boolean isValue = false;
-        Field key = null;
+        String key = null;
+        Field field = null;
         Class<?> valueType;
         Map<String, Field> filedMap = getFieldMapDeep(cls);
         int scope = lexer.scope();
@@ -89,37 +87,44 @@ public final class ObjectParser extends JsonParser implements Serializable
             lexer.naxtToken();
             if (lexer.scope() < scope || lexer.isEOF())
                 break;// 碰到结束符
-                
-            if (lexer.isColon() || lexer.isComma())
-            {
-                if (lexer.isColon() && key != null)
-                    isValue = true;// 已经找到key 当前是冒号，说明下一个token为值
+            
+            key = JsonLexer.removeStartEndQuotation(lexer.value());
+            //查找字段
+            if (lexer.isString() && field == null && !lexer.prevIsColon())
+            {//当前为string 类型 && 上一个不是冒号
+               
+                field = filedMap.get(key);
+                continue;
+            }
+            
+            if (field != null && !lexer.prevIsColon())
+                continue;// 找到key值位开始
+            
+            if ((lexer.isColon() || lexer.isComma()) && field != null)
+            {// 找到key了但是 当前为 冒号 或者逗号,，视为没找到
+                field = null;
                 continue;// 冒号或者逗号跳过
             }
             
-            if (key != null && isValue)
+            if (field != null && lexer.prevIsColon())
             {
-                valueType = key.getType();
+                valueType = field.getType();
                 JsonParser parser = lexer.getParser(valueType);
                 if (parser == lexer.ListParser())
-                    setValue(obj, key, lexer.ListParser().toObject(valueType, JsonLexer.getClass(key.getGenericType(), 0)));
+                    setValue(obj, field, lexer.ListParser().toObject(valueType, JsonLexer.getClass(field.getGenericType(), 0)));
                 else if (parser == lexer.MapParser())//
-                    setValue(obj, key, lexer.MapParser().toObject(valueType, JsonLexer.getClass(key.getGenericType(), 0), JsonLexer.getClass(key.getGenericType(), 1)));
+                    setValue(obj, field, lexer.MapParser().toObject(valueType, JsonLexer.getClass(field.getGenericType(), 0), JsonLexer.getClass(field.getGenericType(), 1)));
                 else
-                    setValue(obj, key, parser.toObject(valueType));
-                key = null;
+                    setValue(obj, field, parser.toObject(valueType));
+                field = null;
             }
-            else
-                key = filedMap.get(JsonLexer.removeStartEndQuotation(lexer.value()));
             
-            isValue = false;
+           
         }
-        
-        if (key != null)
-            setValue(obj, key, null);
-        
-        key = null;
-        isValue = false;
+//        不设置因为默认就是 null
+//        if (field != null)
+//            setValue(obj, field, null);
+     
         return obj;
     }
     
@@ -136,7 +141,8 @@ public final class ObjectParser extends JsonParser implements Serializable
         }
         catch (Exception e)
         {
-            throw new IllegalArgumentException(e);
+            if (level == 1)// 严格检查的情况
+                throw new JsonException(e);
         }
     }
 }

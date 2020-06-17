@@ -115,7 +115,7 @@ public class Jsons implements Serializable
         if (lexer.hasNext())
             lexer.naxtToken();
         
-        return (Map<K, V>) ((MapParser) lexer.MapParser()).toObject(mapClass, keyClass, valueClass);
+        return (Map<K, V>) ((MapParser) lexer.MapParser()).toObject(mapClass, keyClass, valueClass == Object.class ? String.class : valueClass);
     }
     
     /**
@@ -202,64 +202,59 @@ public class Jsons implements Serializable
     public String remove(String json, String key)
     {
         
-        int start = 0;
-        boolean isValue = false, findKey = false;
-        String k = null;
-        int scope = 0;
+        boolean isPreComma = false;
+        String startStr = null;
         JsonLexer lexer = new JsonLexer(json, this.level);
+        byte context = 0;
         while (lexer.hasNext())
         {
             lexer.naxtToken();
-            if (!findKey && !lexer.isString())
+            if (startStr == null && !lexer.isString())
                 continue;// 不是String 型的key
                 
-            if (lexer.isString() && !findKey && key.equals(JsonLexer.removeStartEndQuotation(lexer.value())))
+            if (lexer.isString() && startStr == null && key.equals(JsonLexer.removeStartEndQuotation(lexer.value())))
             {
-                findKey = true;// 找到key
-                start = lexer.pos();
-                k = lexer.value();
-                scope = lexer.scope();
+                startStr = trim(json.substring(0, (lexer.pos() - lexer.getLength()) + 1));// 包含上一个符号;
+                isPreComma = lexer.prevIsComma();
+                context = lexer.getContextType();
                 continue;
             }
             
-            if (!isValue && findKey && !lexer.isColon())
-            {// 找到key 但是下一个token不是 冒号 & 没有标记value开始
-                findKey = false;
-                continue;
-            }
-            
-            if (!isValue && lexer.isColon())
-            {// 没有标记开始 但是当前是冒号表示 下一个是值
-                isValue = true;
-                continue;
-            }
-            
-            if (isValue && findKey)
-            { // start是最后的引号值
-            
-                lexer.BaseParser().toObject(String.class);// 设置value值得结束位置
-                if (lexer.hasNext())
-                    lexer.naxtToken();
+            if (startStr != null && lexer.prevIsColon())
+            {// 找到字段并且 上一个是 冒号,并且相同作用域
+             // 1) 标准情况json 为{a:'cdcd',b:22}, 当前是string值
+                if (!lexer.hasNext())// 避免数据突然截止情况，这里只是比较 json 是否有下一个非空白字符
+                    throw new JsonException("Json 字符没找到，'}'或者']'结尾，pos:" + lexer.pos());
                 
-                int end = lexer.pos();// 设置value结束位置,当前位置可能是 子object的结束符
-                if (lexer.scope() == scope)
-                    end++;// 相同深度的与key 相同深度value 时 指向下一个token
-                    
-                start = start + 1 - k.length();
-                
-                if (end >= json.length())
-                    return json.substring(0, start);
-                else
+                int end = lexer.pos() + 1;// 截止字符串索引
+                if(lexer.isArr() || lexer.isObj())
                 {
-                    String startStr = JsonLexer.trim(json.substring(0, start));
-                    String endStr = JsonLexer.trim(json.substring(end));
-                    if ((endStr.charAt(0) == JsonLexer.BRACE_R || endStr.charAt(0) == JsonLexer.BRACKET_R) && startStr.endsWith(","))
-                        startStr = startStr.substring(0, startStr.length() - 1);
-                    return startStr + endStr;
+                    lexer.BaseParser().toObject(String.class);//跳转值数组或者对象结束
+                    end = lexer.pos() + 1;// 截止字符串索引
+                    if (!lexer.hasNext())// 避免数据突然截止情况，这里只是比较 json 是否有下一个非空白字符
+                        throw new JsonException("Json 字符没找到，'}'或者']'结尾，pos:" + lexer.pos());
                 }
+                
+                // 检查下一个token 是否为逗号
+                lexer.naxtToken();
+                if (lexer.isComma())
+                {
+                    end = lexer.pos() + 1;// 截止字符串索引
+                    if (!lexer.hasNext())// 避免数据突然截止情况，这里只是比较 json 是否有下一个非空白字符
+                        throw new JsonException("Json 字符没找到，'}'或者']'结尾，pos:" + lexer.pos());
+                }
+                
+                if (isPreComma && (lexer.isEndArr() || lexer.isEndObj()))
+                {// 键的上一个是逗号 当前 是对象或者数组结束符
+                    if (startStr.charAt(startStr.length() - 1) == JsonLexer.COMMA)
+                        startStr = startStr.substring(0, startStr.length() - 1);
+                }
+                
+                return startStr + json.substring(end);
             }
         }
         
+        // 找不到对应字段
         return json;
     }
     
@@ -276,7 +271,9 @@ public class Jsons implements Serializable
      */
     public String toStringAddOrUpdate(String json, String key, Object value)
     {
-        boolean isValue = false, findKey = false;
+        boolean findKey = false;
+        if (key == null)
+            return json;
         
         JsonLexer lexer = new JsonLexer(json, this.level);
         while (lexer.hasNext())
@@ -285,47 +282,42 @@ public class Jsons implements Serializable
             if (!findKey && !lexer.isString())
                 continue;// 不是String 型的key
                 
-            // int scope = 0;
             if (lexer.isString() && !findKey && key.equals(JsonLexer.removeStartEndQuotation(lexer.value())))
             {
                 findKey = true;// 找到key
-                // scope = lexer.scope();
                 continue;
             }
             
-            if (!isValue && findKey && !lexer.isColon())
-            {// 找到key 但是下一个token不是 冒号 & 没有标记value开始
-                findKey = false;
-                continue;
-            }
+            if (findKey && lexer.prevIsColon())
+            {// 找到字段并且 上一个是 冒号
             
-            int start = 0;
-            if (!isValue && lexer.isColon())
-            {// 没有标记开始 但是当前是冒号表示 下一个是值
-                isValue = true;
-                start = lexer.pos() + 1;
-                continue;
-            }
-            
-            if (isValue && findKey)
-            { // start是最后的引号值
-                lexer.BaseParser().toObject(String.class);// 设置value值得结束位置
-                if (lexer.hasNext())
-                    lexer.naxtToken();
+                String newValue = value == null ? JsonLexer.NULL : lexer.getParser(value.getClass()).toString(value);
                 
-                int end = lexer.pos();// 设置value结束位置,当前位置可能是 子object的结束符
-                // if (lexer.scope() == scope)
-                // end++;// 相同深度的与key 相同深度value 时 指向下一个token
-                
-                String val = value == null ? JsonLexer.NULL : lexer.getParser(value.getClass()).toString(value);
-                String startStr = json.substring(0, start);
-                String temp = startStr + val;
-                if (end >= json.length())
-                    return temp;
-                else
-                    return temp + JsonLexer.trim(json.substring(end));
+                int start = lexer.pos() - (lexer.value() == null ? 0 : lexer.getLength());
+                String startStr = json.substring(0, start + 1);// 包含上一个符号
+                // 1) 标准情况json 为{a:'cdcd',b:22}, 当前是string值
+                if (lexer.isString())
+                {
+                    if (!lexer.hasNext())// 避免数据突然截止情况，这里只是比较 json 是否有下一个非空白字符
+                        throw new JsonException("Json 字符没找到，'}'或者']'结尾，pos:" + lexer.pos());
+                    
+                    String endstr = json.substring(lexer.pos() + 1);
+                    return startStr + newValue + endstr;
+                }
+                else if (lexer.isArr() || lexer.isObj())
+                {// 2) 标准情况json 为{a:'cdcd',b:22}, 当前是对象或者数组值
+                    lexer.BaseParser().toObject(String.class);// 将索引移动到对象最后
+                    if (!lexer.hasNext())// 避免数据突然截止情况，这里只是比较 json 是否有下一个非空白字符
+                        throw new JsonException("Json 字符没找到，'}'或者']'结尾，pos:" + lexer.pos());
+                    
+                    String endstr = json.substring(lexer.pos() + 1);
+                    return startStr + newValue + endstr;
+                }
             }
         }
+        
+        if (findKey)// 找到字段，但是修改失败
+            return json;
         
         // 找不到字段则插入
         boolean findScope = false;

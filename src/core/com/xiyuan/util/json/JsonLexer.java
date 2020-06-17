@@ -668,7 +668,7 @@ public final class JsonLexer
      */
     public static String removeEscapeChar(String str, boolean isJsonString)
     {
-        if(isJsonString)
+        if (isJsonString)
             return str;
         
         if (str == null)
@@ -730,6 +730,7 @@ public final class JsonLexer
         
         return strb.toString();
     }
+    
     /**
      * 验证是否为空白
      * 
@@ -817,11 +818,9 @@ public final class JsonLexer
     private byte prevType = T_UNKNOWN;// 当前上一个token作用域类型
     private char ch;// 循环的当前字符
     private String value = NULL;
-    
+    private int length = 0;// 实际token值得长度
     private int scopeIndex = -1;
     private char quote = 0;// 字符串开始的引号值
-    
-    // private int length = 0;//当前token 字符串长度
     
     public JsonLexer(String input, int level)
     {
@@ -951,12 +950,12 @@ public final class JsonLexer
     {
         if (json == null)
             return false;
-        
         return this.curType != T_EOF && nextPos() < json.length();
     }
     
     private int nextPos()
     {
+        
         return this.pos + 1;
     }
     
@@ -988,6 +987,7 @@ public final class JsonLexer
     public JsonLexer naxtToken()
     {
         this.value = NULL;
+        this.length = 0;
         if (!hasNext())
         {
             this.setCurrentType(T_EOF);
@@ -1020,12 +1020,23 @@ public final class JsonLexer
             {// { 开头 上一个token类型必须为,空，‘{’，‘[’,‘,’,‘:’
             
                 this.value = String.valueOf(ch);
+                this.length = this.value.length();// 记录token长度
                 this.setContextType(T_BRACE_L);// 设置作用域类型
                 this.setCurrentType(T_BRACE_L);// 设置当前类型
                 break;
             }
             case BRACE_R:
             {
+                if (prevIsColon())
+                {// 如果上一个是冒号 当前为 }
+                    if (BaseParser().level == 1)// 如果是严格检查
+                        throw new JsonException("Json 对象数据 ':' 后必须有值，pos:" + (pos - 1));
+                    
+                    //容错处理
+                    setCurrentType(T_STRING);
+                    this.pos--;
+                    return this;
+                }
                 
                 if (contextType == T_BRACKET_L)// 判断当前作用域为'[' 但接数符 为'}'
                     throw new JsonException("Json 数组字符串必须以 ']' 结束，pos:" + pos);
@@ -1033,6 +1044,7 @@ public final class JsonLexer
                 removeScope();// 设置结束当前context
                 contextType = getContextType();
                 this.value = String.valueOf(ch);
+                this.length = this.value.length();// 记录token长度
                 setCurrentType(T_BRACE_R);// 设置当前为结束 } 类型
                 break;
             }
@@ -1076,6 +1088,7 @@ public final class JsonLexer
                 {
                     this.setCurrentType(T_COMMA);// 设置当前为‘，’类型
                     this.value = String.valueOf(ch);
+                    this.length = this.value.length();// 记录token长度
                 }
                 break;
             }
@@ -1086,6 +1099,7 @@ public final class JsonLexer
                 {// 上一个token是String 或者 ]、}， 则当前是冒号,说明这一段数据是已 键值对形式数据，支持数组，对象类型做key
                     this.setCurrentType(T_COLON);// 设置当前为‘：’类型
                     this.value = String.valueOf(ch);
+                    this.length = this.value.length();// 记录token长度
                 }
                 else
                 {// 否则当string值处理
@@ -1136,7 +1150,7 @@ public final class JsonLexer
             // 非 单双引号开始 则必须
             if (quote != DB_QUOTE && quote != QUOTE)
             {//
-                // 1. 碰到逗号必须结束
+             // 1. 碰到逗号必须结束
                 if (ch == COMMA || ch == COLON)
                 {
                     end = pos;// string结束不包含当前字符
@@ -1153,7 +1167,7 @@ public final class JsonLexer
                 }
                 
                 // 3. 当前作用域为 [ 且碰到 ']'则结束
-                if (contextType == T_BRACKET_L && ch == T_BRACKET_R)
+                if (contextType == T_BRACKET_L && ch == BRACKET_R)
                 {// 当前作用域为 [ 且碰到 ']'则结束
                 
                     end = pos;// string结束不包含当前字符
@@ -1166,7 +1180,7 @@ public final class JsonLexer
              // 查找结束符，引号开头&当前是引号 & 上一个字符不是不是转义符
                 if ((ch == QUOTE || ch == DB_QUOTE) && ch == quote && json.charAt(pos - 1) != '\\')
                 {
-                    end = pos+1;
+                    end = pos + 1;
                     break;
                 }
             }
@@ -1180,9 +1194,9 @@ public final class JsonLexer
         }
         if (end == start)
             return;
-       
-        this.value = json.substring(start, end);
         
+        this.value = json.substring(start, end);
+        this.length = this.value.length();// 记录token长度
     }
     
     /**
@@ -1359,6 +1373,15 @@ public final class JsonLexer
     public boolean prevIsColon()
     {
         return this.prevType == T_COLON;
+    }
+    
+    /**
+     * 获取token内容长度
+     * @return
+     */
+    public int getLength()
+    {
+        return this.length;
     }
     
     /**

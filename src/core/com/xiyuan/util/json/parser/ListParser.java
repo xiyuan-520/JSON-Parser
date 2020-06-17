@@ -45,18 +45,18 @@ public final class ListParser extends JsonParser
         return toObject(cls, String.class);
     }
     
-    public Object toObject(Class<?> genericClass, Class<?> resultClazz)
+    public <T> Object toObject(Class<?> genericClass, Class<T> resultClazz)
     {
         if (!isSupportClass(genericClass))
             return null;// 不支持的类型
         if(!lexer.isArr() && level == 1)
             throw new JsonException("Json数据，必须已 '[' 开头，pos:" + lexer.pos());
         
-        if (!lexer.isArr())
-            return null;
-        
         if (resultClazz.isPrimitive())// 如果是基本类型 则使用基本类型的包装类
             resultClazz = JsonLexer.getPrimitiveBase(resultClazz);
+        
+        if (!lexer.isArr())
+            return new ArrayList<T>();
         
         Object[] arr = (Object[]) lexer.ArrayParser().toObject(Array.newInstance(resultClazz, 0).getClass());
         Collection<Object> list = newList(genericClass, arr == null ? 0 : arr.length);

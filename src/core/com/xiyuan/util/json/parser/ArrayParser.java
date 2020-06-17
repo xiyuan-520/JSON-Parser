@@ -95,34 +95,39 @@ public final class ArrayParser extends JsonParser implements Serializable
     {
         if (obj == null)
             return null;
-        String first = null;
+        
         Object[] arr = toArray(obj);
-        if (arr.length > 0)
+       
+        boolean addSize = false;// 
+        StringBuilder sb = new StringBuilder(arr.length).append(JsonLexer.BRACKET_L);
+        for (int i = 0; i < arr.length; i++)
         {
-            Object o = arr[0];
-            first = lexer.getParser(o.getClass()).toString(o);
-        }
-        
-        if (first == null)
-            return JsonLexer.EMPTY_ARR;
-        
-        StringBuilder sb = new StringBuilder(first.length() * arr.length).append(JsonLexer.BRACKET_L);
-        sb.append(first);
-        for (int i = 1; i < arr.length; i++)
-        {
+            if(i!=0)
             sb.append(JsonLexer.COMMA);
             Object o = arr[i];
-            sb.append(o == null ? JsonLexer.NULL : lexer.getParser(o.getClass()).toString(o));
+            String json = o == null ? JsonLexer.NULL : lexer.getParser(o.getClass()).toString(o);
+            if(!addSize && o != null)
+            {
+                addSize = true;
+                sb.ensureCapacity(arr.length*json.length());//扩容
+            }
+            sb.append(json);
         }
         sb.append(JsonLexer.BRACKET_R);
         return sb.toString();
     }
     
+    /**
+     * cls 数组类型
+     */
     @Override
     public Object toObject(Class<?> cls)
     {
         if (!lexer.isArr() && level == 1)
             throw new JsonException("Json数据，必须已 '[' 开头，pos:" + lexer.pos());
+        
+        if (!lexer.isArr())
+            return Array.newInstance(cls.getComponentType(), 0);
         
         switch (cls.getName().hashCode())
         {
