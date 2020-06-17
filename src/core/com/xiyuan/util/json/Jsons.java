@@ -205,7 +205,6 @@ public class Jsons implements Serializable
         boolean isPreComma = false;
         String startStr = null;
         JsonLexer lexer = new JsonLexer(json, this.level);
-        byte context = 0;
         while (lexer.hasNext())
         {
             lexer.naxtToken();
@@ -216,7 +215,6 @@ public class Jsons implements Serializable
             {
                 startStr = trim(json.substring(0, (lexer.pos() - lexer.getLength()) + 1));// 包含上一个符号;
                 isPreComma = lexer.prevIsComma();
-                context = lexer.getContextType();
                 continue;
             }
             

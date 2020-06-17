@@ -42,8 +42,6 @@ import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicLongArray;
 
-import javax.swing.JEditorPane;
-
 import com.xiyuan.util.json.parser.ArrayParser;
 import com.xiyuan.util.json.parser.BaseParser;
 import com.xiyuan.util.json.parser.DateParser;
